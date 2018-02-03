@@ -1,0 +1,27 @@
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+
+def scalaMajorVersion = "2.12"
+def scalaVersion = "${scalaMajorVersion}.4"
+def akkaVersion = "2.5.9"
+
+subprojects {
+    apply plugin: 'scala'
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        compile "org.scala-lang:scala-library:${scalaVersion}"
+        compile "org.scala-lang:scala-compiler:${scalaVersion}"
+
+        compile "com.typesafe.akka:akka-cluster_${scalaMajorVersion}:${akkaVersion}"
+
+        testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+    }
+}
