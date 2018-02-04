@@ -1,6 +1,9 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "https://dl.bintray.com/ngbinh/maven/"
+        }
     }
     dependencies {
         classpath 'org.github.ngbinh.scalastyle:gradle-scalastyle-plugin_2.12:1.0.0'
@@ -9,7 +12,11 @@ buildscript {
 
 allprojects {
     repositories {
+        maven {
+            url "https://dl.bintray.com/ngbinh/maven/"
+        }
         jcenter()
+
     }
 }
 
