@@ -7,6 +7,8 @@ buildscript {
     }
     dependencies {
         classpath 'org.github.ngbinh.scalastyle:gradle-scalastyle-plugin_2.12:1.0.0'
+        classpath "net.saliman:gradle-cobertura-plugin:2.5.4"
+        classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
     }
 }
 
@@ -27,6 +29,8 @@ def akkaVersion = "2.5.9"
 subprojects {
     apply plugin: 'scala'
     apply plugin: 'scalaStyle'
+    apply plugin: 'net.saliman.cobertura'
+    apply plugin: 'com.github.kt3k.coveralls'
 
     dependencies {
         compile "org.scala-lang:scala-library:${scalaVersion}"
@@ -44,4 +48,6 @@ subprojects {
         source = "src/main/scala"
         testSource = "src/test/scala"
     }
+
+    cobertura.coverageFormats = ['html', 'xml']
 }

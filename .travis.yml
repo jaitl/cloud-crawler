@@ -4,4 +4,4 @@ jdk:
 sudo: false
 install: true
 script:
-    - ./gradlew clean test scalaStyle
+    - ./gradlew clean test scalaStyle cobertura coveralls
