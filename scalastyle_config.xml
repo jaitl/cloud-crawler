@@ -120,4 +120,5 @@
         </parameters>
     </check>
     <check level="warning" class="org.scalastyle.scalariform.ImportGroupingChecker" enabled="true"></check>
+    <check enabled="true" class="org.scalastyle.scalariform.BlockImportChecker" level="warning"/>
 </scalastyle>
