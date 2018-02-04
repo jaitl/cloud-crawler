@@ -4,8 +4,11 @@
 *.iws
 .idea/
 
-#Gradle
+# Gradle
 .gradletasknamecache
 .gradle/
 build/
 bin/
+
+# MacOSg
+.DS_Store

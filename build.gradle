@@ -18,7 +18,6 @@ allprojects {
             url "https://dl.bintray.com/ngbinh/maven/"
         }
         jcenter()
-
     }
 }
 
@@ -33,10 +32,17 @@ subprojects {
     apply plugin: 'com.github.kt3k.coveralls'
 
     dependencies {
+        // scala
         compile "org.scala-lang:scala-library:${scalaVersion}"
         compile "org.scala-lang:scala-compiler:${scalaVersion}"
 
+        // logger
+        compile "ch.qos.logback:logback-classic:1.2.3"
+        compile "com.typesafe.scala-logging:scala-logging_${scalaMajorVersion}:3.7.2"
+
+        // akka
         compile "com.typesafe.akka:akka-cluster_${scalaMajorVersion}:${akkaVersion}"
+        compile "com.typesafe.akka:akka-slf4j_${scalaMajorVersion}:${akkaVersion}"
 
         testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
     }
@@ -49,5 +55,42 @@ subprojects {
         testSource = "src/test/scala"
     }
 
+    tasks.withType(JavaExec) {
+        systemProperties System.properties
+    }
+
     cobertura.coverageFormats = ['html', 'xml']
+}
+
+project(":seed") {
+    apply plugin: 'application'
+
+    mainClassName = 'com.github.jaitl.cloud.seed.App'
+
+    dependencies {
+        compile project(":configs")
+    }
+}
+
+
+project(":master") {
+    apply plugin: 'application'
+
+    mainClassName = "com.github.jaitl.cloud.master.App"
+
+    dependencies {
+        compile project(":base-worker")
+        compile project(":configs")
+    }
+}
+
+project(":simple-worker") {
+    apply plugin: 'application'
+
+    mainClassName = "com.github.jaitl.cloud.simple.worker.App"
+
+    dependencies {
+        compile project(":base-worker")
+        compile project(":configs")
+    }
 }
