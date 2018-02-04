@@ -40,6 +40,7 @@ subprojects {
     scalaStyle {
         configLocation = "$rootDir/scalastyle_config.xml"
         includeTestSourceDirectory = true
+        failOnWarning = true
         source = "src/main/scala"
         testSource = "src/test/scala"
     }
