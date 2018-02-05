@@ -1,7 +1,5 @@
-include 'configs'
 include 'master'
 include 'base-worker'
 include 'simple-worker'
-include 'seed'
 
 rootProject.name = 'cloud-crawler'
