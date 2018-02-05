@@ -62,17 +62,6 @@ subprojects {
     cobertura.coverageFormats = ['html', 'xml']
 }
 
-project(":seed") {
-    apply plugin: 'application'
-
-    mainClassName = 'com.github.jaitl.cloud.seed.App'
-
-    dependencies {
-        compile project(":configs")
-    }
-}
-
-
 project(":master") {
     apply plugin: 'application'
 
@@ -80,7 +69,15 @@ project(":master") {
 
     dependencies {
         compile project(":base-worker")
-        compile project(":configs")
+
+        compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
+        compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
+    }
+}
+
+project(":base-worker") {
+    dependencies {
+        compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
     }
 }
 
@@ -91,6 +88,6 @@ project(":simple-worker") {
 
     dependencies {
         compile project(":base-worker")
-        compile project(":configs")
+
     }
 }
