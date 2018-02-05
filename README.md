@@ -4,17 +4,13 @@
 Distributed highly loaded system for data crawling.
 
 # Run
-1. Run seed nodes:
+1. Run two master node:
     ```
-    ./gradlew :seed:run -DSEED_PORT=2551
-    ./gradlew :seed:run -DSEED_PORT=2552
+    ./gradlew :master:run -DMASTER_PORT=2551
+    ./gradlew :master:run -DMASTER_PORT=2521
     ```
-2. Run master node:
+2. Run worker nodes:
     ```
-    ./gradlew :master:run -DMASTER_PORT=2561
-    ```
-3. Run worker nodes:
-    ```
-    ./gradlew :simple-worker:run -DWORKER_PORT=2571
-    ./gradlew :simple-worker:run -DWORKER_PORT=2572
+    ./gradlew :simple-worker:run -DWORKER_PORT=2561
+    ./gradlew :simple-worker:run -DWORKER_PORT=2562
     ```
