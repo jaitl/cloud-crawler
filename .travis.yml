@@ -4,6 +4,6 @@ jdk:
 sudo: false
 install: true
 script:
-    - ./gradlew clean test scalaStyle cobertura coveralls
+    - ./gradlew clean test scalaStyle
 after_success:
     - ./gradlew cobertura coveralls
