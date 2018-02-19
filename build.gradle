@@ -68,7 +68,7 @@ project(":master") {
     mainClassName = "com.github.jaitl.cloud.master.App"
 
     dependencies {
-        compile project(":base-worker")
+        compile project(":common-models")
 
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
@@ -77,6 +77,8 @@ project(":master") {
 
 project(":base-worker") {
     dependencies {
+        compile project(":common-models")
+
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
     }
 }
@@ -88,6 +90,5 @@ project(":simple-worker") {
 
     dependencies {
         compile project(":base-worker")
-
     }
 }

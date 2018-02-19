@@ -1,5 +1,6 @@
 include 'master'
 include 'base-worker'
+include 'common-models'
 include 'simple-worker'
 
 rootProject.name = 'cloud-crawler'
