@@ -6,7 +6,7 @@ import com.github.jaitl.cloud.base.save.SaveParsedProvider
 import com.github.jaitl.cloud.base.save.SaveRawProvider
 
 class PipelineBuilder {
-  def withTaskName(piplineName: String): PipelineBuilder = ???
+  def withTaskType(taskType: String): PipelineBuilder = ???
 
   def withCrawlerCreator(crawlerCreator: BaseCrawlerCreator): PipelineBuilder = ???
 

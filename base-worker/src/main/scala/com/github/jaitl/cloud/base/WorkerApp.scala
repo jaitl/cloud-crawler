@@ -8,7 +8,7 @@ import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonProxySettings
 import com.github.jaitl.cloud.base.exception.NoPipelinesException
 import com.github.jaitl.cloud.base.pipeline.Pipeline
-import com.github.jaitl.cloud.common.models.QueueTaskBalancerSingletonMessages
+import com.github.jaitl.cloud.common.models.request.RequestTasksBatch
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
@@ -43,7 +43,7 @@ object WorkerApp extends StrictLogging {
         settings = ClusterSingletonProxySettings(system).withRole("master")),
       name = "queueTaskBalancerProxy")
 
-    queueTaskBalancer ! QueueTaskBalancerSingletonMessages.GetWork(UUID.randomUUID(), Seq("type1", "type2"))
-    queueTaskBalancer ! QueueTaskBalancerSingletonMessages.GetWork(UUID.randomUUID(), Seq("type1", "type2"))
+    queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), Seq("type1", "type2"))
+    queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), Seq("type1", "type2"))
   }
 }

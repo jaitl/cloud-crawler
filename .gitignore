@@ -9,6 +9,7 @@
 .gradle/
 build/
 bin/
+out/
 
 # MacOSg
 .DS_Store

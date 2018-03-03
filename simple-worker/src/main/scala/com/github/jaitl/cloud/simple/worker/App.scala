@@ -12,7 +12,7 @@ object App extends StrictLogging {
   def main(args: Array[String]): Unit = {
 
     val habrPipeline = PipelineBuilder()
-      .withTaskName("HabrCrawler")
+      .withTaskType("HabrTasks")
       .withCrawlerCreator(HabrCrawlerCreator)
       .withParser(new HabrParser)
       .withSaveResultProvider(new MongoSaveParsedProvider("HabrResult"))
