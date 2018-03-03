@@ -6,7 +6,7 @@ import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
-import com.github.jaitl.cloud.base.QueueTaskBalancerSingletonMessages.GetWork
+import com.github.jaitl.cloud.common.models.QueueTaskBalancerSingletonMessages.GetWork
 
 import scala.util.Random
 

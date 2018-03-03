@@ -22,8 +22,8 @@ object WorkerApp extends StrictLogging {
 
   def run(): Unit = {
     piplines match {
-      case None | Some(pip) if pip.isEmpty => throw new NoPipelinesException
-      case Some(pip) => logger.info(s"count piplines: ${pip.length}")
+      case Some(pip) if pip.nonEmpty => logger.info(s"count piplines: ${pip.length}")
+      case _ => throw new NoPipelinesException
     }
 
     val config = ConfigFactory.load()
