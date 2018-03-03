@@ -1,4 +1,4 @@
-package com.github.jaitl.cloud.base
+package com.github.jaitl.cloud.common.models
 
 import java.util.UUID
 
