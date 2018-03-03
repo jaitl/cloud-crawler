@@ -7,7 +7,7 @@ import akka.cluster.sharding.ClusterSharding
 import akka.cluster.sharding.ClusterShardingSettings
 import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonManagerSettings
-import com.github.jaitl.cloud.base.QueueTaskBalancerSingletonMessages
+import com.github.jaitl.cloud.common.models.QueueTaskBalancerSingletonMessages
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
