@@ -16,8 +16,10 @@ object WorkerApp extends StrictLogging {
 
   private var piplines: Option[Seq[Pipeline]] = None
 
-  def addPiplines(piplines: Seq[Pipeline]): Unit = {
+  def addPiplines(piplines: Seq[Pipeline]): this.type = {
     this.piplines = Some(piplines)
+
+    this
   }
 
   def run(): Unit = {
