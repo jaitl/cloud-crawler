@@ -22,7 +22,7 @@ object App extends StrictLogging {
     val pipelines = habrPipeline :: Nil
 
     WorkerApp
-      .addPiplines(pipelines)
+      .addPipelines(pipelines)
       .run()
   }
 }
