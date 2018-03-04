@@ -72,6 +72,7 @@ project(":master") {
 
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
+        compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
     }
 }
 
@@ -80,6 +81,7 @@ project(":base-worker") {
         compile project(":common-models")
 
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
+        compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
     }
 }
 

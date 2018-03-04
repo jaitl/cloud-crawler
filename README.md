@@ -7,7 +7,7 @@ Distributed highly loaded system for data crawling.
 1. Run two master node:
     ```
     ./gradlew :master:run -DMASTER_PORT=2551
-    ./gradlew :master:run -DMASTER_PORT=2521
+    ./gradlew :master:run -DMASTER_PORT=2552
     ```
 2. Run worker nodes:
     ```
