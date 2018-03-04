@@ -25,7 +25,7 @@ object App extends StrictLogging {
     )
 
     val taskProvider = new MongoQueueTaskProvider("mongodb://localhost:27017", "cloud_master", "CrawlTasks")
-    val batchSize = QueueTaskControllerConfig(2) // scalastyle:ignore
+    val batchSize = QueueTaskControllerConfig() // scalastyle:ignore
 
     val system = ActorSystem("cloudCrawlerSystem", config)
 
