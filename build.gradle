@@ -60,6 +60,10 @@ subprojects {
     }
 
     cobertura.coverageFormats = ['html', 'xml']
+
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.additionalParameters = ["-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"]
+    }
 }
 
 project(":master") {
