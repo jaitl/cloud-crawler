@@ -36,17 +36,17 @@ class QueueTaskController(
   override def receive: Receive = waitRequest orElse processResult
 
   private def waitRequest: Receive = {
-    case RequestTask(requestId, taskType, requester) =>
+    case RequestTask(requestId, taskType, batchSize, requester) =>
       log.debug(s"RequestTask: $requestId, $taskType")
 
       context.become(processingRequest)
 
       val batchResult = for {
-        tasks <- queueProvider.pullBatch(taskType, config.batchSize)
+        tasks <- queueProvider.pullBatch(taskType, batchSize)
         _ <- if (tasks.nonEmpty) {
           queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskInProgress)
         } else {
-          Future.successful()
+          Future.successful(Unit)
         }
       } yield QueueBatchSuccess(requestId, taskType, requester, tasks)
 
@@ -91,13 +91,13 @@ class QueueTaskController(
       context.unbecome()
       unstashAll()
 
-    case RequestTask(_, _, _) => stash()
+    case RequestTask(_, _, _, _) => stash()
   }
 }
 
 object QueueTaskController {
 
-  case class RequestTask(requestId: UUID, taskType: String, requester: ActorRef)
+  case class RequestTask(requestId: UUID, taskType: String, batchSize: Int,requester: ActorRef)
 
   case class QueueBatchSuccess(requestId: UUID, taskType: String, requester: ActorRef, tasks: Seq[Task])
 
@@ -115,19 +115,19 @@ object QueueTaskController {
   def name(): String = "queueTaskController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg@RequestTask(requestId, _, _) => (requestId.toString, msg)
+    case msg@RequestTask(requestId, _, _, _) => (requestId.toString, msg)
     case msg@MarkAsProcessed(requestId, _, _, _) => (requestId.toString, msg)
     case msg@MarkAsFailed(requestId, _, _, _) => (requestId.toString, msg)
     case msg@AddNewTasks(requestId, _, _, _) => (requestId.toString, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
-    case RequestTask(_, taskType, _) => taskType
+    case RequestTask(_, taskType, _, _) => taskType
     case MarkAsProcessed(_, taskType, _, _) => taskType
     case MarkAsFailed(_, taskType, _, _) => taskType
     case AddNewTasks(_, taskType, _, _) => taskType
   }
 
-  case class QueueTaskControllerConfig(batchSize: Int)
+  case class QueueTaskControllerConfig()
 
 }
