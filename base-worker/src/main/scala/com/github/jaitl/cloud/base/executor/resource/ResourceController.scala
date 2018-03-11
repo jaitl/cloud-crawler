@@ -5,20 +5,20 @@ import java.util.UUID
 import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import com.github.jaitl.cloud.base.creator.OneArgumentActorCreator
+import com.github.jaitl.cloud.base.http.HttpRequestExecutor
 import com.github.jaitl.cloud.base.pipeline.Proxy
 import com.github.jaitl.cloud.base.pipeline.ResourceType
 import com.github.jaitl.cloud.base.pipeline.Tor
-import com.github.jaitl.cloud.common.models.resource.Resource
 
 private[base] object ResourceController {
 
   case class RequestResource(requestId: UUID, taskType: String)
 
-  case class SuccessRequestResource(requestId: UUID, resource: Resource)
+  case class SuccessRequestResource(requestId: UUID, requestExecutor: HttpRequestExecutor)
 
   case class NoResourcesAvailable(requestId: UUID)
 
-  case class ReturnResource(requestId: UUID, taskType: String, resource: Resource)
+  case class ReturnResource(requestId: UUID, taskType: String, requestExecutor: HttpRequestExecutor)
 
 }
 
