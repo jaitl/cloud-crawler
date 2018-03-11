@@ -1,4 +1,4 @@
 package com.github.jaitl.cloud.base.crawler
 
-case class CrawlTask(task: String, taskType: String)
+case class CrawlTask(taskData: String, taskType: String)
 

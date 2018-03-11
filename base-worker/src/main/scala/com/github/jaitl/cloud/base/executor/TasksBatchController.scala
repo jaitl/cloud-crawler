@@ -53,12 +53,12 @@ private class TasksBatchController(
   }
 
   private def resourceRequestHandler: Receive = {
-    case SuccessRequestResource(requestId, resource) =>
+    case SuccessRequestResource(requestId, requestExecutor) =>
       if (taskQueue.nonEmpty) {
         val task = taskQueue.dequeue()
-        crawlExecutor ! Crawl(requestId, task, resource, pipeline)
+        crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
       } else {
-        resourceController ! ReturnResource(requestId, batch.taskType, resource)
+        resourceController ! ReturnResource(requestId, batch.taskType, requestExecutor)
         scheduleTimeout()
       }
 
@@ -67,12 +67,11 @@ private class TasksBatchController(
   }
 
   private def crawlResultHandler: Receive = {
-    case CrawlSuccessResult(requestId, task, resource, crawlResult, parseResult) =>
-      resourceController ! ReturnResource(requestId, batch.taskType, resource)
+    case CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult) =>
+      resourceController ! ReturnResource(requestId, batch.taskType, requestExecutor)
 
-    case CrawlFailureResult(requestId, task, resource, throwable) =>
-      resourceController ! ReturnResource(requestId, batch.taskType, resource)
-
+    case CrawlFailureResult(requestId, task, requestExecutor, throwable) =>
+      resourceController ! ReturnResource(requestId, batch.taskType, requestExecutor)
   }
 
   private def scheduleTimeout(): Unit = ???
