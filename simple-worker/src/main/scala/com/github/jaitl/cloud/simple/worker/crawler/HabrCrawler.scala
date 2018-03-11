@@ -6,10 +6,14 @@ import com.github.jaitl.cloud.base.crawler.CrawlResult
 import com.github.jaitl.cloud.base.crawler.CrawlTask
 import com.github.jaitl.cloud.base.http.HttpRequestExecutor
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class HabrCrawler extends BaseCrawler {
-  override def crawl(task: CrawlTask, httpRequestExecutor: HttpRequestExecutor): Future[CrawlResult] = ???
+  override def crawl(
+    task: CrawlTask,
+    httpRequestExecutor: HttpRequestExecutor
+  )(implicit executionContext: ExecutionContext): Future[CrawlResult] = ???
 }
 
 object HabrCrawlerCreator extends BaseCrawlerCreator {
