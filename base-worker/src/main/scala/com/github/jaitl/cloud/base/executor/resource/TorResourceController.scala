@@ -7,14 +7,14 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import com.github.jaitl.cloud.base.executor.resource.ResourceController.RequestResource
 
-private class ProxyResourceController extends Actor with ActorLogging{
+private class TorResourceController extends Actor with ActorLogging{
   override def receive: Receive = {
     case RequestResource(requestId, taskType) =>
 
   }
 }
 
-private object ProxyResourceController {
-  def props: Props = Props(new ProxyResourceController)
-  def name: String = s"proxyResourceController"
+private object TorResourceController {
+  def props: Props = Props(new TorResourceController)
+  def name: String = s"torResourceController"
 }
