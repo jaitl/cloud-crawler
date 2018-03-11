@@ -86,6 +86,7 @@ project(":base-worker") {
 
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
+        compile "org.apache.httpcomponents:httpasyncclient:4.1.3"
     }
 }
 
