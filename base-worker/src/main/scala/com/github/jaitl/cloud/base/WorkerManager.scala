@@ -7,23 +7,29 @@ import akka.actor.ActorRef
 import akka.actor.Props
 import com.github.jaitl.cloud.base.WorkerManager.RequestBatch
 import com.github.jaitl.cloud.base.config.WorkerConfig
+import com.github.jaitl.cloud.base.creator.TwoArgumentActorCreator
 import com.github.jaitl.cloud.base.executor.TasksBatchController
 import com.github.jaitl.cloud.base.pipeline.Pipeline
 import com.github.jaitl.cloud.common.models.request.FailureTasksBatchRequest
 import com.github.jaitl.cloud.common.models.request.NoTasks
 import com.github.jaitl.cloud.common.models.request.RequestTasksBatch
 import com.github.jaitl.cloud.common.models.request.SuccessTasksBatchRequest
+import com.github.jaitl.cloud.common.models.request.TaskTypeWithBatchSize
+import com.github.jaitl.cloud.common.models.task.TasksBatch
 
 private class WorkerManager(
   queueTaskBalancer: ActorRef,
-  crawlExecutorRouter: ActorRef,
-  pipelines: Seq[Pipeline],
-  config: WorkerConfig
+  pipelines: Map[String, Pipeline],
+  config: WorkerConfig,
+  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline]
 ) extends Actor {
+  private val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
+
   override def receive: Receive = {
+
     case RequestBatch =>
       if (context.children.size < config.parallelBatches) {
-        queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), Seq("type1", "type2"), 2)
+        queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), taskTypes)
       } else {
         scheduleTimeout()
       }
@@ -31,10 +37,8 @@ private class WorkerManager(
     case SuccessTasksBatchRequest(requestId, taskType, tasksBatch) =>
       self ! RequestBatch
 
-      context.actorOf(
-        TasksBatchController.props(tasksBatch, crawlExecutorRouter, pipelines.head),
-        TasksBatchController.name(tasksBatch.id)
-      )
+      val tasksBatchController = tasksBatchControllerCreator.create(this.context, tasksBatch, pipelines(taskType))
+      tasksBatchController ! TasksBatchController.ExecuteTask
 
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
       scheduleTimeout()
@@ -52,11 +56,11 @@ private object WorkerManager {
 
   def props(
     queueTaskBalancer: ActorRef,
-    crawlExecutorRouter: ActorRef,
-    pipelines: Seq[Pipeline],
-    config: WorkerConfig
+    pipelines: Map[String, Pipeline],
+    config: WorkerConfig,
+    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline]
   ): Props =
-    Props(new WorkerManager(queueTaskBalancer, crawlExecutorRouter, pipelines, config))
+    Props(new WorkerManager(queueTaskBalancer, pipelines, config, tasksBatchControllerCreator))
 
   def name(): String = "workerManager"
 }

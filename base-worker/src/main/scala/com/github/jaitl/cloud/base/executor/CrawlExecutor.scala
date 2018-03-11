@@ -33,5 +33,5 @@ private[base] object CrawlExecutor {
   case class CrawlFailureResult(requestId: UUID, task: Task, resource: Resource, throwable: Throwable)
 
   def props(): Props = Props(new CrawlExecutor)
-
+  def name(): String = "crawlExecutor"
 }
