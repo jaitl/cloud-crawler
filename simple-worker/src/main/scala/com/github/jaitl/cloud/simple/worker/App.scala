@@ -27,6 +27,7 @@ object App extends StrictLogging {
 
     WorkerApp
       .addPipelines(pipelines)
+      .parallelBatches(2)
       .run()
   }
 }

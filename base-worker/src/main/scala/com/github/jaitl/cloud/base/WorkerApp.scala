@@ -17,10 +17,15 @@ import com.typesafe.scalalogging.StrictLogging
 object WorkerApp extends StrictLogging {
 
   private var pipelines: Option[Map[String, Pipeline]] = None
-  private var parallelBatch: Option[Int] = None
+  private var parallelBatches: Option[Int] = Some(2)
 
   def addPipelines(pipelines: Seq[Pipeline]): this.type = {
     this.pipelines = Some(pipelines.map(pipe => pipe.taskType -> pipe).toMap)
+    this
+  }
+
+  def parallelBatches(limitParallelBatches: Int): this.type = {
+    parallelBatches = Some(limitParallelBatches)
     this
   }
 
@@ -30,7 +35,7 @@ object WorkerApp extends StrictLogging {
       case _ => throw new NoPipelinesException
     }
 
-    val config = ConfigFactory.load()
+    val config = ConfigFactory.load("worker.conf")
 
     logger.info(
       "Start worker on {}:{}",
@@ -60,7 +65,8 @@ object WorkerApp extends StrictLogging {
       crawlExecutorCreator = crawlExecutorCreator
     )
 
-    val workerConfig = WorkerConfig(parallelBatch.getOrElse(2))
+    // TODO read from application.conf
+    val workerConfig = WorkerConfig(parallelBatches.get)
 
     val workerManager = system.actorOf(
       WorkerManager.props(queueTaskBalancer, pipelines.get, workerConfig, tasksBatchControllerCreator),
