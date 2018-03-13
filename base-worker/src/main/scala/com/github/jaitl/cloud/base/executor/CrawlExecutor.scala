@@ -14,7 +14,6 @@ import com.github.jaitl.cloud.base.executor.TasksBatchController.QueuedTask
 import com.github.jaitl.cloud.base.http.HttpRequestExecutor
 import com.github.jaitl.cloud.base.parser.ParseResult
 import com.github.jaitl.cloud.base.pipeline.Pipeline
-import com.github.jaitl.cloud.common.models.task.Task
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future

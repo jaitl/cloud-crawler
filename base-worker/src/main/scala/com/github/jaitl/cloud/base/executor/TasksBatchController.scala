@@ -45,13 +45,10 @@ private class TasksBatchController(
   pipeline: Pipeline,
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  queueTaskBalancer: ActorRef,
-  saveScheduler: Scheduler,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends Actor with ActorLogging with Stash {
-  private var totalCrawledCount = 0
-  private var saveAttemptsCount: Int = 0
+  private var currentActiveCrawlTask: Int = 0
 
   private val taskQueue: mutable.Queue[QueuedTask] = mutable.Queue.apply(batch.tasks.map(QueuedTask(_, 0)): _*)
 
@@ -68,7 +65,6 @@ private class TasksBatchController(
     crawlExecutor = crawlExecutorCreator.create(this.context)
 
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
-    saveScheduler.schedule(config.saveInterval, self, SaveResults(forced = false))
   }
 
   override def receive: Receive = Seq(waitRequest, waitSave, resourceRequestHandler, crawlResultHandler)
@@ -82,11 +78,6 @@ private class TasksBatchController(
         // TODO save if complete
         self ! SaveResults(forced = false)
       }
-  }
-
-  private def waitSave: Receive = {
-    case SaveResults(forced) =>
-      context.become(saveResultHandler)
   }
 
   private def resourceRequestHandler: Receive = {
@@ -131,44 +122,11 @@ private class TasksBatchController(
       }
   }
 
-  private def saveResultHandler: Receive = {
-    case SaveSuccess =>
-      context.unbecome()
-      unstashAll()
-
-      // TODO send results to queueTaskBalancer
-      successTasks = mutable.ArraySeq.empty[SuccessCrawledTask]
-      failedTasks = mutable.ArraySeq.empty[FailedTask]
-
-      // TODO wait until all crawl task is completed
-      if (taskQueue.isEmpty) {
-        if (saveAttemptsCount > config.finalMaxSaveAttempts || batch.tasks.length == totalCrawledCount) {
-          context.stop(self)
-        } else {
-          saveAttemptsCount += saveAttemptsCount + 1
-        }
-      } else {
-        saveAttemptsCount = 0
-      }
-
-    case SaveFailed(t) =>
-      log.error(t, "Error during save results")
-      context.unbecome()
-      unstashAll()
-
-    case _: Any => stash()
-  }
 }
 
 private[base] object TasksBatchController {
 
   case object ExecuteTask
-
-  case class SaveResults(forced: Boolean)
-
-  case object SaveSuccess
-
-  case class SaveFailed(t: Throwable)
 
   case class QueuedTask(task: Task, attempt: Int, t: Seq[Throwable] = Seq.empty)
 
