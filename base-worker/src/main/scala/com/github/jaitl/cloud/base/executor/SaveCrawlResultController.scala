@@ -1,5 +1,7 @@
 package com.github.jaitl.cloud.base.executor
 
+import java.util.UUID
+
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
@@ -17,6 +19,7 @@ import com.github.jaitl.cloud.base.executor.SaveCrawlResultController.SuccessCra
 import com.github.jaitl.cloud.base.parser.ParseResult
 import com.github.jaitl.cloud.base.pipeline.Pipeline
 import com.github.jaitl.cloud.base.scheduler.Scheduler
+import com.github.jaitl.cloud.common.models.result.TasksBatchProcessResult
 import com.github.jaitl.cloud.common.models.task.Task
 
 import scala.collection.mutable
@@ -25,6 +28,7 @@ import scala.concurrent.duration.FiniteDuration
 class SaveCrawlResultController(
   pipeline: Pipeline,
   queueTaskBalancer: ActorRef,
+  tasksBatchController: ActorRef,
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
 ) extends Actor with ActorLogging with Stash {
@@ -57,35 +61,44 @@ class SaveCrawlResultController(
 
   private def waitSave: Receive = {
     case AutoSaveResults =>
-
+      context.become(saveResultHandler)
     case SaveResults =>
       context.become(saveResultHandler)
   }
 
   private def saveResultHandler: Receive = {
-    case SuccessSavedResults =>
+    case success @ SuccessSavedResults =>
       context.unbecome()
       unstashAll()
 
-      // TODO send results to queueTaskBalancer
+      val successIds = successTasks.map(_.task.id)
+      val failureIds = failedTasks.map(_.task.id)
+      val newTasks = successTasks.flatMap(_.parseResult.flatMap(_.newCrawlTasks.toSeq)).groupBy(_._1)
+        .map {
+          case (taskType, vals) =>
+            val newTasks = vals.flatMap(_._2).distinct
+            (taskType, newTasks)
+        }
+
+      queueTaskBalancer ! TasksBatchProcessResult(
+        requestId = UUID.randomUUID(),
+        taskType = pipeline.taskType,
+        successIds = successIds,
+        failureIds = failureIds,
+        newTasks = newTasks
+      )
+
       successTasks = mutable.ArraySeq.empty[SuccessCrawledTask]
       failedTasks = mutable.ArraySeq.empty[FailedTask]
 
-      // TODO wait until all crawl task is completed
-      if (taskQueue.isEmpty) {
-        if (saveAttemptsCount > config.finalMaxSaveAttempts || batch.tasks.length == totalCrawledCount) {
-          context.stop(self)
-        } else {
-          saveAttemptsCount += saveAttemptsCount + 1
-        }
-      } else {
-        saveAttemptsCount = 0
-      }
+      tasksBatchController ! success
 
-    case FailureSaveResults(t) =>
+    case failure @ FailureSaveResults(t) =>
       log.error(t, "Error during save results")
       context.unbecome()
       unstashAll()
+
+      tasksBatchController ! failure
 
     case _: Any => stash()
   }
