@@ -45,7 +45,7 @@ private class TasksBatchController(
   pipeline: Pipeline,
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: ActorCreator,
+  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline, ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends Actor with ActorLogging with Stash {
@@ -62,7 +62,7 @@ private class TasksBatchController(
     super.preStart()
 
     resourceController = resourceControllerCreator.create(this.context, pipeline.resourceType)
-    saveCrawlResultController = saveCrawlResultCreator.create(this.context)
+    saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self)
     crawlExecutor = crawlExecutorCreator.create(this.context)
 
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
@@ -148,7 +148,7 @@ private[base] object TasksBatchController {
     pipeline: Pipeline,
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
-    saveCrawlResultCreator: ActorCreator,
+    saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline, ActorRef],
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
   ): Props =
@@ -173,7 +173,7 @@ private[base] object TasksBatchController {
 class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: ActorCreator,
+  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline, ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends TwoArgumentActorCreator[TasksBatch, Pipeline] {
