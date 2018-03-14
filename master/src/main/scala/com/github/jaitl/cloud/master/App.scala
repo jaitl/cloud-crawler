@@ -16,7 +16,7 @@ import com.typesafe.scalalogging.StrictLogging
 
 object App extends StrictLogging {
   def main(args: Array[String]): Unit = {
-    val config = ConfigFactory.load()
+    val config = ConfigFactory.load("master.conf")
 
     logger.info(
       "Start master on {}:{}",
@@ -24,7 +24,10 @@ object App extends StrictLogging {
       config.getConfig("akka.remote.netty.tcp").getString("port")
     )
 
+    // TODO configurable
     val taskProvider = new MongoQueueTaskProvider("mongodb://localhost:27017", "cloud_master", "CrawlTasks")
+
+    // TODO read from application.conf
     val batchSize = QueueTaskControllerConfig() // scalastyle:ignore
 
     val system = ActorSystem("cloudCrawlerSystem", config)

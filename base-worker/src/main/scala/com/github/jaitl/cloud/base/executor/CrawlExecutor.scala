@@ -10,10 +10,10 @@ import com.github.jaitl.cloud.base.crawler.CrawlTask
 import com.github.jaitl.cloud.base.executor.CrawlExecutor.Crawl
 import com.github.jaitl.cloud.base.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.cloud.base.executor.CrawlExecutor.CrawlSuccessResult
+import com.github.jaitl.cloud.base.executor.TasksBatchController.QueuedTask
 import com.github.jaitl.cloud.base.http.HttpRequestExecutor
 import com.github.jaitl.cloud.base.parser.ParseResult
 import com.github.jaitl.cloud.base.pipeline.Pipeline
-import com.github.jaitl.cloud.common.models.task.Task
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -30,8 +30,10 @@ private class CrawlExecutor extends Actor {
 
       tryCrawler match {
         case Success(crawler) =>
+          val taskData = task.task.taskData
+          val taskType = task.task.taskType
           val crawlResult = for {
-            crawlResult <- Try(crawler.crawl(CrawlTask(task.taskData, task.taskType), requestExecutor)) match {
+            crawlResult <- Try(crawler.crawl(CrawlTask(taskData, taskType), requestExecutor)) match {
               case Success(res) => res
               case Failure(ex) => Future.failed(ex)
             }
@@ -44,6 +46,8 @@ private class CrawlExecutor extends Actor {
 
           recoveredResult pipeTo sender()
 
+        // TODO kill recoveredResult by timeout
+
         case Failure(ex) =>
           sender() ! CrawlFailureResult(requestId, task, requestExecutor, ex)
       }
@@ -52,11 +56,11 @@ private class CrawlExecutor extends Actor {
 
 private[base] object CrawlExecutor {
 
-  case class Crawl(requestId: UUID, task: Task, requestExecutor: HttpRequestExecutor, pipeline: Pipeline)
+  case class Crawl(requestId: UUID, task: QueuedTask, requestExecutor: HttpRequestExecutor, pipeline: Pipeline)
 
   case class CrawlSuccessResult(
     requestId: UUID,
-    task: Task,
+    task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
     crawlResult: CrawlResult,
     parseResult: Option[ParseResult]
@@ -64,7 +68,7 @@ private[base] object CrawlExecutor {
 
   case class CrawlFailureResult(
     requestId: UUID,
-    task: Task,
+    task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
     throwable: Throwable
   )
