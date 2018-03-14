@@ -18,8 +18,11 @@ private[base] object ResourceController {
 
   case class NoResourcesAvailable(requestId: UUID)
 
-  case class ReturnResource(requestId: UUID, taskType: String, requestExecutor: HttpRequestExecutor)
+  case class NoFreeResource(requestId: UUID)
 
+
+  case class ReturnSuccessResource(requestId: UUID, taskType: String, requestExecutor: HttpRequestExecutor)
+  case class ReturnFailedResource(requestId: UUID, taskType: String, requestExecutor: HttpRequestExecutor, t: Throwable)
 }
 
 private[base] class ResourceControllerCreator extends OneArgumentActorCreator[ResourceType] {

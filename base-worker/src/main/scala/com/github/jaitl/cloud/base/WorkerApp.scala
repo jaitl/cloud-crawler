@@ -8,19 +8,30 @@ import com.github.jaitl.cloud.base.config.WorkerConfig
 import com.github.jaitl.cloud.base.creator.PropsActorCreator
 import com.github.jaitl.cloud.base.exception.NoPipelinesException
 import com.github.jaitl.cloud.base.executor.CrawlExecutor
+import com.github.jaitl.cloud.base.executor.SaveCrawlResultController.SaveCrawlResultControllerConfig
+import com.github.jaitl.cloud.base.executor.SaveCrawlResultControllerCreator
+import com.github.jaitl.cloud.base.executor.TasksBatchController.TasksBatchControllerConfig
 import com.github.jaitl.cloud.base.executor.TasksBatchControllerCreator
 import com.github.jaitl.cloud.base.executor.resource.ResourceControllerCreator
 import com.github.jaitl.cloud.base.pipeline.Pipeline
+import com.github.jaitl.cloud.base.scheduler.AkkaScheduler
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
+// scalastyle:off
 object WorkerApp extends StrictLogging {
+  import scala.concurrent.duration._
 
   private var pipelines: Option[Map[String, Pipeline]] = None
-  private var parallelBatch: Option[Int] = None
+  private var parallelBatches: Option[Int] = Some(2)
 
   def addPipelines(pipelines: Seq[Pipeline]): this.type = {
     this.pipelines = Some(pipelines.map(pipe => pipe.taskType -> pipe).toMap)
+    this
+  }
+
+  def parallelBatches(limitParallelBatches: Int): this.type = {
+    parallelBatches = Some(limitParallelBatches)
     this
   }
 
@@ -30,7 +41,7 @@ object WorkerApp extends StrictLogging {
       case _ => throw new NoPipelinesException
     }
 
-    val config = ConfigFactory.load()
+    val config = ConfigFactory.load("worker.conf")
 
     logger.info(
       "Start worker on {}:{}",
@@ -55,12 +66,22 @@ object WorkerApp extends StrictLogging {
 
     val resourceControllerCreator = new ResourceControllerCreator()
 
-    val tasksBatchControllerCreator = new TasksBatchControllerCreator(
-      resourceControllerCreator = resourceControllerCreator,
-      crawlExecutorCreator = crawlExecutorCreator
+    val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
+      queueTaskBalancer = queueTaskBalancer,
+      saveScheduler = new AkkaScheduler(system),
+      config = SaveCrawlResultControllerConfig(5.minutes) // TODO read from config file
     )
 
-    val workerConfig = WorkerConfig(parallelBatch.getOrElse(2))
+    val tasksBatchControllerCreator = new TasksBatchControllerCreator(
+      resourceControllerCreator = resourceControllerCreator,
+      crawlExecutorCreator = crawlExecutorCreator,
+      saveCrawlResultCreator = saveCrawlResultControllerCreator,
+      executeScheduler = new AkkaScheduler(system),
+      config = TasksBatchControllerConfig(10, 30.seconds) // TODO read from config file
+    )
+
+    // TODO read from application.conf
+    val workerConfig = WorkerConfig(parallelBatches.get)
 
     val workerManager = system.actorOf(
       WorkerManager.props(queueTaskBalancer, pipelines.get, workerConfig, tasksBatchControllerCreator),
