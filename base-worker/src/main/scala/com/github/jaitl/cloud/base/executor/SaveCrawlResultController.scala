@@ -5,8 +5,12 @@ import java.util.UUID
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
+import akka.actor.ActorRefFactory
+import akka.actor.Props
 import akka.actor.Stash
 import com.github.jaitl.cloud.base.crawler.CrawlResult
+import com.github.jaitl.cloud.base.creator.OneArgumentActorCreator
+import com.github.jaitl.cloud.base.creator.TwoArgumentActorCreator
 import com.github.jaitl.cloud.base.executor.SaveCrawlResultController.AddResults
 import com.github.jaitl.cloud.base.executor.SaveCrawlResultController.AutoSaveResults
 import com.github.jaitl.cloud.base.executor.SaveCrawlResultController.FailedTask
@@ -32,9 +36,6 @@ class SaveCrawlResultController(
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
 ) extends Actor with ActorLogging with Stash {
-  private var totalCrawledCount = 0
-  private var saveAttemptsCount: Int = 0
-
   private var successTasks: mutable.Seq[SuccessCrawledTask] = mutable.ArraySeq.empty[SuccessCrawledTask]
   private var failedTasks: mutable.Seq[FailedTask] = mutable.ArraySeq.empty[FailedTask]
 
@@ -73,7 +74,8 @@ class SaveCrawlResultController(
 
       val successIds = successTasks.map(_.task.id)
       val failureIds = failedTasks.map(_.task.id)
-      val newTasks = successTasks.flatMap(_.parseResult.flatMap(_.newCrawlTasks.toSeq)).groupBy(_._1)
+      val newCrawlTasks = successTasks.flatMap(_.parseResult.map(_.newCrawlTasks.toSeq).getOrElse(Seq.empty))
+      val newTasks = newCrawlTasks.groupBy(_._1)
         .map {
           case (taskType, vals) =>
             val newTasks = vals.flatMap(_._2).distinct
@@ -120,4 +122,39 @@ object SaveCrawlResultController {
   case class FailedTask(task: Task, t: Seq[Throwable]) extends CrawlTaskResult
 
   case class SaveCrawlResultControllerConfig(saveInterval: FiniteDuration)
+
+  def props(
+    pipeline: Pipeline,
+    queueTaskBalancer: ActorRef,
+    tasksBatchController: ActorRef,
+    saveScheduler: Scheduler,
+    config: SaveCrawlResultControllerConfig
+  ): Props = Props(new SaveCrawlResultController(
+    pipeline = pipeline,
+    queueTaskBalancer = queueTaskBalancer,
+    tasksBatchController = tasksBatchController,
+    saveScheduler = saveScheduler,
+    config = config
+  ))
+
+  def name(): String = "saveCrawlResultController"
+}
+
+class SaveCrawlResultControllerCreator(
+  queueTaskBalancer: ActorRef,
+  saveScheduler: Scheduler,
+  config: SaveCrawlResultControllerConfig
+) extends TwoArgumentActorCreator[Pipeline, ActorRef] {
+  override def create(factory: ActorRefFactory, firstArg: Pipeline, secondArg: ActorRef): ActorRef = {
+    factory.actorOf(
+      props = SaveCrawlResultController.props(
+        pipeline = firstArg,
+        queueTaskBalancer = queueTaskBalancer,
+        tasksBatchController = secondArg,
+        saveScheduler = saveScheduler,
+        config = config
+      ),
+      name = SaveCrawlResultController.name()
+    )
+  }
 }

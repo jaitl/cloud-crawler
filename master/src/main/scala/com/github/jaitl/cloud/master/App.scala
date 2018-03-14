@@ -24,6 +24,7 @@ object App extends StrictLogging {
       config.getConfig("akka.remote.netty.tcp").getString("port")
     )
 
+    // TODO configurable
     val taskProvider = new MongoQueueTaskProvider("mongodb://localhost:27017", "cloud_master", "CrawlTasks")
 
     // TODO read from application.conf

@@ -30,7 +30,8 @@ private class CrawlExecutor extends Actor {
 
       tryCrawler match {
         case Success(crawler) =>
-          val (taskData, taskType) = task.task
+          val taskData = task.task.taskData
+          val taskType = task.task.taskType
           val crawlResult = for {
             crawlResult <- Try(crawler.crawl(CrawlTask(taskData, taskType), requestExecutor)) match {
               case Success(res) => res
@@ -45,8 +46,7 @@ private class CrawlExecutor extends Actor {
 
           recoveredResult pipeTo sender()
 
-
-          // TODO kill recoveredResult by timeout
+        // TODO kill recoveredResult by timeout
 
         case Failure(ex) =>
           sender() ! CrawlFailureResult(requestId, task, requestExecutor, ex)
