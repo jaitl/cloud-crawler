@@ -13,7 +13,10 @@ import com.github.jaitl.crawler.base.worker.WorkerManager.EmptyTaskTypeList
 
 import scala.util.Random
 
-class QueueTaskBalancer(queueTaskTypedManager: ActorRef) extends Actor with ActorLogging {
+class QueueTaskBalancer(
+  queueTaskQueueReqCtrl: ActorRef,
+  queueTaskQueueResCtrl: ActorRef
+) extends Actor with ActorLogging {
   override def receive: Receive = {
     case RequestTasksBatch(requestId, taskTypes) if taskTypes.nonEmpty =>
       log.debug(s"RequestTasksBatch, requestId: $requestId, types: $taskTypes")
@@ -22,24 +25,24 @@ class QueueTaskBalancer(queueTaskTypedManager: ActorRef) extends Actor with Acto
         sender() ! EmptyTaskTypeList
       } else if (taskTypes.lengthCompare(1) == 0) {
         val task = taskTypes.head
-        queueTaskTypedManager ! QueueTaskController.RequestTask(requestId, task.taskType, task.batchSize, sender())
+        queueTaskQueueReqCtrl ! QueueTaskRequestController.RequestTask(requestId, task.taskType, task.batchSize, sender())
       } else {
         val task = Random.shuffle(taskTypes.toIndexedSeq).head
-        queueTaskTypedManager ! QueueTaskController.RequestTask(requestId, task.taskType, task.batchSize, sender())
+        queueTaskQueueReqCtrl ! QueueTaskRequestController.RequestTask(requestId, task.taskType, task.batchSize, sender())
       }
 
     case TasksBatchProcessResult(requestId, taskType, successIds, failureIds, newTasks) =>
       log.debug(s"TasksBatchProcessResult, requestId: $requestId, types: $taskType")
 
       if (successIds.nonEmpty) {
-        queueTaskTypedManager ! QueueTaskController.MarkAsProcessed(requestId, taskType, successIds, sender())
+        queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsProcessed(requestId, taskType, successIds, sender())
       }
       if (failureIds.nonEmpty) {
-        queueTaskTypedManager ! QueueTaskController.MarkAsFailed(requestId, taskType, failureIds, sender())
+        queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsFailed(requestId, taskType, failureIds, sender())
       }
       if (newTasks.nonEmpty) {
         newTasks.foreach { case (newTaskType, newTasksData) =>
-          queueTaskTypedManager ! QueueTaskController.AddNewTasks(requestId, newTaskType, newTasksData, sender())
+          queueTaskQueueResCtrl ! QueueTaskResultController.AddNewTasks(requestId, newTaskType, newTasksData, sender())
         }
       }
   }
@@ -58,7 +61,8 @@ object QueueTaskBalancer {
     newTasks: Map[String, Seq[String]]
   )
 
-  def props(queueTaskTypedManager: ActorRef): Props = Props(new QueueTaskBalancer(queueTaskTypedManager))
+  def props(queueTaskQueueReqCtrl: ActorRef, queueTaskQueueResCtrl: ActorRef): Props =
+    Props(new QueueTaskBalancer(queueTaskQueueReqCtrl, queueTaskQueueResCtrl))
 
   def name(): String = "queueTaskBalancer"
 
