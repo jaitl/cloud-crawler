@@ -6,4 +6,4 @@ install: true
 script:
     - ./gradlew clean test scalaStyle
 after_success:
-    - ./gradlew cobertura coveralls
+    - ./gradlew jacocoTestReport coveralls

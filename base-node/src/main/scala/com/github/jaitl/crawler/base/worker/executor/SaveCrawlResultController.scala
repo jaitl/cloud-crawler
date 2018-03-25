@@ -8,8 +8,8 @@ import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import akka.actor.Props
 import akka.actor.Stash
-import com.github.jaitl.crawler.base.common.result.TasksBatchProcessResult
-import com.github.jaitl.crawler.base.common.task.Task
+import com.github.jaitl.crawler.base.master.queue.QueueTaskBalancer.TasksBatchProcessResult
+import com.github.jaitl.crawler.base.models.task.Task
 import com.github.jaitl.crawler.base.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.base.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.base.worker.executor.SaveCrawlResultController.AddResults

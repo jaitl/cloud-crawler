@@ -8,8 +8,8 @@ import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import akka.actor.Props
 import akka.actor.Stash
-import com.github.jaitl.crawler.base.common.task.Task
-import com.github.jaitl.crawler.base.common.task.TasksBatch
+import com.github.jaitl.crawler.base.models.task.Task
+import com.github.jaitl.crawler.base.models.task.TasksBatch
 import com.github.jaitl.crawler.base.worker.creator.ActorCreator
 import com.github.jaitl.crawler.base.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.base.worker.creator.TwoArgumentActorCreator

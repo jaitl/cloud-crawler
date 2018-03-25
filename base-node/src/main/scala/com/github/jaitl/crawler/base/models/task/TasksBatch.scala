@@ -1,4 +1,4 @@
-package com.github.jaitl.crawler.base.common.task
+package com.github.jaitl.crawler.base.models.task
 
 import java.util.UUID
 

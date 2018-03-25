@@ -1,6 +1,6 @@
 package com.github.jaitl.crawler.base.master.queue.provider
 
-import com.github.jaitl.crawler.base.common.task.Task
+import com.github.jaitl.crawler.base.models.task.Task
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.mongodb.scala.MongoClient
