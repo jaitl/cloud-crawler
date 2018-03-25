@@ -1,10 +1,10 @@
 package com.github.jaitl.cloud.simple.worker.crawler
 
-import com.github.jaitl.cloud.base.crawler.BaseCrawler
-import com.github.jaitl.cloud.base.crawler.BaseCrawlerCreator
-import com.github.jaitl.cloud.base.crawler.CrawlResult
-import com.github.jaitl.cloud.base.crawler.CrawlTask
-import com.github.jaitl.cloud.base.http.HttpRequestExecutor
+import com.github.jaitl.crawler.base.worker.crawler.BaseCrawler
+import com.github.jaitl.crawler.base.worker.crawler.BaseCrawlerCreator
+import com.github.jaitl.crawler.base.worker.crawler.CrawlResult
+import com.github.jaitl.crawler.base.worker.crawler.CrawlTask
+import com.github.jaitl.crawler.base.worker.http.HttpRequestExecutor
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
