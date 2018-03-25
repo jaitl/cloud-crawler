@@ -4,11 +4,15 @@ buildscript {
         maven {
             url "https://dl.bintray.com/ngbinh/maven/"
         }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'org.github.ngbinh.scalastyle:gradle-scalastyle-plugin_2.12:1.0.0'
         classpath "net.saliman:gradle-cobertura-plugin:2.5.4"
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
+        classpath "gradle.plugin.com.github.maiflai:gradle-scalatest:0.19"
     }
 }
 
@@ -16,6 +20,9 @@ allprojects {
     repositories {
         maven {
             url "https://dl.bintray.com/ngbinh/maven/"
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
         }
         jcenter()
     }
@@ -30,6 +37,7 @@ subprojects {
     apply plugin: 'scalaStyle'
     apply plugin: 'jacoco'
     apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: "com.github.maiflai.scalatest"
 
     dependencies {
         // scala
@@ -39,6 +47,11 @@ subprojects {
         // logger
         compile "ch.qos.logback:logback-classic:1.2.3"
         compile "com.typesafe.scala-logging:scala-logging_${scalaMajorVersion}:3.7.2"
+
+        // test
+        testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+        testRuntime "org.pegdown:pegdown:1.1.0"
+
     }
 
     scalaStyle {
@@ -60,7 +73,6 @@ subprojects {
         }
     }
 
-
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.additionalParameters = ["-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"]
     }
@@ -79,7 +91,7 @@ project(":base-node") {
 
         // test
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
-        testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+        testCompile "org.scalamock:scalamock_${scalaMajorVersion}:4.1.0"
 
     }
 }
