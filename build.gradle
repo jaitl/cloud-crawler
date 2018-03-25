@@ -22,13 +22,13 @@ allprojects {
 }
 
 def scalaMajorVersion = "2.12"
-def scalaVersion = "${scalaMajorVersion}.4"
+def scalaVersion = "${scalaMajorVersion}.5"
 def akkaVersion = "2.5.9"
 
 subprojects {
     apply plugin: 'scala'
     apply plugin: 'scalaStyle'
-    apply plugin: 'net.saliman.cobertura'
+    apply plugin: 'jacoco'
     apply plugin: 'com.github.kt3k.coveralls'
 
     dependencies {
@@ -39,17 +39,11 @@ subprojects {
         // logger
         compile "ch.qos.logback:logback-classic:1.2.3"
         compile "com.typesafe.scala-logging:scala-logging_${scalaMajorVersion}:3.7.2"
-
-        // akka
-        compile "com.typesafe.akka:akka-cluster_${scalaMajorVersion}:${akkaVersion}"
-        compile "com.typesafe.akka:akka-slf4j_${scalaMajorVersion}:${akkaVersion}"
-
-        testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
     }
 
     scalaStyle {
         configLocation = "$rootDir/scalastyle_config.xml"
-        includeTestSourceDirectory = true
+        includeTestSourceDirectory = false
         failOnWarning = true
         source = "src/main/scala"
         testSource = "src/test/scala"
@@ -59,7 +53,13 @@ subprojects {
         systemProperties System.properties
     }
 
-    cobertura.coverageFormats = ['html', 'xml']
+    jacocoTestReport {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }
+
 
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.additionalParameters = ["-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"]
@@ -68,10 +68,19 @@ subprojects {
 
 project(":base-node") {
     dependencies {
+        // akka
+        compile "com.typesafe.akka:akka-cluster_${scalaMajorVersion}:${akkaVersion}"
+        compile "com.typesafe.akka:akka-slf4j_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
+
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
         compile "org.apache.httpcomponents:httpasyncclient:4.1.3"
+
+        // test
+        testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
+        testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+
     }
 }
 

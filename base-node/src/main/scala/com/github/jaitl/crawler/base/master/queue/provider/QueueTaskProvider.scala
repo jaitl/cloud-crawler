@@ -1,6 +1,6 @@
 package com.github.jaitl.crawler.base.master.queue.provider
 
-import com.github.jaitl.crawler.base.common.task.Task
+import com.github.jaitl.crawler.base.models.task.Task
 
 import scala.concurrent.Future
 

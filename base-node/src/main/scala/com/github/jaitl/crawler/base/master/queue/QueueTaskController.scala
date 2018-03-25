@@ -9,11 +9,8 @@ import akka.actor.Props
 import akka.actor.Stash
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import com.github.jaitl.crawler.base.common.request.FailureTasksBatchRequest
-import com.github.jaitl.crawler.base.common.request.NoTasks
-import com.github.jaitl.crawler.base.common.request.SuccessTasksBatchRequest
-import com.github.jaitl.crawler.base.common.task.Task
-import com.github.jaitl.crawler.base.common.task.TasksBatch
+import com.github.jaitl.crawler.base.models.task.Task
+import com.github.jaitl.crawler.base.models.task.TasksBatch
 import com.github.jaitl.crawler.base.master.queue.QueueTaskController.AddNewTasks
 import com.github.jaitl.crawler.base.master.queue.QueueTaskController.MarkAsFailed
 import com.github.jaitl.crawler.base.master.queue.QueueTaskController.MarkAsProcessed
@@ -23,6 +20,9 @@ import com.github.jaitl.crawler.base.master.queue.QueueTaskController.QueueTaskC
 import com.github.jaitl.crawler.base.master.queue.QueueTaskController.RequestTask
 import com.github.jaitl.crawler.base.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.base.master.queue.provider.TaskStatus
+import com.github.jaitl.crawler.base.worker.WorkerManager.FailureTasksBatchRequest
+import com.github.jaitl.crawler.base.worker.WorkerManager.NoTasks
+import com.github.jaitl.crawler.base.worker.WorkerManager.SuccessTasksBatchRequest
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
