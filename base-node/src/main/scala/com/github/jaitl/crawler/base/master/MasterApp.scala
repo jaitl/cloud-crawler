@@ -6,7 +6,7 @@ import akka.cluster.sharding.ClusterSharding
 import akka.cluster.sharding.ClusterShardingSettings
 import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonManagerSettings
-import com.github.jaitl.crawler.base.master.queue.QueueTaskBalancerSingleton
+import com.github.jaitl.crawler.base.master.queue.QueueTaskBalancer
 import com.github.jaitl.crawler.base.master.queue.QueueTaskController
 import com.github.jaitl.crawler.base.master.queue.QueueTaskController.QueueTaskControllerConfig
 import com.github.jaitl.crawler.base.master.queue.provider.QueueTaskProvider
@@ -27,11 +27,11 @@ class MasterApp(system: ActorSystem, taskProvider: QueueTaskProvider) extends St
 
     system.actorOf(
       ClusterSingletonManager.props(
-        singletonProps = QueueTaskBalancerSingleton.props(typedQueueManager),
-        terminationMessage = QueueTaskBalancerSingleton.Stop,
+        singletonProps = QueueTaskBalancer.props(typedQueueManager),
+        terminationMessage = QueueTaskBalancer.Stop,
         settings = ClusterSingletonManagerSettings(system).withRole("master")
       ),
-      name = QueueTaskBalancerSingleton.name()
+      name = QueueTaskBalancer.name()
     )
   }
 }
