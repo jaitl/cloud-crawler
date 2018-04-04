@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import com.github.jaitl.crawler.base.master.MasterApp
 import com.github.jaitl.crawler.base.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.base.worker.WorkerApp
-import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
@@ -15,11 +14,11 @@ object NodeApp extends StrictLogging {
 
   private val actorSystemName: String = "cloudCrawlerSystem"
 
-  private var pipelines: Option[Map[String, Pipeline[_ <: ParsedData]]] = None
+  private var pipelines: Option[Map[String, Pipeline[_]]] = None
   private var parallelBatches: Option[Int] = Some(2)
   private var taskProvider: Option[QueueTaskProvider] = None
 
-  def addPipelines(pipelines: Seq[Pipeline[_ <: ParsedData]]): this.type = {
+  def addPipelines(pipelines: Seq[Pipeline[_]]): this.type = {
     this.pipelines = Some(pipelines.map(pipe => pipe.taskType -> pipe).toMap)
     this
   }
