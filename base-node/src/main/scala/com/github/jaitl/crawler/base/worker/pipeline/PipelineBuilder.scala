@@ -3,11 +3,10 @@ package com.github.jaitl.crawler.base.worker.pipeline
 import com.github.jaitl.crawler.base.worker.crawler.BaseCrawlerCreator
 import com.github.jaitl.crawler.base.worker.parser.BaseParser
 import com.github.jaitl.crawler.base.worker.parser.NoParser
-import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.base.worker.save.SaveRawProvider
 
-private[pipeline] class PipelineBuilder[T <: ParsedData] {
+private[pipeline] class PipelineBuilder[T] {
   private var taskType: Option[String] = None
   private var batchSize: Option[Int] = None
   private var crawlerCreator: Option[BaseCrawlerCreator] = None
@@ -92,7 +91,7 @@ private[pipeline] class PipelineBuilder[T <: ParsedData] {
 }
 
 object PipelineBuilder {
-  def apply[T <: ParsedData](): PipelineBuilder[T] = new PipelineBuilder[T]()
+  def apply[T](): PipelineBuilder[T] = new PipelineBuilder[T]()
   def noParserPipeline(): PipelineBuilder[NoParser] = new PipelineBuilder[NoParser]()
 }
 

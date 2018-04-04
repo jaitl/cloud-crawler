@@ -13,7 +13,6 @@ import com.github.jaitl.crawler.base.worker.executor.CrawlExecutor.CrawlSuccessR
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchController.QueuedTask
 import com.github.jaitl.crawler.base.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.base.worker.parser.ParseResult
-import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 
 import scala.concurrent.ExecutionContext
@@ -60,7 +59,7 @@ private[base] object CrawlExecutor {
     requestId: UUID,
     task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
-    pipeline: Pipeline[_ <: ParsedData]
+    pipeline: Pipeline[_]
   )
 
   case class CrawlSuccessResult(
@@ -68,7 +67,7 @@ private[base] object CrawlExecutor {
     task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
     crawlResult: CrawlResult,
-    parseResult: Option[ParseResult[_ <: ParsedData]]
+    parseResult: Option[ParseResult[_]]
   )
 
   case class CrawlFailureResult(
