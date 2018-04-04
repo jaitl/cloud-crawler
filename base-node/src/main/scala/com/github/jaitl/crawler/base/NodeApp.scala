@@ -15,11 +15,11 @@ object NodeApp extends StrictLogging {
 
   private val actorSystemName: String = "cloudCrawlerSystem"
 
-  private var pipelines: Option[Map[String, Pipeline[ParsedData]]] = None
+  private var pipelines: Option[Map[String, Pipeline[_ <: ParsedData]]] = None
   private var parallelBatches: Option[Int] = Some(2)
   private var taskProvider: Option[QueueTaskProvider] = None
 
-  def addPipelines[T <: ParsedData](pipelines: Seq[Pipeline[T]]): this.type = {
+  def addPipelines(pipelines: Seq[Pipeline[_ <: ParsedData]]): this.type = {
     this.pipelines = Some(pipelines.map(pipe => pipe.taskType -> pipe).toMap)
     this
   }

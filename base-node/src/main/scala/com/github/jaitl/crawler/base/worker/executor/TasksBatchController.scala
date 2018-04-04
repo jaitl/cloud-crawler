@@ -43,10 +43,10 @@ import scala.concurrent.duration.FiniteDuration
 
 private class TasksBatchController(
   batch: TasksBatch,
-  pipeline: Pipeline[ParsedData],
+  pipeline: Pipeline[_ <: ParsedData],
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef],
+  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_ <: ParsedData], ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends Actor with ActorLogging with Stash {
@@ -146,10 +146,10 @@ private[base] object TasksBatchController {
 
   def props(
     batch: TasksBatch,
-    pipeline: Pipeline[ParsedData],
+    pipeline: Pipeline[_ <: ParsedData],
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
-    saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef],
+    saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_ <: ParsedData], ActorRef],
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
   ): Props =
@@ -174,12 +174,12 @@ private[base] object TasksBatchController {
 class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef],
+  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_ <: ParsedData], ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
-) extends TwoArgumentActorCreator[TasksBatch, Pipeline[ParsedData]] {
+) extends TwoArgumentActorCreator[TasksBatch, Pipeline[_ <: ParsedData]] {
   override def create(
-    factory: ActorRefFactory, firstArg: TasksBatch, secondArg: Pipeline[ParsedData]
+    factory: ActorRefFactory, firstArg: TasksBatch, secondArg: Pipeline[_ <: ParsedData]
   ): ActorRef = {
     factory.actorOf(
       props = TasksBatchController.props(

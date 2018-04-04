@@ -21,9 +21,9 @@ import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 
 private[base] class WorkerManager(
   queueTaskBalancer: ActorRef,
-  pipelines: Map[String, Pipeline[ParsedData]],
+  pipelines: Map[String, Pipeline[_ <: ParsedData]],
   config: WorkerConfig,
-  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[ParsedData]]
+  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_ <: ParsedData]]
 ) extends Actor {
   private val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
 
@@ -75,9 +75,9 @@ private[base] object WorkerManager {
 
   def props(
     queueTaskBalancer: ActorRef,
-    pipelines: Map[String, Pipeline[ParsedData]],
+    pipelines: Map[String, Pipeline[_ <: ParsedData]],
     config: WorkerConfig,
-    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[ParsedData]]
+    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_ <: ParsedData]]
   ): Props =
     Props(new WorkerManager(queueTaskBalancer, pipelines, config, tasksBatchControllerCreator))
 

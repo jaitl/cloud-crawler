@@ -60,15 +60,15 @@ private[base] object CrawlExecutor {
     requestId: UUID,
     task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
-    pipeline: Pipeline[ParsedData]
+    pipeline: Pipeline[_ <: ParsedData]
   )
 
-  case class CrawlSuccessResult[T <: ParsedData](
+  case class CrawlSuccessResult(
     requestId: UUID,
     task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
     crawlResult: CrawlResult,
-    parseResult: Option[ParseResult[T]]
+    parseResult: Option[ParseResult[_ <: ParsedData]]
   )
 
   case class CrawlFailureResult(
