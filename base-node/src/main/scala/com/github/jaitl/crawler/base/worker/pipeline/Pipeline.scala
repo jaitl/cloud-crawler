@@ -2,11 +2,10 @@ package com.github.jaitl.crawler.base.worker.pipeline
 
 import com.github.jaitl.crawler.base.worker.crawler.BaseCrawlerCreator
 import com.github.jaitl.crawler.base.worker.parser.BaseParser
-import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.base.worker.save.SaveRawProvider
 
-private[base] case class Pipeline[T <: ParsedData](
+private[base] case class Pipeline[T](
   taskType: String,
   batchSize: Int,
   crawlerCreator: BaseCrawlerCreator,
