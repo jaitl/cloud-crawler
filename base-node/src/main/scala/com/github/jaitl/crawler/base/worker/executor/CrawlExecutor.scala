@@ -13,6 +13,7 @@ import com.github.jaitl.crawler.base.worker.executor.CrawlExecutor.CrawlSuccessR
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchController.QueuedTask
 import com.github.jaitl.crawler.base.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.base.worker.parser.ParseResult
+import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 
 import scala.concurrent.ExecutionContext
@@ -30,14 +31,13 @@ private class CrawlExecutor extends Actor {
 
       tryCrawler match {
         case Success(crawler) =>
-          val taskData = task.task.taskData
-          val taskType = task.task.taskType
+          val crawlTask = CrawlTask(task.task.taskData, task.task.taskType)
           val crawlResult = for {
-            crawlResult <- Try(crawler.crawl(CrawlTask(taskData, taskType), requestExecutor)) match {
+            crawlResult <- Try(crawler.crawl(crawlTask, requestExecutor)) match {
               case Success(res) => res
               case Failure(ex) => Future.failed(ex)
             }
-            parseResult <- Future(pipeline.parser.map(parser => parser.parse(crawlResult)))
+            parseResult <- Future(pipeline.parser.map(parser => parser.parse(crawlTask, crawlResult)))
           } yield CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult)
 
           val recoveredResult = crawlResult.recover {
@@ -56,14 +56,19 @@ private class CrawlExecutor extends Actor {
 
 private[base] object CrawlExecutor {
 
-  case class Crawl(requestId: UUID, task: QueuedTask, requestExecutor: HttpRequestExecutor, pipeline: Pipeline)
+  case class Crawl(
+    requestId: UUID,
+    task: QueuedTask,
+    requestExecutor: HttpRequestExecutor,
+    pipeline: Pipeline[ParsedData]
+  )
 
-  case class CrawlSuccessResult(
+  case class CrawlSuccessResult[T <: ParsedData](
     requestId: UUID,
     task: QueuedTask,
     requestExecutor: HttpRequestExecutor,
     crawlResult: CrawlResult,
-    parseResult: Option[ParseResult]
+    parseResult: Option[ParseResult[T]]
   )
 
   case class CrawlFailureResult(

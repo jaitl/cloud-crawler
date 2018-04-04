@@ -13,13 +13,14 @@ import com.github.jaitl.crawler.base.worker.executor.SaveCrawlResultControllerCr
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchController.TasksBatchControllerConfig
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchControllerCreator
 import com.github.jaitl.crawler.base.worker.executor.resource.ResourceControllerCreator
+import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.base.worker.scheduler.AkkaScheduler
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
 // scalastyle:off
-class WorkerApp(pipelines: Map[String, Pipeline], parallelBatches: Int, system: ActorSystem) extends StrictLogging {
+class WorkerApp(pipelines: Map[String, Pipeline[ParsedData]], parallelBatches: Int, system: ActorSystem) extends StrictLogging {
   import scala.concurrent.duration._
 
   def run(): Unit = {
