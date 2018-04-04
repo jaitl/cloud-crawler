@@ -16,13 +16,14 @@ import com.github.jaitl.crawler.base.worker.WorkerManager.SuccessTasksBatchReque
 import com.github.jaitl.crawler.base.worker.config.WorkerConfig
 import com.github.jaitl.crawler.base.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchController
+import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 
 private[base] class WorkerManager(
   queueTaskBalancer: ActorRef,
-  pipelines: Map[String, Pipeline],
+  pipelines: Map[String, Pipeline[_ <: ParsedData]],
   config: WorkerConfig,
-  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline]
+  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_ <: ParsedData]]
 ) extends Actor {
   private val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
 
@@ -74,9 +75,9 @@ private[base] object WorkerManager {
 
   def props(
     queueTaskBalancer: ActorRef,
-    pipelines: Map[String, Pipeline],
+    pipelines: Map[String, Pipeline[_ <: ParsedData]],
     config: WorkerConfig,
-    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline]
+    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_ <: ParsedData]]
   ): Props =
     Props(new WorkerManager(queueTaskBalancer, pipelines, config, tasksBatchControllerCreator))
 
