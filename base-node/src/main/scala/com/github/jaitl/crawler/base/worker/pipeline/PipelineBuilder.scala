@@ -2,60 +2,62 @@ package com.github.jaitl.crawler.base.worker.pipeline
 
 import com.github.jaitl.crawler.base.worker.crawler.BaseCrawlerCreator
 import com.github.jaitl.crawler.base.worker.parser.BaseParser
+import com.github.jaitl.crawler.base.worker.parser.NoParser
+import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.base.worker.save.SaveRawProvider
 
-class PipelineBuilder {
+private[pipeline] class PipelineBuilder[T <: ParsedData] {
   private var taskType: Option[String] = None
   private var batchSize: Option[Int] = None
   private var crawlerCreator: Option[BaseCrawlerCreator] = None
   private var saveRawProvider: Option[SaveRawProvider] = None
-  private var parser: Option[BaseParser] = None
-  private var saveParsedProvider: Option[SaveParsedProvider] = None
+  private var parser: Option[BaseParser[T]] = None
+  private var saveParsedProvider: Option[SaveParsedProvider[T]] = None
   private var resourceType: Option[ResourceType] = None
 
-  def withTaskType(taskType: String): PipelineBuilder = {
+  def withTaskType(taskType: String): this.type = {
     this.taskType = Some(taskType)
     this
   }
 
-  def withBatchSize(batchSize: Int): PipelineBuilder = {
+  def withBatchSize(batchSize: Int): this.type = {
     this.batchSize = Some(batchSize)
     this
   }
 
-  def withCrawlerCreator(crawlerCreator: BaseCrawlerCreator): PipelineBuilder = {
+  def withCrawlerCreator(crawlerCreator: BaseCrawlerCreator): this.type = {
     this.crawlerCreator = Some(crawlerCreator)
     this
   }
 
-  def withSaveRawProvider(saveRawProvider: SaveRawProvider): PipelineBuilder = {
+  def withSaveRawProvider(saveRawProvider: SaveRawProvider): this.type = {
     this.saveRawProvider = Some(saveRawProvider)
     this
   }
 
 
-  def withParser(parser: BaseParser): PipelineBuilder = {
+  def withParser(parser: BaseParser[T]): this.type = {
     this.parser = Some(parser)
     this
   }
 
-  def withSaveResultProvider(saveParsedProvider: SaveParsedProvider): PipelineBuilder = {
+  def withSaveResultProvider(saveParsedProvider: SaveParsedProvider[T]): this.type = {
     this.saveParsedProvider = Some(saveParsedProvider)
     this
   }
 
-  def withProxy(proxyLimit: Int): PipelineBuilder = {
+  def withProxy(proxyLimit: Int): this.type = {
     resourceType = Some(Proxy(proxyLimit))
     this
   }
 
-  def withTor(host: String, post: Int, limit: Int): PipelineBuilder = {
+  def withTor(host: String, post: Int, limit: Int): this.type = {
     resourceType = Some(Tor(host, post, limit))
     this
   }
 
-  def build(): Pipeline = {
+  def build(): Pipeline[T] = {
     if (taskType.isEmpty) {
       throw new PipelineBuilderException("task type is not defined")
     }
@@ -90,7 +92,8 @@ class PipelineBuilder {
 }
 
 object PipelineBuilder {
-  def apply(): PipelineBuilder = new PipelineBuilder()
+  def apply[T <: ParsedData](): PipelineBuilder[T] = new PipelineBuilder[T]()
+  def noParserPipeline(): PipelineBuilder[NoParser] = new PipelineBuilder[NoParser]()
 }
 
 class PipelineBuilderException(message: String) extends Exception(message)

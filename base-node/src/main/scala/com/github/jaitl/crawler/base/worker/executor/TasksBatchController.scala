@@ -33,6 +33,7 @@ import com.github.jaitl.crawler.base.worker.executor.resource.ResourceController
 import com.github.jaitl.crawler.base.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.base.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.base.worker.executor.resource.ResourceHepler
+import com.github.jaitl.crawler.base.worker.parser.ParsedData
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.base.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.base.worker.scheduler.Scheduler
@@ -42,10 +43,10 @@ import scala.concurrent.duration.FiniteDuration
 
 private class TasksBatchController(
   batch: TasksBatch,
-  pipeline: Pipeline,
+  pipeline: Pipeline[ParsedData],
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline, ActorRef],
+  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends Actor with ActorLogging with Stash {
@@ -145,10 +146,10 @@ private[base] object TasksBatchController {
 
   def props(
     batch: TasksBatch,
-    pipeline: Pipeline,
+    pipeline: Pipeline[ParsedData],
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
-    saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline, ActorRef],
+    saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef],
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
   ): Props =
@@ -173,12 +174,12 @@ private[base] object TasksBatchController {
 class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline, ActorRef],
+  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
-) extends TwoArgumentActorCreator[TasksBatch, Pipeline] {
+) extends TwoArgumentActorCreator[TasksBatch, Pipeline[ParsedData]] {
   override def create(
-    factory: ActorRefFactory, firstArg: TasksBatch, secondArg: Pipeline
+    factory: ActorRefFactory, firstArg: TasksBatch, secondArg: Pipeline[ParsedData]
   ): ActorRef = {
     factory.actorOf(
       props = TasksBatchController.props(
