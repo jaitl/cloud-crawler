@@ -20,7 +20,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
 // scalastyle:off
-class WorkerApp(pipelines: Map[String, Pipeline[ParsedData]], parallelBatches: Int, system: ActorSystem) extends StrictLogging {
+class WorkerApp(pipelines: Map[String, Pipeline[_ <: ParsedData]], parallelBatches: Int, system: ActorSystem) extends StrictLogging {
   import scala.concurrent.duration._
 
   def run(): Unit = {

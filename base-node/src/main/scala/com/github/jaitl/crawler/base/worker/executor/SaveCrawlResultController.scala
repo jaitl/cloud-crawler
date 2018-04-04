@@ -30,7 +30,7 @@ import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 
 class SaveCrawlResultController(
-  pipeline: Pipeline[ParsedData],
+  pipeline: Pipeline[_ <: ParsedData],
   queueTaskBalancer: ActorRef,
   tasksBatchController: ActorRef,
   saveScheduler: Scheduler,
@@ -118,13 +118,13 @@ object SaveCrawlResultController {
   case object SuccessAddedResults
 
   trait CrawlTaskResult
-  case class SuccessCrawledTask(task: Task, crawlResult: CrawlResult, parseResult: Option[ParseResult[ParsedData]]) extends CrawlTaskResult
+  case class SuccessCrawledTask(task: Task, crawlResult: CrawlResult, parseResult: Option[ParseResult[_ <: ParsedData]]) extends CrawlTaskResult
   case class FailedTask(task: Task, t: Seq[Throwable]) extends CrawlTaskResult
 
   case class SaveCrawlResultControllerConfig(saveInterval: FiniteDuration)
 
   def props(
-    pipeline: Pipeline[ParsedData],
+    pipeline: Pipeline[_ <: ParsedData],
     queueTaskBalancer: ActorRef,
     tasksBatchController: ActorRef,
     saveScheduler: Scheduler,
@@ -144,8 +144,8 @@ class SaveCrawlResultControllerCreator(
   queueTaskBalancer: ActorRef,
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
-) extends TwoArgumentActorCreator[Pipeline[ParsedData], ActorRef] {
-  override def create(factory: ActorRefFactory, firstArg: Pipeline[ParsedData], secondArg: ActorRef): ActorRef = {
+) extends TwoArgumentActorCreator[Pipeline[_ <: ParsedData], ActorRef] {
+  override def create(factory: ActorRefFactory, firstArg: Pipeline[_ <: ParsedData], secondArg: ActorRef): ActorRef = {
     factory.actorOf(
       props = SaveCrawlResultController.props(
         pipeline = firstArg,
