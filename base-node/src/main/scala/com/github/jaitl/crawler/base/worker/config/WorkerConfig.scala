@@ -1,3 +1,5 @@
 package com.github.jaitl.crawler.base.worker.config
 
-case class WorkerConfig(parallelBatches: Int)
+import scala.concurrent.duration.FiniteDuration
+
+case class WorkerConfig(parallelBatches: Int, executeInterval: FiniteDuration)
