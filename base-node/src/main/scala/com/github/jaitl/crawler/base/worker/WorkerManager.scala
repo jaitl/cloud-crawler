@@ -17,12 +17,14 @@ import com.github.jaitl.crawler.base.worker.config.WorkerConfig
 import com.github.jaitl.crawler.base.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchController
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
+import com.github.jaitl.crawler.base.worker.scheduler.Scheduler
 
 private[base] class WorkerManager(
   queueTaskBalancer: ActorRef,
   pipelines: Map[String, Pipeline[_]],
   config: WorkerConfig,
-  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]]
+  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]],
+  batchRequestScheduler: Scheduler
 ) extends Actor {
   private val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
 
@@ -49,7 +51,9 @@ private[base] class WorkerManager(
     case EmptyTaskTypeList =>
   }
 
-  private def scheduleTimeout(): Unit = ???
+  private def scheduleTimeout(): Unit = {
+    batchRequestScheduler.scheduleOnce(config.executeInterval, self, RequestBatch)
+  }
 }
 
 private[base] object WorkerManager {
@@ -76,9 +80,10 @@ private[base] object WorkerManager {
     queueTaskBalancer: ActorRef,
     pipelines: Map[String, Pipeline[_]],
     config: WorkerConfig,
-    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]]
+    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]],
+    batchRequestScheduler: Scheduler
   ): Props =
-    Props(new WorkerManager(queueTaskBalancer, pipelines, config, tasksBatchControllerCreator))
+    Props(new WorkerManager(queueTaskBalancer, pipelines, config, tasksBatchControllerCreator, batchRequestScheduler))
 
   def name(): String = "workerManager"
 }
