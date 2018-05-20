@@ -54,10 +54,16 @@ class WorkerApp(pipelines: Map[String, Pipeline[_]], parallelBatches: Int, syste
       config = TasksBatchControllerConfig(10, 30.seconds) // TODO read from config file
     )
 
-    val workerConfig = WorkerConfig(parallelBatches)
+    val workerConfig = WorkerConfig(parallelBatches, 10.seconds)
 
     val workerManager = system.actorOf(
-      WorkerManager.props(queueTaskBalancer, pipelines, workerConfig, tasksBatchControllerCreator),
+      WorkerManager.props(
+        queueTaskBalancer = queueTaskBalancer,
+        pipelines = pipelines,
+        config = workerConfig,
+        tasksBatchControllerCreator = tasksBatchControllerCreator,
+        batchRequestScheduler = new AkkaScheduler(system)
+      ),
       WorkerManager.name()
     )
 
