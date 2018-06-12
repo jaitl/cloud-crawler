@@ -74,7 +74,7 @@ private class TasksBatchController(
   private def waitRequest: Receive = {
     case ExecuteTask =>
       if (taskQueue.nonEmpty || !forcedStop) {
-        resourceController ! RequestResource(UUID.randomUUID(), batch.taskType)
+        resourceController ! RequestResource(UUID.randomUUID())
       } else {
         saveCrawlResultController ! SaveResults
       }
@@ -88,7 +88,7 @@ private class TasksBatchController(
         self ! ExecuteTask
         currentActiveCrawlTask = currentActiveCrawlTask + 1
       } else {
-        resourceController ! ReturnSuccessResource(requestId, batch.taskType, requestExecutor)
+        resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       }
 
     case NoFreeResource(requestId) =>
@@ -102,16 +102,16 @@ private class TasksBatchController(
 
   private def crawlResultHandler: Receive = {
     case CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult) =>
-      resourceController ! ReturnSuccessResource(requestId, batch.taskType, requestExecutor)
+      resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       saveCrawlResultController ! AddResults(SuccessCrawledTask(task.task, crawlResult, parseResult))
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
       if (ResourceHepler.isResourceFailed(t)) {
-        resourceController ! ReturnFailedResource(requestId, batch.taskType, requestExecutor, t)
+        resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
         currentActiveCrawlTask = currentActiveCrawlTask - 1
       } else {
-        resourceController ! ReturnSuccessResource(requestId, batch.taskType, requestExecutor)
+        resourceController ! ReturnSuccessResource(requestId, requestExecutor)
 
         if (task.attempt < config.maxAttempts) {
           taskQueue += task.copy(attempt = task.attempt + 1, t = task.t :+ t)
