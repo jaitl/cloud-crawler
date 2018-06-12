@@ -78,13 +78,18 @@ subprojects {
     }
 }
 
-project(":base-node") {
+project(":models") {
+
+}
+
+project(":worker") {
     dependencies {
+        compile project(":models")
+
         // akka
         compile "com.typesafe.akka:akka-cluster_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-slf4j_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
-        compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
 
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
         compile "org.asynchttpclient:async-http-client:2.4.7"
@@ -96,12 +101,32 @@ project(":base-node") {
     }
 }
 
+project(":master") {
+    apply plugin: 'application'
+
+    mainClassName = "com.github.jaitl.crawler.master.MasterApp"
+    dependencies {
+        compile project(":models")
+
+        // akka
+        compile "com.typesafe.akka:akka-cluster_${scalaMajorVersion}:${akkaVersion}"
+        compile "com.typesafe.akka:akka-slf4j_${scalaMajorVersion}:${akkaVersion}"
+        compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
+        compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
+        compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
+
+        // test
+        testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
+        testCompile "org.scalamock:scalamock_${scalaMajorVersion}:4.1.0"
+    }
+}
+
 project(":simple-worker") {
     apply plugin: 'application'
 
     mainClassName = "com.github.jaitl.cloud.simple.worker.App"
 
     dependencies {
-        compile project(":base-node")
+        compile project(":worker")
     }
 }
