@@ -1,5 +1,7 @@
 package com.github.jaitl.crawler.base.worker.http
 
+import java.util.UUID
+
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.BoundRequestBuilder
@@ -44,6 +46,8 @@ class AsyncHttpRequestExecutor(
   private def execute(request: BoundRequestBuilder): Future[HttpResult] = {
     toScala(request.execute().toCompletableFuture).map(resp => HttpResult(resp.getStatusCode, resp.getResponseBody))
   }
+
+  override def getExecutorId(): UUID = executorConfig.executorId
 
   override def close(): Unit = {
     client.close()
