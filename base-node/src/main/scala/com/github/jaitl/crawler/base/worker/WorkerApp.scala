@@ -12,6 +12,7 @@ import com.github.jaitl.crawler.base.worker.executor.SaveCrawlResultController.S
 import com.github.jaitl.crawler.base.worker.executor.SaveCrawlResultControllerCreator
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchController.TasksBatchControllerConfig
 import com.github.jaitl.crawler.base.worker.executor.TasksBatchControllerCreator
+import com.github.jaitl.crawler.base.worker.executor.resource.ResourceControllerConfig
 import com.github.jaitl.crawler.base.worker.executor.resource.ResourceControllerCreator
 import com.github.jaitl.crawler.base.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.base.worker.scheduler.AkkaScheduler
@@ -38,7 +39,9 @@ class WorkerApp(pipelines: Map[String, Pipeline[_]], parallelBatches: Int, syste
       props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
     )
 
-    val resourceControllerCreator = new ResourceControllerCreator()
+    val resourceControllerConfig = ResourceControllerConfig(maxFailCount = 100)
+
+    val resourceControllerCreator = new ResourceControllerCreator(resourceControllerConfig)
 
     val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
       queueTaskBalancer = queueTaskBalancer,

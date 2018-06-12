@@ -5,9 +5,13 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import com.github.jaitl.crawler.base.worker.executor.resource.ResourceController.RequestResource
 
-private class ProxyResourceController extends Actor with ActorLogging{
+import scala.concurrent.ExecutionContext
+
+private class ProxyResourceController extends Actor with ActorLogging {
+  private implicit val executionContext: ExecutionContext = context.dispatcher
+
   override def receive: Receive = {
-    case RequestResource(requestId, taskType) =>
+    case RequestResource(requestId) =>
 
   }
 }

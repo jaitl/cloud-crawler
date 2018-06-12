@@ -5,6 +5,7 @@ import com.github.jaitl.crawler.base.worker.parser.BaseParser
 import com.github.jaitl.crawler.base.worker.parser.NoParser
 import com.github.jaitl.crawler.base.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.base.worker.save.SaveRawProvider
+import com.github.jaitl.crawler.base.worker.timeout.RandomTimeout
 
 private[pipeline] class PipelineBuilder[T] {
   private var taskType: Option[String] = None
@@ -46,13 +47,13 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
-  def withProxy(proxyLimit: Int): this.type = {
-    resourceType = Some(Proxy(proxyLimit))
+  def withProxy(proxyLimit: Int, timeout: RandomTimeout): this.type = {
+    resourceType = Some(Proxy(proxyLimit, timeout))
     this
   }
 
-  def withTor(host: String, post: Int, limit: Int): this.type = {
-    resourceType = Some(Tor(host, post, limit))
+  def withTor(host: String, post: Int, limit: Int, timeout: RandomTimeout): this.type = {
+    resourceType = Some(Tor(host, post, limit, timeout))
     this
   }
 

@@ -7,7 +7,10 @@ import com.github.jaitl.crawler.base.master.queue.provider.MongoQueueTaskProvide
 import com.github.jaitl.crawler.base.worker.pipeline.PipelineBuilder
 import com.github.jaitl.crawler.base.worker.save.LocalFileSystemSaveRawProvider
 import com.github.jaitl.crawler.base.worker.save.MongoSaveParsedProvider
+import com.github.jaitl.crawler.base.worker.timeout.RandomTimeout
 import com.typesafe.scalalogging.StrictLogging
+
+import scala.concurrent.duration._
 
 object App extends StrictLogging {
   def main(args: Array[String]): Unit = {
@@ -21,7 +24,7 @@ object App extends StrictLogging {
       .withParser(new HabrParser)
       .withSaveResultProvider(new MongoSaveParsedProvider("HabrResult"))
       .withSaveRawProvider(new LocalFileSystemSaveRawProvider("/data/crawler/habr"))
-      .withProxy(proxyLimit)
+      .withProxy(proxyLimit, RandomTimeout(3.seconds, 1.second))
       .build()
 
     val pipelines = habrPipeline :: Nil
