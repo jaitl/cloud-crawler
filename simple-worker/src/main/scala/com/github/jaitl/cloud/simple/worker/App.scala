@@ -2,12 +2,11 @@ package com.github.jaitl.cloud.simple.worker
 
 import com.github.jaitl.cloud.simple.worker.crawler.HabrCrawlerCreator
 import com.github.jaitl.cloud.simple.worker.parser.HabrParser
-import com.github.jaitl.crawler.base.NodeApp
-import com.github.jaitl.crawler.base.master.queue.provider.MongoQueueTaskProvider
-import com.github.jaitl.crawler.base.worker.pipeline.PipelineBuilder
-import com.github.jaitl.crawler.base.worker.save.LocalFileSystemSaveRawProvider
-import com.github.jaitl.crawler.base.worker.save.MongoSaveParsedProvider
-import com.github.jaitl.crawler.base.worker.timeout.RandomTimeout
+import com.github.jaitl.crawler.worker.WorkerApp
+import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
+import com.github.jaitl.crawler.worker.save.LocalFileSystemSaveRawProvider
+import com.github.jaitl.crawler.worker.save.MongoSaveParsedProvider
+import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.duration._
@@ -29,10 +28,9 @@ object App extends StrictLogging {
 
     val pipelines = habrPipeline :: Nil
 
-    NodeApp
-      .addTaskProvider(new MongoQueueTaskProvider("mongodb://localhost:27017", "cloud_master", "CrawlTasks"))
+    WorkerApp
       .addPipelines(pipelines)
-      .addParallelBatches(2)
+      .parallelBatches(2)
       .run()
   }
 }
