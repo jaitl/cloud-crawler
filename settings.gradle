@@ -1,4 +1,6 @@
-include 'base-node'
+include 'models'
+include 'worker'
+include 'master'
 include 'simple-worker'
 
 rootProject.name = 'cloud-crawler'
