@@ -22,6 +22,13 @@ object MasterApp extends StrictLogging {
     )
 
     val config = ConfigFactory.load("master.conf")
+
+    logger.info(
+      "Start master on {}:{}",
+      config.getConfig("akka.remote.netty.tcp").getString("hostname"),
+      config.getConfig("akka.remote.netty.tcp").getString("port")
+    )
+
     val system = ActorSystem("cloudCrawlerSystem", config)
 
     val queueTaskQueueReqCtrl: ActorRef = ClusterSharding(system).start(
