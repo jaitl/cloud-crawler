@@ -7,7 +7,6 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import akka.actor.Props
-import akka.actor.Stash
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.task.TasksBatch
 import com.github.jaitl.crawler.worker.creator.ActorCreator
@@ -32,7 +31,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Requ
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceHepler
+import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
@@ -40,7 +39,7 @@ import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 
-private class TasksBatchController(
+private[worker] class TasksBatchController(
   batch: TasksBatch,
   pipeline: Pipeline[_],
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
@@ -48,11 +47,11 @@ private class TasksBatchController(
   saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
-) extends Actor with ActorLogging with Stash {
-  private var currentActiveCrawlTask: Int = 0
-  private var forcedStop: Boolean = false
+) extends Actor with ActorLogging {
+  var currentActiveCrawlTask: Int = 0
+  var forcedStop: Boolean = false
 
-  private val taskQueue: mutable.Queue[QueuedTask] = mutable.Queue.apply(batch.tasks.map(QueuedTask(_, 0)): _*)
+  val taskQueue: mutable.Queue[QueuedTask] = mutable.Queue.apply(batch.tasks.map(QueuedTask(_, 0)): _*)
 
   private var resourceController: ActorRef = _
   private var saveCrawlResultController: ActorRef = _
@@ -73,7 +72,7 @@ private class TasksBatchController(
 
   private def waitRequest: Receive = {
     case ExecuteTask =>
-      if (taskQueue.nonEmpty || !forcedStop) {
+      if (taskQueue.nonEmpty && !forcedStop) {
         resourceController ! RequestResource(UUID.randomUUID())
       } else {
         saveCrawlResultController ! SaveResults
@@ -85,7 +84,6 @@ private class TasksBatchController(
       if (taskQueue.nonEmpty) {
         val task = taskQueue.dequeue()
         crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
-        self ! ExecuteTask
         currentActiveCrawlTask = currentActiveCrawlTask + 1
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
@@ -97,7 +95,7 @@ private class TasksBatchController(
     case NoResourcesAvailable(requestId) =>
       log.debug(s"NoResourcesAvailable, requestId: $requestId")
       forcedStop = true
-      resourceController ! SaveResults
+      saveCrawlResultController ! SaveResults
   }
 
   private def crawlResultHandler: Receive = {
@@ -106,18 +104,18 @@ private class TasksBatchController(
       saveCrawlResultController ! AddResults(SuccessCrawledTask(task.task, crawlResult, parseResult))
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
-      if (ResourceHepler.isResourceFailed(t)) {
+      if (ResourceHelper.isResourceFailed(t)) {
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
         currentActiveCrawlTask = currentActiveCrawlTask - 1
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
 
-        if (task.attempt < config.maxAttempts) {
+        if (task.attempt + 1 < config.maxAttempts) {
           taskQueue += task.copy(attempt = task.attempt + 1, t = task.t :+ t)
           currentActiveCrawlTask = currentActiveCrawlTask - 1
         } else {
-          saveCrawlResultController ! AddResults(FailedTask(task.task, task.t :+ t))
+          saveCrawlResultController ! AddResults(FailedTask(task.task, t))
         }
       }
   }

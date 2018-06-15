@@ -8,12 +8,12 @@ import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import akka.actor.Props
 import akka.actor.Stash
+import akka.pattern.pipe
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AutoSaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveCrawlResultControllerConfig
@@ -26,6 +26,8 @@ import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 class SaveCrawlResultController(
@@ -35,8 +37,10 @@ class SaveCrawlResultController(
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
 ) extends Actor with ActorLogging with Stash {
-  private var successTasks: mutable.Seq[SuccessCrawledTask] = mutable.ArraySeq.empty[SuccessCrawledTask]
-  private var failedTasks: mutable.Seq[FailedTask] = mutable.ArraySeq.empty[FailedTask]
+  private implicit val executionContext: ExecutionContext = context.dispatcher
+
+  var successTasks: mutable.Seq[SuccessCrawledTask] = mutable.ArraySeq.empty[SuccessCrawledTask]
+  var failedTasks: mutable.Seq[FailedTask] = mutable.ArraySeq.empty[FailedTask]
 
   override def preStart(): Unit = {
     super.preStart()
@@ -50,20 +54,41 @@ class SaveCrawlResultController(
     case AddResults(result) =>
       result match {
         case a @ SuccessCrawledTask(_, _, _) =>
-          successTasks :+ a
+          successTasks = successTasks :+ a
           sender() ! SuccessAddedResults
 
         case a @ FailedTask(_, _) =>
-          failedTasks :+ a
+          failedTasks = failedTasks :+ a
           sender() ! SuccessAddedResults
       }
   }
 
   private def waitSave: Receive = {
-    case AutoSaveResults =>
-      context.become(saveResultHandler)
+    case SaveResults if successTasks.isEmpty && failedTasks.isEmpty =>
+      tasksBatchController ! SuccessSavedResults
+
     case SaveResults =>
       context.become(saveResultHandler)
+
+      val parserResults = successTasks.flatMap(_.parseResult).map(_.parsedData)
+      val rawResult = successTasks.map(r => (r.task, r.crawlResult))
+
+      val saveFuture: Future[SaveResults] = for {
+        _ <- (parserResults.nonEmpty, pipeline.saveParsedProvider) match {
+          case (true, Some(provider)) => provider.saveResults(parserResults)
+          case _ => Future.successful(Unit)
+        }
+        _ <- pipeline.saveRawProvider match {
+          case Some(provider) => provider.save(rawResult)
+          case None => Future.successful(Unit)
+        }
+      } yield SuccessSavedResults
+
+      val recoveredSaveFuture = saveFuture.recover {
+        case ex: Exception => FailureSaveResults(ex)
+      }
+
+      recoveredSaveFuture pipeTo self
   }
 
   private def saveResultHandler: Receive = {
@@ -108,7 +133,6 @@ class SaveCrawlResultController(
 object SaveCrawlResultController {
 
   trait SaveResults
-  case object AutoSaveResults extends SaveResults
   case object SaveResults extends SaveResults
   case object SuccessSavedResults extends SaveResults
   case class FailureSaveResults(t: Throwable) extends SaveResults
@@ -118,7 +142,7 @@ object SaveCrawlResultController {
 
   trait CrawlTaskResult
   case class SuccessCrawledTask(task: Task, crawlResult: CrawlResult, parseResult: Option[ParseResult[_]]) extends CrawlTaskResult
-  case class FailedTask(task: Task, t: Seq[Throwable]) extends CrawlTaskResult
+  case class FailedTask(task: Task, t: Throwable) extends CrawlTaskResult
 
   case class SaveCrawlResultControllerConfig(saveInterval: FiniteDuration)
 
@@ -139,7 +163,7 @@ object SaveCrawlResultController {
   def name(): String = "saveCrawlResultController"
 }
 
-class SaveCrawlResultControllerCreator(
+private[worker] class SaveCrawlResultControllerCreator(
   queueTaskBalancer: ActorRef,
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
@@ -152,7 +176,7 @@ class SaveCrawlResultControllerCreator(
         tasksBatchController = secondArg,
         saveScheduler = saveScheduler,
         config = config
-      ),
+      ).withDispatcher("worker.blocking-io-dispatcher"),
       name = SaveCrawlResultController.name()
     )
   }

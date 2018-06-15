@@ -26,30 +26,23 @@ private class CrawlExecutor extends Actor {
 
   override def receive: Receive = {
     case Crawl(requestId, task, requestExecutor, pipeline) =>
-      val tryCrawler = Try(pipeline.crawlerCreator.create())
 
-      tryCrawler match {
-        case Success(crawler) =>
-          val crawlTask = CrawlTask(task.task.taskData, task.task.taskType)
-          val crawlResult = for {
-            crawlResult <- Try(crawler.crawl(crawlTask, requestExecutor)) match {
-              case Success(res) => res
-              case Failure(ex) => Future.failed(ex)
-            }
-            parseResult <- Future(pipeline.parser.map(parser => parser.parse(crawlTask, crawlResult)))
-          } yield CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult)
+      val crawlTask = CrawlTask(task.task.taskData, task.task.taskType)
+      val crawlResult = for {
+        crawlResult <- Try(pipeline.crawler.crawl(crawlTask, requestExecutor)) match {
+          case Success(res) => res
+          case Failure(ex) => Future.failed(ex)
+        }
+        parseResult <- Future(pipeline.parser.map(parser => parser.parse(crawlTask, crawlResult)))
+      } yield CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult)
 
-          val recoveredResult = crawlResult.recover {
-            case t: Throwable => CrawlFailureResult(requestId, task, requestExecutor, t)
-          }
-
-          recoveredResult pipeTo sender()
-
-        // TODO kill recoveredResult by timeout
-
-        case Failure(ex) =>
-          sender() ! CrawlFailureResult(requestId, task, requestExecutor, ex)
+      val recoveredResult = crawlResult.recover {
+        case t: Throwable => CrawlFailureResult(requestId, task, requestExecutor, t)
       }
+
+      recoveredResult pipeTo sender()
+
+    // TODO kill recoveredResult by timeout
   }
 }
 
