@@ -11,7 +11,3 @@ trait BaseCrawler {
     httpRequestExecutor: HttpRequestExecutor
   )(implicit executionContext: ExecutionContext): Future[CrawlResult]
 }
-
-trait BaseCrawlerCreator {
-  def create(): BaseCrawler
-}
