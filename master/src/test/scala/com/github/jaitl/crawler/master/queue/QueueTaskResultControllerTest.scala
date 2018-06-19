@@ -3,6 +3,7 @@ package com.github.jaitl.crawler.master.queue
 import java.util.UUID
 
 import akka.actor.ActorRef
+import com.github.jaitl.crawler.master.ActorTestSuite
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ActionSuccess
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed

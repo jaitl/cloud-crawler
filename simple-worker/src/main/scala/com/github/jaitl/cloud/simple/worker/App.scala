@@ -1,6 +1,6 @@
 package com.github.jaitl.cloud.simple.worker
 
-import com.github.jaitl.cloud.simple.worker.crawler.HabrCrawlerCreator
+import com.github.jaitl.cloud.simple.worker.crawler.HabrCrawler
 import com.github.jaitl.cloud.simple.worker.parser.HabrParser
 import com.github.jaitl.crawler.worker.WorkerApp
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
@@ -19,7 +19,7 @@ object App extends StrictLogging {
     val habrPipeline = PipelineBuilder()
       .withTaskType("HabrTasks")
       .withBatchSize(batchSize)
-      .withCrawlerCreator(HabrCrawlerCreator)
+      .withCrawler(new HabrCrawler)
       .withParser(new HabrParser)
       .withSaveResultProvider(new MongoSaveParsedProvider("HabrResult"))
       .withSaveRawProvider(new LocalFileSystemSaveRawProvider("/data/crawler/habr"))
