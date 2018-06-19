@@ -1,6 +1,6 @@
 package com.github.jaitl.crawler.worker.pipeline
 
-import com.github.jaitl.crawler.worker.crawler.BaseCrawlerCreator
+import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NoParser
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
@@ -10,7 +10,7 @@ import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 private[pipeline] class PipelineBuilder[T] {
   private var taskType: Option[String] = None
   private var batchSize: Option[Int] = None
-  private var crawlerCreator: Option[BaseCrawlerCreator] = None
+  private var crawler: Option[BaseCrawler] = None
   private var saveRawProvider: Option[SaveRawProvider] = None
   private var parser: Option[BaseParser[T]] = None
   private var saveParsedProvider: Option[SaveParsedProvider[T]] = None
@@ -26,8 +26,8 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
-  def withCrawlerCreator(crawlerCreator: BaseCrawlerCreator): this.type = {
-    this.crawlerCreator = Some(crawlerCreator)
+  def withCrawler(crawler: BaseCrawler): this.type = {
+    this.crawler = Some(crawler)
     this
   }
 
@@ -66,8 +66,8 @@ private[pipeline] class PipelineBuilder[T] {
       throw new PipelineBuilderException("batch size is not defined")
     }
 
-    if (crawlerCreator.isEmpty) {
-      throw new PipelineBuilderException("crawler creator is not defined")
+    if (crawler.isEmpty) {
+      throw new PipelineBuilderException("crawler is not defined")
     }
 
     (parser, saveParsedProvider) match {
@@ -82,7 +82,7 @@ private[pipeline] class PipelineBuilder[T] {
     Pipeline(
       taskType = taskType.get,
       batchSize = batchSize.get,
-      crawlerCreator = crawlerCreator.get,
+      crawler = crawler.get,
       saveRawProvider = saveRawProvider,
       parser = parser,
       saveParsedProvider = saveParsedProvider,

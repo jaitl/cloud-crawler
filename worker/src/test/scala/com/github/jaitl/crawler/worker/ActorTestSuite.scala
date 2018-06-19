@@ -1,4 +1,4 @@
-package com.github.jaitl.crawler.master.queue
+package com.github.jaitl.crawler.worker
 
 import akka.actor.ActorSystem
 import akka.testkit.ImplicitSender
@@ -12,11 +12,11 @@ import scala.concurrent.Future
 
 abstract class ActorTestSuite
   extends TestKit(ActorSystem("CloudCrawlerTest"))
-  with ImplicitSender
-  with WordSpecLike
-  with Matchers
-  with BeforeAndAfterAll
-  with MockFactory {
+    with ImplicitSender
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with MockFactory {
 
   protected val futureSuccess: Future[Unit] = Future.successful(Unit)
 
