@@ -11,9 +11,9 @@ import akka.cluster.sharding.ShardRegion
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
-import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ActionSuccess
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.TaskStatus
+import com.github.jaitl.crawler.models.worker.CommonActions.ActionSuccess
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContextExecutor
@@ -63,8 +63,6 @@ object QueueTaskResultController {
   case class MarkAsFailed(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
 
   case class AddNewTasks(requestId: UUID, taskType: String, tasksData: Seq[String], requester: ActorRef)
-
-  case class ActionSuccess(requestId: UUID, taskType: String)
 
   def props(queueProvider: QueueTaskProvider): Props = Props(new QueueTaskResultController(queueProvider))
 
