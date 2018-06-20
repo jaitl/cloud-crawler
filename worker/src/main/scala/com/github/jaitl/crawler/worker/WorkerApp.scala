@@ -81,7 +81,7 @@ object WorkerApp extends StrictLogging {
       crawlExecutorCreator = crawlExecutorCreator,
       saveCrawlResultCreator = saveCrawlResultControllerCreator,
       executeScheduler = new AkkaScheduler(system),
-      config = TasksBatchControllerConfig(10, 100.millis) // TODO read from config file
+      config = TasksBatchControllerConfig(3, 100.millis) // TODO read from config file
     )
 
     val workerConfig = WorkerConfig(parallelBatches.get, 1.seconds) // TODO read from config file
