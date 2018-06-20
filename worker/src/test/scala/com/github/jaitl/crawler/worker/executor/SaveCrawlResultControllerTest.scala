@@ -24,6 +24,7 @@ import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class SaveCrawlResultControllerTest extends ActorTestSuite {
@@ -163,7 +164,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     }
 
     "save parsed result" in new OnlyParsedResultSaverSuite {
-      (saveParsedProvider.saveResults _).expects(*).returning(futureSuccess)
+      (saveParsedProvider.saveResults(_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(futureSuccess)
 
       val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"),
         Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
@@ -195,7 +196,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     }
 
     "save raw and parsed result" in new RawAndParsedResultSaverSuite {
-      (saveParsedProvider.saveResults _).expects(*).returning(futureSuccess)
+      (saveParsedProvider.saveResults (_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(futureSuccess)
       (saveRawProvider.save _).expects(*).returning(futureSuccess)
 
       val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"),
@@ -232,7 +233,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     }
 
     "failure during save" in new OnlyParsedResultSaverSuite {
-      (saveParsedProvider.saveResults _).expects(*).returning(Future.failed(new Exception("")))
+      (saveParsedProvider.saveResults (_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(Future.failed(new Exception("")))
 
       val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"),
         Some(ParseResult(TestDataRes("1"))))
@@ -248,7 +249,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     }
 
     "try to save empty results" in new OnlyParsedResultSaverSuite {
-      (saveParsedProvider.saveResults _).expects(*).never()
+      (saveParsedProvider.saveResults (_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).never()
 
       saveCrawlResultController.underlyingActor.successTasks should have size 0
       saveCrawlResultController.underlyingActor.failedTasks should have size 0
