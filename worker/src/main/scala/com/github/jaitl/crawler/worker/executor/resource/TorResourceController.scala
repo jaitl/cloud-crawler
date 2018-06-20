@@ -78,7 +78,7 @@ private class TorResourceController(
       executorId = id,
       host = config.host,
       port = config.port,
-      proxyType = ProxyType.Http,
+      proxyType = ProxyType.Socks5,
       userAgent = userAgent
     )
 
@@ -94,7 +94,6 @@ private class TorResourceController(
 }
 
 private object TorResourceController {
-
   case class ExecutorContext(
     id: UUID,
     executor: HttpRequestExecutor,

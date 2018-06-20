@@ -66,7 +66,7 @@ object WorkerApp extends StrictLogging {
       props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
     )
 
-    val resourceControllerConfig = ResourceControllerConfig(maxFailCount = 100)
+    val resourceControllerConfig = ResourceControllerConfig(maxFailCount = 3)
 
     val resourceControllerCreator = new ResourceControllerCreator(resourceControllerConfig)
 
@@ -81,10 +81,10 @@ object WorkerApp extends StrictLogging {
       crawlExecutorCreator = crawlExecutorCreator,
       saveCrawlResultCreator = saveCrawlResultControllerCreator,
       executeScheduler = new AkkaScheduler(system),
-      config = TasksBatchControllerConfig(10, 30.seconds) // TODO read from config file
+      config = TasksBatchControllerConfig(10, 100.millis) // TODO read from config file
     )
 
-    val workerConfig = WorkerConfig(parallelBatches.get, 10.seconds)
+    val workerConfig = WorkerConfig(parallelBatches.get, 1.seconds) // TODO read from config file
 
     val workerManager = system.actorOf(
       WorkerManager.props(

@@ -2,6 +2,7 @@ package com.github.jaitl.crawler.worker.http
 
 import java.util.UUID
 
+import com.typesafe.scalalogging.StrictLogging
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.BoundRequestBuilder
@@ -15,8 +16,9 @@ import scala.concurrent.Future
 
 class AsyncHttpRequestExecutor(
   executorConfig: HttpRequestExecutorConfig
-)(implicit executionContext: ExecutionContext) extends HttpRequestExecutor {
+)(implicit executionContext: ExecutionContext) extends HttpRequestExecutor with StrictLogging {
   private val jsonContentType = "application/json"
+  private val maxRedirectsCount = 5
 
   private val client: AsyncHttpClient = {
     val proxyType = executorConfig.proxyType match {
@@ -26,7 +28,8 @@ class AsyncHttpRequestExecutor(
 
     val proxyServer = new ProxyServer.Builder(executorConfig.host, executorConfig.port).setProxyType(proxyType).build()
 
-    asyncHttpClient(config().setProxyServer(proxyServer).setUserAgent(executorConfig.userAgent))
+    asyncHttpClient(config().setProxyServer(proxyServer).setUserAgent(executorConfig.userAgent)
+      .setFollowRedirect(true).setMaxRedirects(maxRedirectsCount))
   }
 
   override def get(uri: String): Future[HttpResult] = {

@@ -95,7 +95,6 @@ class CrawlExecutorTest extends ActorTestSuite {
 
       expectMsgType[CrawlFailureResult]
     }
-
   }
 
   case class TestDataRes(data: String)
