@@ -41,8 +41,6 @@ private class CrawlExecutor extends Actor {
       }
 
       recoveredResult pipeTo sender()
-
-    // TODO kill recoveredResult by timeout
   }
 }
 
