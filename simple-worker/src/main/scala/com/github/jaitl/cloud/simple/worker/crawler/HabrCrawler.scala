@@ -15,6 +15,11 @@ class HabrCrawler extends BaseCrawler {
     httpRequestExecutor: HttpRequestExecutor
   )(implicit executionContext: ExecutionContext): Future[CrawlResult] =
     httpRequestExecutor.get(s"$habrUrl/${task.taskData}/")
-      .filter(_.code == 200)
+      .map { r =>
+        if (r.code != 200) {
+          throw new Exception(s"wrong http code: ${r.code}, body: ${r.body}")
+        }
+        r
+      }
       .map(res => CrawlResult(res.body))
 }
