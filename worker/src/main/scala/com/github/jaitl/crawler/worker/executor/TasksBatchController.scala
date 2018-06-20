@@ -107,12 +107,12 @@ private[worker] class TasksBatchController(
 
   private def crawlResultHandler: Receive = {
     case CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult) =>
-      log.info(s"success crawl completed: ${task.task.id}")
+      log.info(s"success crawl completed: ${task.task.taskData}")
       resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       saveCrawlResultController ! AddResults(SuccessCrawledTask(task.task, crawlResult, parseResult))
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
-      log.error(t, s"failure crawl completed: ${task.task.id}, attempt: ${task.attempt}")
+      log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
       if (ResourceHelper.isResourceFailed(t)) {
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task

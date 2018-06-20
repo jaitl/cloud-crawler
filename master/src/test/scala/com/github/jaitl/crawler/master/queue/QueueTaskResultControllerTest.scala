@@ -4,12 +4,12 @@ import java.util.UUID
 
 import akka.actor.ActorRef
 import com.github.jaitl.crawler.master.ActorTestSuite
-import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ActionSuccess
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.TaskStatus
+import com.github.jaitl.crawler.models.worker.CommonActions.ActionSuccess
 
 class QueueTaskResultControllerTest extends ActorTestSuite {
 
