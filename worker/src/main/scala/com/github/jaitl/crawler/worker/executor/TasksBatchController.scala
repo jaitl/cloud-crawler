@@ -59,12 +59,18 @@ private[worker] class TasksBatchController(
 
   override def preStart(): Unit = {
     super.preStart()
+    log.info(s"Start new TasksBatchController, batch id: ${batch.id}")
 
     resourceController = resourceControllerCreator.create(this.context, pipeline.resourceType)
     saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self)
     crawlExecutor = crawlExecutorCreator.create(this.context)
 
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
+  }
+
+  override def postStop(): Unit = {
+    super.postStop()
+    log.info(s"Stop TasksBatchController, batch id: ${batch.id}")
   }
 
   override def receive: Receive = Seq(waitRequest, resourceRequestHandler, crawlResultHandler, resultSavedHandler)
@@ -85,6 +91,7 @@ private[worker] class TasksBatchController(
         val task = taskQueue.dequeue()
         crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
         currentActiveCrawlTask = currentActiveCrawlTask + 1
+        log.info(s"crawl task: ${task.task.id}, activeTasks: $currentActiveCrawlTask")
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       }
@@ -100,10 +107,12 @@ private[worker] class TasksBatchController(
 
   private def crawlResultHandler: Receive = {
     case CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult) =>
+      log.info(s"success crawl completed: ${task.task.id}")
       resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       saveCrawlResultController ! AddResults(SuccessCrawledTask(task.task, crawlResult, parseResult))
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
+      log.error(t, s"failure crawl completed: ${task.task.id}, attempt: ${task.attempt}")
       if (ResourceHelper.isResourceFailed(t)) {
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
@@ -123,6 +132,7 @@ private[worker] class TasksBatchController(
   private def resultSavedHandler: Receive = {
     case SuccessAddedResults =>
       currentActiveCrawlTask = currentActiveCrawlTask - 1
+      log.info(s"SuccessAddedResults, activeTasks: $currentActiveCrawlTask")
 
     case SuccessSavedResults =>
       if ((taskQueue.isEmpty || forcedStop) && currentActiveCrawlTask == 0) {
