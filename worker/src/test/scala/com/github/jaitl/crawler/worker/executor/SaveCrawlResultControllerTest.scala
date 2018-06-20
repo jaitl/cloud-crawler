@@ -33,7 +33,8 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val baseCrawler = mock[BaseCrawler]
     val saveRawProvider = mock[SaveRawProvider]
 
-    val pipeline = PipelineBuilder[TestDataRes]()
+    val pipeline = PipelineBuilder
+      .noParserPipeline()
       .withTaskType("test")
       .withBatchSize(10)
       .withSaveRawProvider(saveRawProvider)
