@@ -27,32 +27,23 @@ private[worker] class WorkerManager(
   batchRequestScheduler: Scheduler
 ) extends Actor {
   private val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
+  private val cancellable = batchRequestScheduler.schedule(config.executeInterval, self, RequestBatch)
 
   override def receive: Receive = {
     case RequestBatch =>
       if (context.children.size < config.parallelBatches) {
         queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), taskTypes)
-      } else {
-        scheduleTimeout()
       }
 
     case SuccessTasksBatchRequest(requestId, taskType, tasksBatch) =>
-      self ! RequestBatch
-
       val tasksBatchController = tasksBatchControllerCreator.create(this.context, tasksBatch, pipelines(taskType))
       tasksBatchController ! TasksBatchController.ExecuteTask
 
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
-      scheduleTimeout()
 
     case NoTasks(requestId, taskType) =>
-      scheduleTimeout()
 
     case EmptyTaskTypeList =>
-  }
-
-  private def scheduleTimeout(): Unit = {
-    batchRequestScheduler.scheduleOnce(config.executeInterval, self, RequestBatch)
   }
 }
 
