@@ -5,5 +5,5 @@ import scala.concurrent.Future
 
 
 trait SaveParsedProvider[T] {
-  def saveResults[D](parsedData: Seq[D])(implicit executionContext: ExecutionContext): Future[Unit]
+  def saveResults(parsedData: Seq[T])(implicit executionContext: ExecutionContext): Future[Unit]
 }
