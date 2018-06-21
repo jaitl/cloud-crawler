@@ -51,7 +51,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val config = SaveCrawlResultControllerConfig(1.minute)
 
-    val saveCrawlResultController = TestActorRef[SaveCrawlResultController](SaveCrawlResultController.props(
+    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](SaveCrawlResultController.props(
       pipeline, queueTaskBalancer.ref, tasksBatchController.ref, saveScheduler, config
     ))
   }
@@ -78,7 +78,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val config = SaveCrawlResultControllerConfig(1.minute)
 
-    val saveCrawlResultController = TestActorRef[SaveCrawlResultController](SaveCrawlResultController.props(
+    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](SaveCrawlResultController.props(
       pipeline, queueTaskBalancer.ref, tasksBatchController.ref, saveScheduler, config
     ))
   }
@@ -107,7 +107,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val config = SaveCrawlResultControllerConfig(1.minute)
 
-    val saveCrawlResultController = TestActorRef[SaveCrawlResultController](SaveCrawlResultController.props(
+    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](SaveCrawlResultController.props(
       pipeline, queueTaskBalancer.ref, tasksBatchController.ref, saveScheduler, config
     ))
   }
