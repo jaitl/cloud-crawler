@@ -30,8 +30,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-class SaveCrawlResultController(
-  pipeline: Pipeline[_],
+class SaveCrawlResultController[T](
+  pipeline: Pipeline[T],
   queueTaskBalancer: ActorRef,
   tasksBatchController: ActorRef,
   saveScheduler: Scheduler,
@@ -70,7 +70,7 @@ class SaveCrawlResultController(
     case SaveResults =>
       context.become(saveResultHandler)
 
-      val parserResults = successTasks.flatMap(_.parseResult).map(_.parsedData)
+      val parserResults = successTasks.flatMap(_.parseResult).map(_.parsedData.asInstanceOf[T])
       val rawResult = successTasks.map(r => (r.task, r.crawlResult))
 
       val saveFuture: Future[SaveResults] = for {
