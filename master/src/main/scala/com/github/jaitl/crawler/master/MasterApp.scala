@@ -7,6 +7,7 @@ import akka.cluster.sharding.ClusterShardingSettings
 import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonManagerSettings
 import com.github.jaitl.crawler.master.queue.QueueTaskBalancer
+import com.github.jaitl.crawler.master.queue.QueueTaskConfig
 import com.github.jaitl.crawler.master.queue.QueueTaskRequestController
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController
 import com.github.jaitl.crawler.master.queue.provider.MongoQueueTaskProvider
@@ -31,6 +32,8 @@ object MasterApp extends StrictLogging {
 
     val system = ActorSystem("cloudCrawlerSystem", config)
 
+    val queueTaskConfig = QueueTaskConfig(3)
+
     val queueTaskQueueReqCtrl: ActorRef = ClusterSharding(system).start(
       typeName = QueueTaskRequestController.name(),
       entityProps = QueueTaskRequestController.props(taskProvider),
@@ -41,7 +44,7 @@ object MasterApp extends StrictLogging {
 
     val queueTaskQueueResCtrl: ActorRef = ClusterSharding(system).start(
       typeName = QueueTaskResultController.name(),
-      entityProps = QueueTaskResultController.props(taskProvider),
+      entityProps = QueueTaskResultController.props(taskProvider, queueTaskConfig),
       settings = ClusterShardingSettings(system).withRole("master"),
       extractEntityId = QueueTaskResultController.extractEntityId,
       extractShardId = QueueTaskResultController.extractShardId

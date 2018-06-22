@@ -37,7 +37,8 @@ class MongoQueueTaskProvider(
       .toFuture()
 
   override def pushTasks(taskType: String, taskData: Seq[String]): Future[Unit] = {
-    val newTasks = taskData.map(data => MongoQueueTaskEntity(new ObjectId(), taskType, data, TaskStatus.taskWait))
+    val newTasks = taskData
+      .map(data => MongoQueueTaskEntity(new ObjectId(), taskType, data, TaskStatus.taskWait, Some(0)))
 
     collection.insertMany(newTasks).toFuture().map(_ => Unit)
   }
@@ -49,6 +50,16 @@ class MongoQueueTaskProvider(
     collection.bulkWrite(updates).toFuture().map(_ => Unit)
   }
 
+  override def updateTasksStatusAndIncAttempt(ids: Seq[String], taskStatus: String): Future[Unit] = {
+    val updates = ids.map { id =>
+      UpdateManyModel(
+        equal("_id", new ObjectId(id)),
+        combine(set("taskStatus", taskStatus), inc("attempt", 1))
+      )
+    }
+    collection.bulkWrite(updates).toFuture().map(_ => Unit)
+  }
+
   override def dropTasks(ids: Seq[String]): Future[Unit] = {
     val deletes = ids.map { id =>
       DeleteManyModel(equal("_id", new ObjectId(id)))
@@ -56,6 +67,18 @@ class MongoQueueTaskProvider(
     collection.bulkWrite(deletes).toFuture().map(_ => Unit)
   }
 
-  case class MongoQueueTaskEntity(_id: ObjectId, taskType: String, taskData: String, taskStatus: String)
+  override def getByIds(ids: Seq[String]): Future[Seq[Task]] = {
+    collection.find(in("_id", ids))
+      .map(entity => Task(entity._id.toString, entity.taskType, entity.taskData))
+      .toFuture()
+  }
+
+  case class MongoQueueTaskEntity(
+    _id: ObjectId,
+    taskType: String,
+    taskData: String,
+    taskStatus: String,
+    attempt: Option[Int]
+  )
 
 }
