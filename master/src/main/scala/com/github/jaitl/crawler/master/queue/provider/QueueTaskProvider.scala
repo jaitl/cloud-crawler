@@ -11,5 +11,9 @@ trait QueueTaskProvider {
 
   def updateTasksStatus(ids: Seq[String], taskStatus: String): Future[Unit]
 
+  def updateTasksStatusAndIncAttempt(ids: Seq[String], taskStatus: String): Future[Unit]
+
   def dropTasks(ids: Seq[String]): Future[Unit]
+
+  def getByIds(ids: Seq[String]): Future[Seq[Task]]
 }
