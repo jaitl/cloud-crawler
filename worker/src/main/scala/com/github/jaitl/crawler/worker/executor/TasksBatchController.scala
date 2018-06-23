@@ -9,6 +9,7 @@ import akka.actor.ActorRefFactory
 import akka.actor.Props
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.task.TasksBatch
+import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
@@ -45,6 +46,7 @@ private[worker] class TasksBatchController(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
   saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
+  queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends Actor with ActorLogging {
@@ -137,6 +139,12 @@ private[worker] class TasksBatchController(
     case SuccessSavedResults =>
       if ((taskQueue.isEmpty || forcedStop) && currentActiveCrawlTask == 0) {
         log.info(s"Stop task batch controller: ${batch.id}, forcedStop: $forcedStop")
+
+        if (taskQueue.nonEmpty) {
+          val ids = taskQueue.map(_.task.id)
+          queueTaskBalancer ! ReturnTasks(UUID.randomUUID(), batch.taskType, ids)
+        }
+
         context.stop(self)
       }
 
@@ -157,6 +165,7 @@ private[worker] object TasksBatchController {
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
     saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
+    queueTaskBalancer: ActorRef,
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
   ): Props =
@@ -166,6 +175,7 @@ private[worker] object TasksBatchController {
       resourceControllerCreator = resourceControllerCreator,
       crawlExecutorCreator = crawlExecutorCreator,
       saveCrawlResultCreator = saveCrawlResultCreator,
+      queueTaskBalancer = queueTaskBalancer,
       executeScheduler = executeScheduler,
       config = config
     ))
@@ -182,6 +192,7 @@ class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
   saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
+  queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends TwoArgumentActorCreator[TasksBatch, Pipeline[_]] {
@@ -195,6 +206,7 @@ class TasksBatchControllerCreator(
         resourceControllerCreator = resourceControllerCreator,
         crawlExecutorCreator = crawlExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,
+        queueTaskBalancer = queueTaskBalancer,
         executeScheduler = executeScheduler,
         config = config
       ),

@@ -8,12 +8,13 @@ import com.github.jaitl.crawler.master.queue.QueueTaskRequestController.RequestT
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ReturnToQueue
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
+import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.TaskTypeWithBatchSize
 import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
 
 class QueueTaskBalancerTest extends ActorTestSuite {
-
   "QueueTaskBalancer" should {
     "send batch tasks request" in {
       val queueTaskQueueReqCtrl = TestProbe()
@@ -51,6 +52,26 @@ class QueueTaskBalancerTest extends ActorTestSuite {
       queueTaskQueueResCtrl.expectMsg(MarkAsProcessed(requestId, taskType, Seq("1", "2"), self))
       queueTaskQueueResCtrl.expectMsg(MarkAsFailed(requestId, taskType, Seq("3", "4"), self))
       queueTaskQueueResCtrl.expectMsg(AddNewTasks(requestId, "type2", Seq("tt1", "tt2"), self))
+    }
+
+    "return tasks" in {
+      val queueTaskQueueReqCtrl = TestProbe()
+      val queueTaskQueueResCtrl = TestProbe()
+      val queueTaskBalancer = system
+        .actorOf(QueueTaskBalancer.props(queueTaskQueueReqCtrl.ref, queueTaskQueueResCtrl.ref))
+
+      val requestId = UUID.randomUUID()
+      val taskType = "type1"
+
+      val request = ReturnTasks(
+        requestId = requestId,
+        taskType = taskType,
+        ids = Seq("1", "2", "3")
+      )
+
+      queueTaskBalancer ! request
+
+      queueTaskQueueResCtrl.expectMsg(ReturnToQueue(requestId, taskType, Seq("1", "2", "3"), self))
     }
   }
 }
