@@ -11,6 +11,7 @@ import akka.cluster.sharding.ShardRegion
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ReturnToQueue
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.TaskStatus
 import com.github.jaitl.crawler.models.worker.CommonActions.ActionSuccess
@@ -26,7 +27,9 @@ class QueueTaskResultController(
 ) extends Actor with ActorLogging {
   implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
-  override def receive: Receive = {
+  override def receive: Receive = markTasks orElse addTasks orElse returnTasks
+
+  private val markTasks: Receive = {
     case MarkAsProcessed(requestId, taskType, ids, requester) =>
       val dropFuture = queueProvider.dropTasks(ids).map(_ => ActionSuccess(requestId, taskType))
 
@@ -60,7 +63,9 @@ class QueueTaskResultController(
         case Failure(ex) => log.error(ex, s"Error during MarkAsFailed, requestId: $requestId")
         case _ =>
       }
+  }
 
+  private val addTasks: Receive = {
     case AddNewTasks(requestId, taskType, tasksData, requester) =>
       val pushFuture = queueProvider.pushTasks(taskType, tasksData).map(_ => ActionSuccess(requestId, taskType))
 
@@ -71,6 +76,15 @@ class QueueTaskResultController(
         case _ =>
       }
   }
+
+  private val returnTasks: Receive = {
+    case ReturnToQueue(requestId, taskType, ids, requester) =>
+      val returnFuture = queueProvider
+        .updateTasksStatus(ids, TaskStatus.taskWait)
+        .map(_ => ActionSuccess(requestId, taskType))
+
+      returnFuture pipeTo requester
+  }
 }
 
 object QueueTaskResultController {
@@ -79,6 +93,8 @@ object QueueTaskResultController {
   case class MarkAsFailed(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
 
   case class AddNewTasks(requestId: UUID, taskType: String, tasksData: Seq[String], requester: ActorRef)
+
+  case class ReturnToQueue(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
 
   def props(queueProvider: QueueTaskProvider, config: QueueTaskConfig): Props =
     Props(new QueueTaskResultController(queueProvider, config))
@@ -89,11 +105,13 @@ object QueueTaskResultController {
     case msg @ MarkAsProcessed(_ , taskType, _, _) => (taskType, msg)
     case msg @ MarkAsFailed(_ , taskType, _, _) => (taskType, msg)
     case msg @ AddNewTasks(_ , taskType, _, _) => (taskType, msg)
+    case msg @ ReturnToQueue(_, taskType, _, _) => (taskType, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
     case MarkAsProcessed(_, taskType, _, _) => taskType
     case MarkAsFailed(_, taskType, _, _) => taskType
     case AddNewTasks(_, taskType, _, _) => taskType
+    case ReturnToQueue(_, taskType, _, _) => taskType
   }
 }
