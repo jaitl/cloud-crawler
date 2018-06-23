@@ -86,9 +86,9 @@ object QueueTaskResultController {
   def name(): String = "queueTaskResultController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg @ MarkAsProcessed(requestId, _, _, _) => (requestId.toString, msg)
-    case msg @ MarkAsFailed(requestId, _, _, _) => (requestId.toString, msg)
-    case msg @ AddNewTasks(requestId, _, _, _) => (requestId.toString, msg)
+    case msg @ MarkAsProcessed(_ , taskType, _, _) => (taskType, msg)
+    case msg @ MarkAsFailed(_ , taskType, _, _) => (taskType, msg)
+    case msg @ AddNewTasks(_ , taskType, _, _) => (taskType, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
