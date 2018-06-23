@@ -19,8 +19,10 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.Failure
 
-// TODO add retry/persistence and retry attempts
-class QueueTaskResultController(queueProvider: QueueTaskProvider) extends Actor with ActorLogging {
+class QueueTaskResultController(
+  queueProvider: QueueTaskProvider,
+  config: QueueTaskConfig
+) extends Actor with ActorLogging {
   implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
   override def receive: Receive = {
@@ -35,8 +37,13 @@ class QueueTaskResultController(queueProvider: QueueTaskProvider) extends Actor 
       }
 
     case MarkAsFailed(requestId, taskType, ids, requester) =>
-      val updateFuture = queueProvider.updateTasksStatus(ids, TaskStatus.taskWait)
-        .map(_ => ActionSuccess(requestId, taskType))
+      val updateFuture = for {
+        tasks <- queueProvider.getByIds(ids)
+        failedTasks = tasks.filter(t => t.attempt + 1 >= config.maxAttemptsCount).map(_.id)
+        recoveredTasks = tasks.filter(t => t.attempt + 1 < config.maxAttemptsCount).map(_.id)
+        _ <- queueProvider.updateTasksStatusAndIncAttempt(failedTasks, TaskStatus.taskFailed)
+        _ <- queueProvider.updateTasksStatusAndIncAttempt(recoveredTasks, TaskStatus.taskWait)
+      } yield ActionSuccess(requestId, taskType)
 
       updateFuture pipeTo requester
 
@@ -64,7 +71,8 @@ object QueueTaskResultController {
 
   case class AddNewTasks(requestId: UUID, taskType: String, tasksData: Seq[String], requester: ActorRef)
 
-  def props(queueProvider: QueueTaskProvider): Props = Props(new QueueTaskResultController(queueProvider))
+  def props(queueProvider: QueueTaskProvider, config: QueueTaskConfig): Props =
+    Props(new QueueTaskResultController(queueProvider, config))
 
   def name(): String = "queueTaskResultController"
 
