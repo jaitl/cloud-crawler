@@ -7,6 +7,7 @@ import com.github.jaitl.crawler.master.ActorTestSuite
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ReturnToQueue
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.TaskStatus
 import com.github.jaitl.crawler.models.task.Task
@@ -78,6 +79,16 @@ class QueueTaskResultControllerTest extends ActorTestSuite {
       (queueProvider.pushTasks _).expects(taskType, tasksData).returning(futureSuccess)
 
       queueTaskResultController ! AddNewTasks(requestId, taskType, tasksData, self)
+
+      expectMsg(ActionSuccess(requestId, taskType))
+    }
+
+    "return to queue" in new SimpleMock {
+      val tasksData = Seq("data1", "data2")
+
+      (queueProvider.updateTasksStatus _).expects(tasksData, TaskStatus.taskWait).returning(futureSuccess)
+
+      queueTaskResultController ! ReturnToQueue(requestId, taskType, tasksData, self)
 
       expectMsg(ActionSuccess(requestId, taskType))
     }

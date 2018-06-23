@@ -8,6 +8,7 @@ import akka.actor.ActorRef
 import akka.actor.Props
 import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyTaskTypeList
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
+import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
 
 import scala.util.Random
@@ -43,6 +44,13 @@ class QueueTaskBalancer(
         newTasks.foreach { case (newTaskType, newTasksData) =>
           queueTaskQueueResCtrl ! QueueTaskResultController.AddNewTasks(requestId, newTaskType, newTasksData, sender())
         }
+      }
+
+    case ReturnTasks(requestId, taskType, ids) =>
+      log.debug(s"ReturnTasks, requestId: $requestId, types: $taskType")
+
+      if (ids.nonEmpty) {
+        queueTaskQueueResCtrl ! QueueTaskResultController.ReturnToQueue(requestId, taskType, ids, sender())
       }
   }
 }

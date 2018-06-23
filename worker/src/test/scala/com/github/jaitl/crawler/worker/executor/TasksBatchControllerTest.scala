@@ -8,6 +8,7 @@ import akka.testkit.TestActorRef
 import akka.testkit.TestProbe
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.task.TasksBatch
+import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.ActorTestSuite
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
@@ -64,6 +65,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
     val crawlExecutorCreator = mock[ActorCreator]
     val saveCrawlResultController = TestProbe()
     val saveCrawlResultCreator = mock[TwoArgumentActorCreator[Pipeline[_], ActorRef]]
+    val queueTaskBalancer = TestProbe()
     val executeScheduler = mock[Scheduler]
     val config = TasksBatchControllerConfig(maxAttempts = 2, 1.minute)
 
@@ -74,7 +76,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
     val tasksBatchController = TestActorRef[TasksBatchController](
       TasksBatchController.props(batch, pipeline, resourceControllerCreator, crawlExecutorCreator,
-        saveCrawlResultCreator, executeScheduler, config)
+        saveCrawlResultCreator, queueTaskBalancer.ref, executeScheduler, config)
     )
 
     val requestExecutor = mock[HttpRequestExecutor]
@@ -144,6 +146,11 @@ class TasksBatchControllerTest extends ActorTestSuite {
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       saveCrawlResultController.reply(SuccessSavedResults)
+
+      val returnedRes = queueTaskBalancer.expectMsgType[ReturnTasks]
+
+      returnedRes.taskType shouldBe batch.taskType
+      returnedRes.ids shouldBe tasks.map(_.id)
 
       watcher.expectTerminated(tasksBatchController)
     }
