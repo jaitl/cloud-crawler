@@ -4,6 +4,6 @@ jdk:
 sudo: false
 install: true
 script:
-    - ./gradlew clean test scalaStyle
+    - ./gradlew clean test jacocoFullReport scalaStyle
 after_success:
-    - ./gradlew jacocoTestReport coveralls
+    - ./gradlew coveralls
