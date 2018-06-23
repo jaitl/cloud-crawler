@@ -13,10 +13,14 @@ buildscript {
         classpath "net.saliman:gradle-cobertura-plugin:2.5.4"
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
         classpath "gradle.plugin.com.github.maiflai:gradle-scalatest:0.19"
+        classpath "gradle.plugin.com.palantir:jacoco-coverage:0.4.0"
     }
 }
 
 allprojects {
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'com.palantir.jacoco-full-report'
+
     repositories {
         maven {
             url "https://dl.bintray.com/ngbinh/maven/"
@@ -25,6 +29,10 @@ allprojects {
             url "https://plugins.gradle.org/m2/"
         }
         jcenter()
+    }
+
+    jacocoFull {
+        excludeProject ":models", ":simple-worker"
     }
 }
 
@@ -35,9 +43,8 @@ def akkaVersion = "2.5.9"
 subprojects {
     apply plugin: 'scala'
     apply plugin: 'scalaStyle'
-    apply plugin: 'jacoco'
-    apply plugin: 'com.github.kt3k.coveralls'
     apply plugin: "com.github.maiflai.scalatest"
+    apply plugin: 'jacoco'
 
     dependencies {
         // scala
@@ -51,7 +58,6 @@ subprojects {
         // test
         testCompile "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
         testRuntime "org.pegdown:pegdown:1.1.0"
-
     }
 
     scalaStyle {
@@ -68,14 +74,20 @@ subprojects {
 
     jacocoTestReport {
         reports {
-            xml.enabled = true
             html.enabled = true
+            xml.enabled = true
+            csv.enabled = false
         }
     }
 
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.additionalParameters = ["-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"]
     }
+}
+
+coveralls {
+    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
 }
 
 project(":models") {
