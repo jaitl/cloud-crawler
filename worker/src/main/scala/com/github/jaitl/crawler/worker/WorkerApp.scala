@@ -80,6 +80,7 @@ object WorkerApp extends StrictLogging {
       resourceControllerCreator = resourceControllerCreator,
       crawlExecutorCreator = crawlExecutorCreator,
       saveCrawlResultCreator = saveCrawlResultControllerCreator,
+      queueTaskBalancer = queueTaskBalancer,
       executeScheduler = new AkkaScheduler(system),
       config = TasksBatchControllerConfig(3, 100.millis) // TODO read from config file
     )

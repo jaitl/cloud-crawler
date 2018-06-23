@@ -7,13 +7,15 @@ import com.github.jaitl.crawler.models.task.TasksBatch
 object WorkerManager {
   case class RequestTasksBatch(requestId: UUID, taskTypes: Seq[TaskTypeWithBatchSize])
 
-  case class TasksBatchProcessResult(
+  case class  TasksBatchProcessResult(
     requestId: UUID,
     taskType: String,
     successIds: Seq[String],
     failureIds: Seq[String],
     newTasks: Map[String, Seq[String]]
   )
+
+  case class ReturnTasks(requestId: UUID, taskType: String, ids: Seq[String])
 
   case class TaskTypeWithBatchSize(taskType: String, batchSize: Int)
 
