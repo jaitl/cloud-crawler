@@ -33,7 +33,7 @@ class QueueTaskRequestController(
 
   private def waitRequest: Receive = {
     case RequestTask(requestId, taskType, batchSize, requester) =>
-      log.debug(s"RequestTask: $requestId, $taskType")
+      log.debug(s"RequestTask: $requestId, $taskType, self: $self")
 
       context.become(processingRequest)
 
@@ -53,6 +53,7 @@ class QueueTaskRequestController(
 
   private def processingRequest: Receive = {
     case QueueBatchSuccess(requestId, taskType, requester, tasks) =>
+      log.debug(s"QueueBatchSuccess: $requestId, $taskType, self: $self, tasks: $tasks")
 
       if (tasks.nonEmpty) {
         val tasksBatch = TasksBatch(requestId, taskType, tasks)
@@ -89,7 +90,7 @@ object QueueTaskRequestController {
   def name(): String = "queueTaskRequestController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg@RequestTask(requestId, _, _, _) => (requestId.toString, msg)
+    case msg@RequestTask(_, taskType, _, _) => (taskType, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
