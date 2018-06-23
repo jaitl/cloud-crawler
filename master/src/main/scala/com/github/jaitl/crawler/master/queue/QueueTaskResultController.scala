@@ -17,6 +17,7 @@ import com.github.jaitl.crawler.models.worker.CommonActions.ActionSuccess
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.Future
 import scala.util.Failure
 
 class QueueTaskResultController(
@@ -41,8 +42,16 @@ class QueueTaskResultController(
         tasks <- queueProvider.getByIds(ids)
         failedTasks = tasks.filter(t => t.attempt + 1 >= config.maxAttemptsCount).map(_.id)
         recoveredTasks = tasks.filter(t => t.attempt + 1 < config.maxAttemptsCount).map(_.id)
-        _ <- queueProvider.updateTasksStatusAndIncAttempt(failedTasks, TaskStatus.taskFailed)
-        _ <- queueProvider.updateTasksStatusAndIncAttempt(recoveredTasks, TaskStatus.taskWait)
+        _ <- if (failedTasks.nonEmpty) {
+          queueProvider.updateTasksStatusAndIncAttempt(failedTasks, TaskStatus.taskFailed)
+        } else {
+          Future.successful(Unit)
+        }
+        _ <- if (recoveredTasks.nonEmpty) {
+          queueProvider.updateTasksStatusAndIncAttempt(recoveredTasks, TaskStatus.taskWait)
+        } else {
+          Future.successful(Unit)
+        }
       } yield ActionSuccess(requestId, taskType)
 
       updateFuture pipeTo requester
@@ -77,9 +86,9 @@ object QueueTaskResultController {
   def name(): String = "queueTaskResultController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg@MarkAsProcessed(requestId, _, _, _) => (requestId.toString, msg)
-    case msg@MarkAsFailed(requestId, _, _, _) => (requestId.toString, msg)
-    case msg@AddNewTasks(requestId, _, _, _) => (requestId.toString, msg)
+    case msg @ MarkAsProcessed(requestId, _, _, _) => (requestId.toString, msg)
+    case msg @ MarkAsFailed(requestId, _, _, _) => (requestId.toString, msg)
+    case msg @ AddNewTasks(requestId, _, _, _) => (requestId.toString, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
