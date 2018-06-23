@@ -1,3 +1,3 @@
 package com.github.jaitl.crawler.models.task
 
-case class Task(id: String, taskType: String, taskData: String)
+case class Task(id: String, taskType: String, taskData: String, attempt: Int = 0)
