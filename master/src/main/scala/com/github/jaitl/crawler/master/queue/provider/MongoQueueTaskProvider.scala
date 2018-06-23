@@ -8,8 +8,8 @@ import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.MongoDatabase
 import org.mongodb.scala.bson.ObjectId
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
-import org.mongodb.scala.model.DeleteManyModel
-import org.mongodb.scala.model.UpdateManyModel
+import org.mongodb.scala.model.DeleteOneModel
+import org.mongodb.scala.model.UpdateOneModel
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,7 +33,7 @@ class MongoQueueTaskProvider(
   override def pullBatch(taskType: String, size: Int): Future[Seq[Task]] =
     collection.find(and(equal("taskType", taskType), equal("taskStatus", TaskStatus.taskWait)))
       .limit(size)
-      .map(entity => Task(entity._id.toString, entity.taskType, entity.taskData))
+      .map(entity => Task(entity._id.toString, entity.taskType, entity.taskData, entity.attempt.getOrElse(0)))
       .toFuture()
 
   override def pushTasks(taskType: String, taskData: Seq[String]): Future[Unit] = {
@@ -45,14 +45,14 @@ class MongoQueueTaskProvider(
 
   override def updateTasksStatus(ids: Seq[String], taskStatus: String): Future[Unit] = {
     val updates = ids.map { id =>
-      UpdateManyModel(equal("_id", new ObjectId(id)), set("taskStatus", taskStatus))
+      UpdateOneModel(equal("_id", new ObjectId(id)), set("taskStatus", taskStatus))
     }
     collection.bulkWrite(updates).toFuture().map(_ => Unit)
   }
 
   override def updateTasksStatusAndIncAttempt(ids: Seq[String], taskStatus: String): Future[Unit] = {
     val updates = ids.map { id =>
-      UpdateManyModel(
+      UpdateOneModel(
         equal("_id", new ObjectId(id)),
         combine(set("taskStatus", taskStatus), inc("attempt", 1))
       )
@@ -62,14 +62,15 @@ class MongoQueueTaskProvider(
 
   override def dropTasks(ids: Seq[String]): Future[Unit] = {
     val deletes = ids.map { id =>
-      DeleteManyModel(equal("_id", new ObjectId(id)))
+      DeleteOneModel(equal("_id", new ObjectId(id)))
     }
     collection.bulkWrite(deletes).toFuture().map(_ => Unit)
   }
 
   override def getByIds(ids: Seq[String]): Future[Seq[Task]] = {
-    collection.find(in("_id", ids))
-      .map(entity => Task(entity._id.toString, entity.taskType, entity.taskData))
+    val objIds = ids.map(id => new ObjectId(id))
+    collection.find(in("_id", objIds:_*))
+      .map(entity => Task(entity._id.toString, entity.taskType, entity.taskData, entity.attempt.getOrElse(0)))
       .toFuture()
   }
 

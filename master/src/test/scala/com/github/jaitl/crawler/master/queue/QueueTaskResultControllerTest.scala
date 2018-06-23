@@ -61,6 +61,17 @@ class QueueTaskResultControllerTest extends ActorTestSuite {
       expectMsg(ActionSuccess(requestId, taskType))
     }
 
+
+    "mark as failed empty" in new SimpleMock {
+      (queueProvider.getByIds _).expects(Seq.empty).returning(Future.successful(Seq.empty))
+      (queueProvider.updateTasksStatusAndIncAttempt _).expects(*, *).never()
+      (queueProvider.updateTasksStatusAndIncAttempt _).expects(*, *).never()
+
+      queueTaskResultController ! MarkAsFailed(requestId, taskType, Seq.empty, self)
+
+      expectMsg(ActionSuccess(requestId, taskType))
+    }
+
     "add new tasks" in new SimpleMock {
       val tasksData = Seq("data1", "data2")
 
