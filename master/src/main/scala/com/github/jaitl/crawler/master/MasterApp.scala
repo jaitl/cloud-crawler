@@ -10,19 +10,20 @@ import com.github.jaitl.crawler.master.queue.QueueTaskBalancer
 import com.github.jaitl.crawler.master.queue.QueueTaskConfig
 import com.github.jaitl.crawler.master.queue.QueueTaskRequestController
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController
-import com.github.jaitl.crawler.master.queue.provider.MongoQueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
+import com.github.jaitl.crawler.master.queue.provider.QueueTaskProviderFactory
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
 object MasterApp extends StrictLogging {
-  def main(args: Array[String]): Unit = {
-    // TODO move to config
-    val taskProvider: QueueTaskProvider = new MongoQueueTaskProvider(
-      "mongodb://localhost:27017", "cloud_master", "CrawlTasks"
-    )
+  import net.ceedubs.ficus.Ficus._ // scalastyle:ignore
+  import net.ceedubs.ficus.readers.ArbitraryTypeReader._ // scalastyle:ignore
 
+  def main(args: Array[String]): Unit = {
     val config = ConfigFactory.load("master.conf")
+
+    val taskProvider: QueueTaskProvider = QueueTaskProviderFactory
+      .getProvider(config.getConfig("master.task-provider"))
 
     logger.info(
       "Start master on {}:{}",
@@ -32,7 +33,7 @@ object MasterApp extends StrictLogging {
 
     val system = ActorSystem("cloudCrawlerSystem", config)
 
-    val queueTaskConfig = QueueTaskConfig(3)
+    val queueTaskConfig = config.as[QueueTaskConfig]("master.queue-task")
 
     val queueTaskQueueReqCtrl: ActorRef = ClusterSharding(system).start(
       typeName = QueueTaskRequestController.name(),
