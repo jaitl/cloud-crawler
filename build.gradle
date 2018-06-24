@@ -78,7 +78,8 @@ subprojects {
                 fileTree(dir: it,
                         exclude: ['**/WorkerApp**',
                                   '**/MasterApp**',
-                                  '**/MongoQueueTaskProvider**'
+                                  '**/MongoQueueTaskProvider**',
+                                  '**/QueueTaskProviderFactory**'
                         ])
             })
         }
@@ -114,6 +115,7 @@ project(":worker") {
 
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
         compile "org.asynchttpclient:async-http-client:2.4.7"
+        compile "com.iheart:ficus_${scalaMajorVersion}:1.4.3"
 
         // test
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
@@ -135,6 +137,8 @@ project(":master") {
         compile "com.typesafe.akka:akka-cluster-tools_${scalaMajorVersion}:${akkaVersion}"
         compile "com.typesafe.akka:akka-cluster-sharding_${scalaMajorVersion}:${akkaVersion}"
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
+
+        compile "com.iheart:ficus_${scalaMajorVersion}:1.4.3"
 
         // test
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
