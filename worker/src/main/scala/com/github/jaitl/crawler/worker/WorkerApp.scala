@@ -23,6 +23,8 @@ import com.typesafe.scalalogging.StrictLogging
 // scalastyle:off
 object WorkerApp extends StrictLogging {
   import scala.concurrent.duration._
+  import net.ceedubs.ficus.Ficus._
+  import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 
   private var pipelines: Option[Map[String, Pipeline[_]]] = None
   private var parallelBatches: Option[Int] = Some(2)
@@ -45,6 +47,12 @@ object WorkerApp extends StrictLogging {
 
     val config = ConfigFactory.load("worker.conf")
 
+    val resourceControllerConfig = config.as[ResourceControllerConfig]("worker.resource-controller")
+    val saveCrawlResultControllerConfig = config.as[SaveCrawlResultControllerConfig]("worker.save-controller")
+    val tasksBatchControllerConfig = config.as[TasksBatchControllerConfig]("worker.task-batch-controller")
+    val executeInterval = config.as[FiniteDuration]("worker.manager.executeInterval")
+    val workerConfig = WorkerConfig(parallelBatches.get, executeInterval)
+
     logger.info(
       "Start worker on {}:{}",
       config.getConfig("akka.remote.netty.tcp").getString("hostname"),
@@ -66,14 +74,12 @@ object WorkerApp extends StrictLogging {
       props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
     )
 
-    val resourceControllerConfig = ResourceControllerConfig(maxFailCount = 3)
-
     val resourceControllerCreator = new ResourceControllerCreator(resourceControllerConfig)
 
     val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
       queueTaskBalancer = queueTaskBalancer,
       saveScheduler = new AkkaScheduler(system),
-      config = SaveCrawlResultControllerConfig(5.minutes) // TODO read from config file
+      config = saveCrawlResultControllerConfig
     )
 
     val tasksBatchControllerCreator = new TasksBatchControllerCreator(
@@ -82,10 +88,8 @@ object WorkerApp extends StrictLogging {
       saveCrawlResultCreator = saveCrawlResultControllerCreator,
       queueTaskBalancer = queueTaskBalancer,
       executeScheduler = new AkkaScheduler(system),
-      config = TasksBatchControllerConfig(3, 100.millis) // TODO read from config file
+      config = tasksBatchControllerConfig
     )
-
-    val workerConfig = WorkerConfig(parallelBatches.get, 1.seconds) // TODO read from config file
 
     val workerManager = system.actorOf(
       WorkerManager.props(
