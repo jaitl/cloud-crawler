@@ -73,6 +73,15 @@ subprojects {
     }
 
     jacocoTestReport {
+        afterEvaluate {
+            classDirectories = files(classDirectories.files.collect {
+                fileTree(dir: it,
+                        exclude: ['**/WorkerApp**',
+                                  '**/MasterApp**',
+                                  '**/MongoQueueTaskProvider**'
+                        ])
+            })
+        }
         reports {
             html.enabled = true
             xml.enabled = true
