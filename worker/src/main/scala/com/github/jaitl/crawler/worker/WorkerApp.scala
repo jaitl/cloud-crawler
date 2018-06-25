@@ -50,8 +50,13 @@ object WorkerApp extends StrictLogging {
     val resourceControllerConfig = config.as[ResourceControllerConfig]("worker.resource-controller")
     val saveCrawlResultControllerConfig = config.as[SaveCrawlResultControllerConfig]("worker.save-controller")
     val tasksBatchControllerConfig = config.as[TasksBatchControllerConfig]("worker.task-batch-controller")
-    val executeInterval = config.as[FiniteDuration]("worker.manager.executeInterval")
-    val workerConfig = WorkerConfig(parallelBatches.get, executeInterval)
+
+    val workerConfig = WorkerConfig(
+      parallelBatches.get,
+      config.as[FiniteDuration]("worker.manager.executeInterval"),
+      config.as[FiniteDuration]("worker.manager.runExecutionTimeoutCheckInterval"),
+      config.as[FiniteDuration]("worker.manager.batchExecutionTimeout")
+    )
 
     logger.info(
       "Start worker on {}:{}",
@@ -97,7 +102,8 @@ object WorkerApp extends StrictLogging {
         pipelines = pipelines.get,
         config = workerConfig,
         tasksBatchControllerCreator = tasksBatchControllerCreator,
-        batchRequestScheduler = new AkkaScheduler(system)
+        batchRequestScheduler = new AkkaScheduler(system),
+        batchExecutionTimeoutScheduler = new AkkaScheduler(system)
       ),
       WorkerManager.name()
     )
