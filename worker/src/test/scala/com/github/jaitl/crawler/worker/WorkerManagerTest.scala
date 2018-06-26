@@ -2,7 +2,6 @@ package com.github.jaitl.crawler.worker
 
 import java.util.UUID
 
-import akka.actor.Terminated
 import akka.testkit.TestActorRef
 import akka.testkit.TestProbe
 import com.github.jaitl.crawler.models.task.Task
@@ -21,8 +20,9 @@ import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
+import org.scalatest.concurrent.Eventually
 
-class WorkerManagerTest extends ActorTestSuite {
+class WorkerManagerTest extends ActorTestSuite with Eventually {
   import scala.concurrent.duration._
 
   class WorkerTestSuite {
@@ -85,9 +85,9 @@ class WorkerManagerTest extends ActorTestSuite {
 
       system.stop(tasksBatchController.ref)
 
-      Thread.sleep(200)
-
-      workerManager.underlyingActor.batchControllers should have size 0
+      eventually {
+        workerManager.underlyingActor.batchControllers should have size 0
+      }
     }
 
     "CheckTimeout" in new WorkerTestSuite {
