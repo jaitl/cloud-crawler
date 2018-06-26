@@ -8,10 +8,13 @@ import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonManagerSettings
 import com.github.jaitl.crawler.master.queue.QueueTaskBalancer
 import com.github.jaitl.crawler.master.queue.QueueTaskConfig
+import com.github.jaitl.crawler.master.queue.QueueTaskRecover
+import com.github.jaitl.crawler.master.queue.QueueTaskRecover.RecoveryConfig
 import com.github.jaitl.crawler.master.queue.QueueTaskRequestController
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProviderFactory
+import com.github.jaitl.crawler.master.scheduler.AkkaScheduler
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
@@ -34,6 +37,7 @@ object MasterApp extends StrictLogging {
     val system = ActorSystem("cloudCrawlerSystem", config)
 
     val queueTaskConfig = config.as[QueueTaskConfig]("master.queue-task")
+    val recoveryConfig = config.as[RecoveryConfig]("master.queue-task-recovery")
 
     val queueTaskQueueReqCtrl: ActorRef = ClusterSharding(system).start(
       typeName = QueueTaskRequestController.name(),
@@ -58,6 +62,15 @@ object MasterApp extends StrictLogging {
         settings = ClusterSingletonManagerSettings(system).withRole("master")
       ),
       name = QueueTaskBalancer.name()
+    )
+
+    system.actorOf(
+      ClusterSingletonManager.props(
+        singletonProps = QueueTaskRecover.props(taskProvider, new AkkaScheduler(system), recoveryConfig),
+        terminationMessage = QueueTaskRecover.Stop,
+        settings = ClusterSingletonManagerSettings(system).withRole("master")
+      ),
+      name = QueueTaskRecover.name()
     )
   }
 }
