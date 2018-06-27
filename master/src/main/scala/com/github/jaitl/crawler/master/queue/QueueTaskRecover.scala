@@ -32,7 +32,7 @@ class QueueTaskRecover(
       val now = Instant.now()
 
       val recoveryResult = queueTaskProvider.updateTasksStatusFromTo(
-        now.minusMillis(config.recoveryCheckPeriod.toMillis), TaskStatus.taskInProgress, TaskStatus.taskWait
+        now.minusMillis(config.recoveryTimeout.toMillis), TaskStatus.taskInProgress, TaskStatus.taskWait
       )
 
       recoveryResult.onComplete {
