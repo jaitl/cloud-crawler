@@ -24,8 +24,9 @@ class S3SaveRawProvider(
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
     raw.toList.par.foreach(r => {
       val fileName = path.concat(r._1.id).concat(r._1.taskType).concat(r._1.taskData)
+      val file = File.createTempFile(fileName, "")
       client.putObject(bucketName,
-        r._1.taskType.concat("/").concat(r._1.id).concat("/").concat(r._1.taskData), new File(fileName))
+        r._1.taskType.concat("/").concat(r._1.id).concat("/").concat(r._1.taskData), file)
       logger.debug(s"Saving crawler result to: $fileName")
     })
   }

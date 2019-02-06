@@ -39,7 +39,7 @@ allprojects {
 def scalaMajorVersion = "2.12"
 def scalaVersion = "${scalaMajorVersion}.5"
 def akkaVersion = "2.5.9"
-def elastic4sVersion = "6.5.1"
+def elastic4sVersion = "6.3.3"
 
 subprojects {
     apply plugin: 'scala'
@@ -122,7 +122,10 @@ project(":worker") {
         compile "com.amazonaws:aws-java-sdk:1.9.20.1"
 
         // es
-        compile "com.sksamuel.elastic4s:elastic4s-core_2.12:${elastic4sVersion}"
+        compile "com.sksamuel.elastic4s:elastic4s-core_${scalaMajorVersion}:${elastic4sVersion}"
+        compile "com.sksamuel.elastic4s:elastic4s-http_${scalaMajorVersion}:${elastic4sVersion}"
+        compile "com.google.code.gson:gson:2.8.5"
+
 
         // test
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
@@ -156,7 +159,7 @@ project(":master") {
 project(":simple-worker") {
     apply plugin: 'application'
 
-    mainClassName = "com.github.jaitl.cloud.simple.worker.App"
+    mainClassName = "com.github.jaitl.cloud.simple.worker.AppSO"
 
     dependencies {
         compile project(":worker")
