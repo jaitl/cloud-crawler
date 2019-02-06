@@ -53,7 +53,7 @@ class QueueTaskRequestController(
 
   private def processingRequest: Receive = {
     case QueueBatchSuccess(requestId, taskType, requester, tasks) =>
-      log.debug(s"QueueBatchSuccess: $requestId, $taskType, self: $self, tasks: $tasks")
+      log.info(s"QueueBatchSuccess: $requestId, $taskType, self: $self, tasks: $tasks")
 
       if (tasks.nonEmpty) {
         val tasksBatch = TasksBatch(requestId, taskType, tasks)

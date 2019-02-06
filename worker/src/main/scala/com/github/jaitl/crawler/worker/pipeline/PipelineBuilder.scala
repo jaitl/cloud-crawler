@@ -36,7 +36,6 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
-
   def withParser(parser: BaseParser[T]): this.type = {
     this.parser = Some(parser)
     this
@@ -47,13 +46,30 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
-  def withProxy(proxyLimit: Int, timeout: RandomTimeout): this.type = {
-    resourceType = Some(Proxy(proxyLimit, timeout))
+  def withProxy(host: String, post: Int, limit: Int, timeout: RandomTimeout): this.type = {
+    resourceType = Some(Proxy(host, post, limit, timeout))
     this
   }
 
-  def withTor(host: String, post: Int, limit: Int, timeout: RandomTimeout): this.type = {
-    resourceType = Some(Tor(host, post, limit, timeout))
+  def withProxy(
+    host: String,
+    post: Int,
+    limit: Int,
+    timeout: RandomTimeout,
+    login: String,
+    password: String): this.type = {
+    resourceType = Some(Proxy(host, post, limit, timeout, login, password))
+    this
+  }
+
+  def withTor(
+    host: String,
+    post: Int,
+    limit: Int,
+    timeout: RandomTimeout,
+    controlPort: Int,
+    password: String): this.type = {
+    resourceType = Some(Tor(host, post, limit, timeout, controlPort, password))
     this
   }
 

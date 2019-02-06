@@ -30,5 +30,7 @@ case class HttpRequestExecutorConfig(
   host: String,
   port: Int,
   proxyType: ProxyType,
-  userAgent: String
+  userAgent: String,
+  login: String = "",
+  password: String = ""
 )

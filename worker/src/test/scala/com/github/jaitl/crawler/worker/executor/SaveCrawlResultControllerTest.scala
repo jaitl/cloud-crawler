@@ -40,7 +40,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       .withBatchSize(10)
       .withSaveRawProvider(saveRawProvider)
       .withCrawler(baseCrawler)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis))
+      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -51,9 +51,14 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val config = SaveCrawlResultControllerConfig(1.minute)
 
-    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](SaveCrawlResultController.props(
-      pipeline, queueTaskBalancer.ref, tasksBatchController.ref, saveScheduler, config
-    ))
+    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
+      SaveCrawlResultController.props(
+        pipeline,
+        queueTaskBalancer.ref,
+        tasksBatchController.ref,
+        saveScheduler,
+        config
+      ))
   }
 
   class OnlyParsedResultSaverSuite {
@@ -67,7 +72,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       .withSaveResultProvider(saveParsedProvider)
       .withCrawler(baseCrawler)
       .withParser(parser)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis))
+      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -78,9 +83,14 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val config = SaveCrawlResultControllerConfig(1.minute)
 
-    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](SaveCrawlResultController.props(
-      pipeline, queueTaskBalancer.ref, tasksBatchController.ref, saveScheduler, config
-    ))
+    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
+      SaveCrawlResultController.props(
+        pipeline,
+        queueTaskBalancer.ref,
+        tasksBatchController.ref,
+        saveScheduler,
+        config
+      ))
   }
 
   class RawAndParsedResultSaverSuite {
@@ -96,7 +106,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       .withCrawler(baseCrawler)
       .withParser(parser)
       .withSaveRawProvider(saveRawProvider)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis))
+      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -107,22 +117,29 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val config = SaveCrawlResultControllerConfig(1.minute)
 
-    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](SaveCrawlResultController.props(
-      pipeline, queueTaskBalancer.ref, tasksBatchController.ref, saveScheduler, config
-    ))
+    val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
+      SaveCrawlResultController.props(
+        pipeline,
+        queueTaskBalancer.ref,
+        tasksBatchController.ref,
+        saveScheduler,
+        config
+      ))
   }
 
   "AddResults" should {
     "SuccessCrawledTask" in new OnlyRawResultSaverSuite {
       val successCrawledTask = SuccessCrawledTask(
-        Task("1", "1", "1"), CrawlResult("1"), Some(ParseResult[TestDataRes](TestDataRes("1")))
+        Task("1", "1", "1"),
+        CrawlResult("1"),
+        Some(ParseResult[TestDataRes](TestDataRes("1")))
       )
 
       saveCrawlResultController ! AddResults(successCrawledTask)
 
       expectMsg(SuccessAddedResults)
 
-      saveCrawlResultController.underlyingActor.successTasks should have size 1
+      (saveCrawlResultController.underlyingActor.successTasks should have).size(1)
     }
 
     "FailedTask" in new OnlyRawResultSaverSuite {
@@ -132,7 +149,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       expectMsg(SuccessAddedResults)
 
-      saveCrawlResultController.underlyingActor.failedTasks should have size 1
+      (saveCrawlResultController.underlyingActor.failedTasks should have).size(1)
     }
   }
 
@@ -152,13 +169,13 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
-      saveCrawlResultController.underlyingActor.successTasks should have size 3
+      (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
 
       saveCrawlResultController ! SaveResults
 
       val result = queueTaskBalancer.expectMsgType[TasksBatchProcessResult]
-      result.successIds should contain only ("1", "2", "3")
-      result.failureIds should have size 0
+      (result.successIds should contain).only("1", "2", "3")
+      (result.failureIds should have).size(0)
 
       tasksBatchController.expectMsg(SuccessSavedResults)
     }
@@ -166,82 +183,93 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     "save parsed result" in new OnlyParsedResultSaverSuite {
       (saveParsedProvider.saveResults(_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(futureSuccess)
 
-      val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"),
+      val successCrawledTask1 = SuccessCrawledTask(
+        Task("1", "test", "1"),
+        CrawlResult("1"),
         Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask2 = SuccessCrawledTask(Task("2", "test", "2"), CrawlResult("2"),
+      val successCrawledTask2 = SuccessCrawledTask(
+        Task("2", "test", "2"),
+        CrawlResult("2"),
         Some(ParseResult(TestDataRes("2"), Seq(NewCrawlTasks("test2", Seq("21", "22", "23"))))))
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask3 = SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"),
-        Some(ParseResult(TestDataRes("3"))))
+      val successCrawledTask3 =
+        SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"), Some(ParseResult(TestDataRes("3"))))
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
-      saveCrawlResultController.underlyingActor.successTasks should have size 3
+      (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
 
       saveCrawlResultController ! SaveResults
 
       val result = queueTaskBalancer.expectMsgType[TasksBatchProcessResult]
-      result.successIds should contain only ("1", "2", "3")
-      result.failureIds should have size 0
-      result.newTasks.keySet should contain only ("test1", "test2")
-      result.newTasks("test1") should contain only ("1", "2", "3")
-      result.newTasks("test2") should contain only ("21", "22", "23")
+      (result.successIds should contain).only("1", "2", "3")
+      (result.failureIds should have).size(0)
+      (result.newTasks.keySet should contain).only("test1", "test2")
+      (result.newTasks("test1") should contain).only("1", "2", "3")
+      (result.newTasks("test2") should contain).only("21", "22", "23")
 
       tasksBatchController.expectMsg(SuccessSavedResults)
     }
 
     "save raw and parsed result" in new RawAndParsedResultSaverSuite {
-      (saveParsedProvider.saveResults (_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(futureSuccess)
+      (saveParsedProvider.saveResults(_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(futureSuccess)
       (saveRawProvider.save _).expects(*).returning(futureSuccess)
 
-      val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"),
+      val successCrawledTask1 = SuccessCrawledTask(
+        Task("1", "test", "1"),
+        CrawlResult("1"),
         Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask2 = SuccessCrawledTask(Task("2", "test", "2"), CrawlResult("2"),
+      val successCrawledTask2 = SuccessCrawledTask(
+        Task("2", "test", "2"),
+        CrawlResult("2"),
         Some(ParseResult(TestDataRes("2"), Seq(NewCrawlTasks("test2", Seq("21", "22", "23"))))))
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask3 = SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"),
-        Some(ParseResult(TestDataRes("3"))))
+      val successCrawledTask3 =
+        SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"), Some(ParseResult(TestDataRes("3"))))
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
       saveCrawlResultController ! AddResults(FailedTask(Task("4", "test", "4"), new Exception))
       expectMsg(SuccessAddedResults)
 
-      saveCrawlResultController.underlyingActor.successTasks should have size 3
-      saveCrawlResultController.underlyingActor.failedTasks should have size 1
+      (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
+      (saveCrawlResultController.underlyingActor.failedTasks should have).size(1)
 
       saveCrawlResultController ! SaveResults
 
       val result = queueTaskBalancer.expectMsgType[TasksBatchProcessResult]
-      result.successIds should contain only ("1", "2", "3")
-      result.failureIds should contain only ("4")
-      result.newTasks.keySet should contain only ("test1", "test2")
-      result.newTasks("test1") should contain only ("1", "2", "3")
-      result.newTasks("test2") should contain only ("21", "22", "23")
+      (result.successIds should contain).only("1", "2", "3")
+      (result.failureIds should contain).only("4")
+      (result.newTasks.keySet should contain).only("test1", "test2")
+      (result.newTasks("test1") should contain).only("1", "2", "3")
+      (result.newTasks("test2") should contain).only("21", "22", "23")
 
       tasksBatchController.expectMsg(SuccessSavedResults)
     }
 
     "failure during save" in new OnlyParsedResultSaverSuite {
-      (saveParsedProvider.saveResults (_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).returning(Future.failed(new Exception("")))
+      (saveParsedProvider
+        .saveResults(_: Seq[TestDataRes])(_: ExecutionContext))
+        .expects(*, *)
+        .returning(Future.failed(new Exception("")))
 
-      val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"),
-        Some(ParseResult(TestDataRes("1"))))
+      val successCrawledTask1 =
+        SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"), Some(ParseResult(TestDataRes("1"))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
-      saveCrawlResultController.underlyingActor.successTasks should have size 1
-      saveCrawlResultController.underlyingActor.failedTasks should have size 0
+      (saveCrawlResultController.underlyingActor.successTasks should have).size(1)
+      (saveCrawlResultController.underlyingActor.failedTasks should have).size(0)
 
       saveCrawlResultController ! SaveResults
 
@@ -249,10 +277,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     }
 
     "try to save empty results" in new OnlyParsedResultSaverSuite {
-      (saveParsedProvider.saveResults (_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).never()
+      (saveParsedProvider.saveResults(_: Seq[TestDataRes])(_: ExecutionContext)).expects(*, *).never()
 
-      saveCrawlResultController.underlyingActor.successTasks should have size 0
-      saveCrawlResultController.underlyingActor.failedTasks should have size 0
+      (saveCrawlResultController.underlyingActor.successTasks should have).size(0)
+      (saveCrawlResultController.underlyingActor.failedTasks should have).size(0)
 
       saveCrawlResultController ! SaveResults
       tasksBatchController.expectMsg(SuccessSavedResults)

@@ -32,7 +32,7 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
       .withBatchSize(10)
       .withSaveRawProvider(mock[SaveRawProvider])
       .withCrawler(mock[BaseCrawler])
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis))
+      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()

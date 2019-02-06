@@ -33,18 +33,21 @@ private[worker] class WorkerManager(
   tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]],
   batchRequestScheduler: Scheduler,
   batchExecutionTimeoutScheduler: Scheduler
-) extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
   val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
   val batchControllers: mutable.Map[ActorRef, TaskBatchContext] = mutable.Map.empty
 
   batchRequestScheduler.schedule(config.executeInterval, self, RequestBatch)
   batchExecutionTimeoutScheduler.schedule(config.runExecutionTimeoutCheckInterval, self, CheckTimeout)
 
-  override def receive: Receive = monitors orElse balancerActions
+  override def receive: Receive = monitors.orElse(balancerActions)
 
   private def balancerActions: Receive = {
     case RequestBatch =>
       if (context.children.size < config.parallelBatches) {
+        val id = UUID.randomUUID()
+        log.info(s"RequestBatch size: ${context.children.size} params: ${config.parallelBatches}, id: $id")
         queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), taskTypes)
       }
 
@@ -53,16 +56,16 @@ private[worker] class WorkerManager(
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
       context.watch(tasksBatchController)
       tasksBatchController ! TasksBatchController.ExecuteTask
-
+      log.info(
+        s"SuccessTasksBatchRequest size: ${context.children.size} batchControllers: ${batchControllers.size}, id: $requestId")
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
-
     case NoTasks(requestId, taskType) =>
-
     case EmptyTaskTypeList =>
   }
 
   private def monitors: Receive = {
     case Terminated(ctrl) =>
+      log.error(s"Force stop task batch controller: $ctrl")
       batchControllers -= ctrl
 
     case CheckTimeout =>
@@ -91,14 +94,15 @@ private[worker] object WorkerManager {
     batchRequestScheduler: Scheduler,
     batchExecutionTimeoutScheduler: Scheduler
   ): Props =
-    Props(new WorkerManager(
-      queueTaskBalancer,
-      pipelines,
-      config,
-      tasksBatchControllerCreator,
-      batchRequestScheduler,
-      batchExecutionTimeoutScheduler
-    ))
+    Props(
+      new WorkerManager(
+        queueTaskBalancer,
+        pipelines,
+        config,
+        tasksBatchControllerCreator,
+        batchRequestScheduler,
+        batchExecutionTimeoutScheduler
+      ))
 
   def name(): String = "workerManager"
 }

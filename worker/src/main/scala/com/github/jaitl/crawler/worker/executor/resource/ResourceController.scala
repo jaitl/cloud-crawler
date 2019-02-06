@@ -5,6 +5,7 @@ import java.util.UUID
 import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
+import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ProxyConfig
 import com.github.jaitl.crawler.worker.executor.resource.TorResourceController.TorConfig
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.worker.pipeline.Proxy
@@ -21,6 +22,8 @@ private[worker] object ResourceController {
 
   case class ReturnSuccessResource(requestId: UUID, requestExecutor: HttpRequestExecutor)
   case class ReturnFailedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
+  case class ReturnSkippedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
+  case class ReturnBannedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
 }
 
 case class ResourceControllerConfig(maxFailCount: Int)
@@ -30,13 +33,14 @@ private[worker] class ResourceControllerCreator(
 ) extends OneArgumentActorCreator[ResourceType] {
   override def create(factory: ActorRefFactory, firstArg: ResourceType): ActorRef = {
     firstArg match {
-      case Proxy(_, _) =>
+      case Proxy(host, port, limit, timeout, login, password) =>
+        val config = ProxyConfig(host, port, limit, ctrlConfig.maxFailCount, timeout, login, password)
         factory.actorOf(
-          props = ProxyResourceController.props.withDispatcher("worker.blocking-io-dispatcher"),
+          props = ProxyResourceController.props(config).withDispatcher("worker.blocking-io-dispatcher"),
           name = ProxyResourceController.name
         )
-      case Tor(host, port, limit, timeout) =>
-        val config = TorConfig(host, port, limit, ctrlConfig.maxFailCount, timeout)
+      case Tor(host, port, limit, timeout, controlPort, password) =>
+        val config = TorConfig(host, port, limit, ctrlConfig.maxFailCount, timeout, controlPort, password)
         factory.actorOf(
           props = TorResourceController.props(config).withDispatcher("worker.blocking-io-dispatcher"),
           name = TorResourceController.name

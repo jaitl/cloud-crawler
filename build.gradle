@@ -14,6 +14,7 @@ buildscript {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
         classpath "gradle.plugin.com.github.maiflai:gradle-scalatest:0.19"
         classpath "gradle.plugin.com.palantir:jacoco-coverage:0.4.0"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+"
     }
 }
@@ -29,6 +30,9 @@ allprojects {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        maven {
+            url "https://jitpack.io"
+        }
         jcenter()
     }
 
@@ -40,6 +44,7 @@ allprojects {
 def scalaMajorVersion = "2.12"
 def scalaVersion = "${scalaMajorVersion}.5"
 def akkaVersion = "2.5.9"
+def elastic4sVersion = "6.3.3"
 
 subprojects {
     apply plugin: 'scala'
@@ -141,6 +146,7 @@ project(":models") {
 }
 
 project(":worker") {
+    apply plugin: "com.github.johnrengelman.shadow"
     dependencies {
         compile project(":models")
 
@@ -152,6 +158,16 @@ project(":worker") {
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
         compile "org.asynchttpclient:async-http-client:2.4.7"
         compile "com.iheart:ficus_${scalaMajorVersion}:1.4.3"
+
+        // aws
+        compile "com.amazonaws:aws-java-sdk:1.9.20.1"
+
+        // es
+        compile "com.sksamuel.elastic4s:elastic4s-core_${scalaMajorVersion}:${elastic4sVersion}"
+        compile "com.sksamuel.elastic4s:elastic4s-http_${scalaMajorVersion}:${elastic4sVersion}"
+        compile "org.json4s:json4s-jackson_${scalaMajorVersion}:3.6.4"
+        compile "com.github.avchu:jtorctl:v0.3.3"
+
 
         // test
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
@@ -188,10 +204,13 @@ project(":worker") {
             }
         }
     }
+
 }
 
 project(":master") {
     apply plugin: 'application'
+    apply plugin: "com.github.johnrengelman.shadow"
+
 
     mainClassName = "com.github.jaitl.crawler.master.MasterApp"
     dependencies {
@@ -214,12 +233,18 @@ project(":master") {
 
 project(":simple-worker") {
     apply plugin: 'application'
+    apply plugin: "com.github.johnrengelman.shadow"
 
     mainClassName = "com.github.jaitl.cloud.simple.worker.App"
 
     dependencies {
         compile project(":worker")
-
         compile "org.jsoup:jsoup:1.11.3"
+    }
+
+    shadowJar {
+        transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+            resource = 'reference.conf'
+        }
     }
 }
