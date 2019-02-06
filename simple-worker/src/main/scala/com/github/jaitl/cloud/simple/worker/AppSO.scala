@@ -22,7 +22,7 @@ object AppSO extends StrictLogging {
       .withBatchSize(batchSize)
       .withCrawler(new StackoverflowCrawler)
       .withParser(new StackoverflowParser)
-      .withSaveResultProvider(new ElasticSearchSaveParsedProvider("localhost", "so", 9200, "docker-cluster"))
+      .withSaveResultProvider(new ElasticSearchSaveParsedProvider("localhost", "so1", 9200, "docker-cluster"))
       //.withSaveRawProvider(new LocalFileSystemSaveRawProvider("./"))
       .withSaveRawProvider(new S3SaveRawProvider(
       "AKIAJNM66J3T7O6FZDNA",

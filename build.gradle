@@ -124,7 +124,7 @@ project(":worker") {
         // es
         compile "com.sksamuel.elastic4s:elastic4s-core_${scalaMajorVersion}:${elastic4sVersion}"
         compile "com.sksamuel.elastic4s:elastic4s-http_${scalaMajorVersion}:${elastic4sVersion}"
-        compile "com.google.code.gson:gson:2.8.5"
+        compile "org.json4s:json4s-jackson_${scalaMajorVersion}:3.6.4"
 
 
         // test

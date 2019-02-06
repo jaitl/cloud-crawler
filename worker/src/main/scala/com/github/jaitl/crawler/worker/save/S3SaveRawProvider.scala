@@ -1,6 +1,6 @@
 package com.github.jaitl.crawler.worker.save
 
-import java.io.File
+import java.io.{BufferedWriter, File, FileWriter}
 
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
@@ -25,6 +25,9 @@ class S3SaveRawProvider(
     raw.toList.par.foreach(r => {
       val fileName = path.concat(r._1.id).concat(r._1.taskType).concat(r._1.taskData)
       val file = File.createTempFile(fileName, "")
+      val bw = new BufferedWriter(new FileWriter(file))
+      bw.write(r._2.data)
+      bw.close()
       client.putObject(bucketName,
         r._1.taskType.concat("/").concat(r._1.id).concat("/").concat(r._1.taskData), file)
       logger.debug(s"Saving crawler result to: $fileName")
