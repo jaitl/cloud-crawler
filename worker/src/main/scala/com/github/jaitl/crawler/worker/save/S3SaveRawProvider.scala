@@ -15,7 +15,7 @@ class S3SaveRawProvider(
                          val accessKey: String,
                          val secretKey: String,
                          val bucketName: String,
-                         val path: String,
+                         val path: String = "",
                          val endpoint: String = "https://s3-us-west-1.amazonaws.com"
                        ) extends SaveRawProvider with StrictLogging {
   val credentials = new BasicAWSCredentials(accessKey, secretKey)
@@ -24,7 +24,8 @@ class S3SaveRawProvider(
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
     raw.toList.par.foreach(r => {
       val fileName = path.concat(r._1.id).concat(r._1.taskType).concat(r._1.taskData)
-      client.putObject(bucketName, r._1.taskType.concat("/").concat(r._1.id), new File(fileName))
+      client.putObject(bucketName,
+        r._1.taskType.concat("/").concat(r._1.id).concat("/").concat(r._1.taskData), new File(fileName))
       logger.debug(s"Saving crawler result to: $fileName")
     })
   }
