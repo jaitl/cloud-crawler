@@ -11,6 +11,7 @@ import akka.cluster.sharding.ShardRegion
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsSkipped
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ReturnToQueue
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.TaskStatus
@@ -63,6 +64,23 @@ class QueueTaskResultController(
         case Failure(ex) => log.error(ex, s"Error during MarkAsFailed, requestId: $requestId")
         case _ =>
       }
+
+    case MarkAsSkipped(requestId, taskType, ids, requester) =>
+      val updateFuture = for {
+        tasks <- queueProvider.getByIds(ids)
+        _ <- if (tasks.nonEmpty) {
+          queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskSkipped)
+        } else {
+          Future.successful(Unit)
+        }
+      } yield ActionSuccess(requestId, taskType)
+
+      updateFuture pipeTo requester
+
+      updateFuture.onComplete {
+        case Failure(ex) => log.error(ex, s"Error during MarkAsSkipped, requestId: $requestId")
+        case _ =>
+      }
   }
 
   private val addTasks: Receive = {
@@ -92,6 +110,8 @@ object QueueTaskResultController {
 
   case class MarkAsFailed(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
 
+  case class MarkAsSkipped(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
+
   case class AddNewTasks(requestId: UUID, taskType: String, tasksData: Seq[String], requester: ActorRef)
 
   case class ReturnToQueue(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
@@ -104,6 +124,7 @@ object QueueTaskResultController {
   val extractEntityId: ShardRegion.ExtractEntityId = {
     case msg @ MarkAsProcessed(_ , taskType, _, _) => (taskType, msg)
     case msg @ MarkAsFailed(_ , taskType, _, _) => (taskType, msg)
+    case msg @ MarkAsSkipped(_ , taskType, _, _) => (taskType, msg)
     case msg @ AddNewTasks(_ , taskType, _, _) => (taskType, msg)
     case msg @ ReturnToQueue(_, taskType, _, _) => (taskType, msg)
   }
@@ -111,6 +132,7 @@ object QueueTaskResultController {
   val extractShardId: ShardRegion.ExtractShardId = {
     case MarkAsProcessed(_, taskType, _, _) => taskType
     case MarkAsFailed(_, taskType, _, _) => taskType
+    case MarkAsSkipped(_, taskType, _, _) => taskType
     case AddNewTasks(_, taskType, _, _) => taskType
     case ReturnToQueue(_, taskType, _, _) => taskType
   }

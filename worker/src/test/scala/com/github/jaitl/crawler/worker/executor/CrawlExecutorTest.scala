@@ -36,14 +36,16 @@ class CrawlExecutorTest extends ActorTestSuite {
       .withCrawler(baseCrawler)
       .withParser(parser)
       .withSaveResultProvider(saveParsedProvider)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis))
+      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
   }
 
   "CrawlExecutor" should {
     "success crawl" in new ExecutorTestSuite {
-      (baseCrawler.crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
-        .expects(*, *, *).returning(Future.successful(CrawlResult("1")))
+      (baseCrawler
+        .crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
+        .expects(*, *, *)
+        .returning(Future.successful(CrawlResult("1")))
 
       (parser.parse _).expects(*, *).returning(ParseResult(TestDataRes("1")))
 
@@ -58,8 +60,10 @@ class CrawlExecutorTest extends ActorTestSuite {
     }
 
     "crawl throw exception" in new ExecutorTestSuite {
-      (baseCrawler.crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
-        .expects(*, *, *).throwing(new Exception(""))
+      (baseCrawler
+        .crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
+        .expects(*, *, *)
+        .throwing(new Exception(""))
 
       (parser.parse _).expects(*, *).never()
 
@@ -71,8 +75,10 @@ class CrawlExecutorTest extends ActorTestSuite {
     }
 
     "crawl failed" in new ExecutorTestSuite {
-      (baseCrawler.crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
-        .expects(*, *, *).returning(Future.failed(new Exception("")))
+      (baseCrawler
+        .crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
+        .expects(*, *, *)
+        .returning(Future.failed(new Exception("")))
 
       (parser.parse _).expects(*, *).never()
 
@@ -84,8 +90,10 @@ class CrawlExecutorTest extends ActorTestSuite {
     }
 
     "parser failed" in new ExecutorTestSuite {
-      (baseCrawler.crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
-        .expects(*, *, *).returning(Future.successful(CrawlResult("1")))
+      (baseCrawler
+        .crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
+        .expects(*, *, *)
+        .returning(Future.successful(CrawlResult("1")))
 
       (parser.parse _).expects(*, *).throwing(new Exception(""))
 

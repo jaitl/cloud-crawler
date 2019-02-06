@@ -107,7 +107,7 @@ object WorkerApp extends StrictLogging {
       ),
       WorkerManager.name()
     )
-
+    logger.info("Aktor call")
     workerManager ! RequestBatch
   }
 }

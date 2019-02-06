@@ -17,9 +17,11 @@ import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.BannedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SkippedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessAddedResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessCrawledTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessSavedResults
@@ -29,7 +31,9 @@ import com.github.jaitl.crawler.worker.executor.TasksBatchController.TasksBatchC
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFreeResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnBannedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
@@ -49,7 +53,8 @@ private[worker] class TasksBatchController(
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
-) extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
   var currentActiveCrawlTask: Int = 0
   var forcedStop: Boolean = false
 
@@ -61,12 +66,11 @@ private[worker] class TasksBatchController(
 
   override def preStart(): Unit = {
     super.preStart()
-    log.info(s"Start new TasksBatchController, batch id: ${batch.id}")
+    log.info(s"Start new TasksBatchController, batch id: ${batch.id} with ")
 
     resourceController = resourceControllerCreator.create(this.context, pipeline.resourceType)
     saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self)
     crawlExecutor = crawlExecutorCreator.create(this.context)
-
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
   }
 
@@ -75,8 +79,9 @@ private[worker] class TasksBatchController(
     log.info(s"Stop TasksBatchController, batch id: ${batch.id}")
   }
 
-  override def receive: Receive = Seq(waitRequest, resourceRequestHandler, crawlResultHandler, resultSavedHandler)
-    .reduce(_ orElse _)
+  override def receive: Receive =
+    Seq(waitRequest, resourceRequestHandler, crawlResultHandler, resultSavedHandler)
+      .reduce(_.orElse(_))
 
   private def waitRequest: Receive = {
     case ExecuteTask =>
@@ -115,13 +120,19 @@ private[worker] class TasksBatchController(
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
       log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
-      if (ResourceHelper.isResourceFailed(t)) {
+      if (ResourceHelper.isResourceSkipped(t)) {
+        resourceController ! ReturnSkippedResource(requestId, requestExecutor, t)
+        saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
+      } else if (ResourceHelper.isBotBanned(t)) {
+        resourceController ! ReturnBannedResource(requestId, requestExecutor, t)
+        taskQueue += task
+        saveCrawlResultController ! AddResults(BannedTask(task.task, t))
+      } else if (ResourceHelper.isResourceFailed(t)) {
+        currentActiveCrawlTask = currentActiveCrawlTask - 1
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
-        currentActiveCrawlTask = currentActiveCrawlTask - 1
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
-
         if (task.attempt + 1 < config.maxAttempts) {
           taskQueue += task.copy(attempt = task.attempt + 1, t = task.t :+ t)
           currentActiveCrawlTask = currentActiveCrawlTask - 1
@@ -146,6 +157,8 @@ private[worker] class TasksBatchController(
         }
 
         context.stop(self)
+      } else {
+        //log.error(s"Can not request new tasks currentActiveCrawlTask: ${currentActiveCrawlTask}")
       }
 
     case FailureSaveResults(t) =>
@@ -169,16 +182,17 @@ private[worker] object TasksBatchController {
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
   ): Props =
-    Props(new TasksBatchController(
-      batch = batch,
-      pipeline = pipeline,
-      resourceControllerCreator = resourceControllerCreator,
-      crawlExecutorCreator = crawlExecutorCreator,
-      saveCrawlResultCreator = saveCrawlResultCreator,
-      queueTaskBalancer = queueTaskBalancer,
-      executeScheduler = executeScheduler,
-      config = config
-    ))
+    Props(
+      new TasksBatchController(
+        batch = batch,
+        pipeline = pipeline,
+        resourceControllerCreator = resourceControllerCreator,
+        crawlExecutorCreator = crawlExecutorCreator,
+        saveCrawlResultCreator = saveCrawlResultCreator,
+        queueTaskBalancer = queueTaskBalancer,
+        executeScheduler = executeScheduler,
+        config = config
+      ))
 
   def name(batchId: UUID): String = s"tasksBatchController-$batchId"
 
@@ -197,8 +211,10 @@ class TasksBatchControllerCreator(
   config: TasksBatchControllerConfig
 ) extends TwoArgumentActorCreator[TasksBatch, Pipeline[_]] {
   override def create(
-    factory: ActorRefFactory, firstArg: TasksBatch, secondArg: Pipeline[_]
-  ): ActorRef = {
+    factory: ActorRefFactory,
+    firstArg: TasksBatch,
+    secondArg: Pipeline[_]
+  ): ActorRef =
     factory.actorOf(
       props = TasksBatchController.props(
         batch = firstArg,
@@ -212,5 +228,4 @@ class TasksBatchControllerCreator(
       ),
       name = TasksBatchController.name(firstArg.id)
     )
-  }
 }

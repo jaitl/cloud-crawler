@@ -56,7 +56,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
       .withBatchSize(10)
       .withSaveRawProvider(mock[SaveRawProvider])
       .withCrawler(mock[BaseCrawler])
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis))
+      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val resourceController = TestProbe()

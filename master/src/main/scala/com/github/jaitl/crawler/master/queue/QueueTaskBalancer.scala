@@ -1,7 +1,5 @@
 package com.github.jaitl.crawler.master.queue
 
-import java.util.UUID
-
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
@@ -14,9 +12,9 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessRes
 import scala.util.Random
 
 class QueueTaskBalancer(
-  queueTaskQueueReqCtrl: ActorRef,
-  queueTaskQueueResCtrl: ActorRef
-) extends Actor with ActorLogging {
+                         queueTaskQueueReqCtrl: ActorRef,
+                         queueTaskQueueResCtrl: ActorRef
+                       ) extends Actor with ActorLogging {
   override def receive: Receive = {
     case RequestTasksBatch(requestId, taskTypes) if taskTypes.nonEmpty =>
       log.debug(s"RequestTasksBatch, requestId: $requestId, types: $taskTypes")
@@ -31,7 +29,7 @@ class QueueTaskBalancer(
         queueTaskQueueReqCtrl ! QueueTaskRequestController.RequestTask(requestId, task.taskType, task.batchSize, sender())
       }
 
-    case TasksBatchProcessResult(requestId, taskType, successIds, failureIds, newTasks) =>
+    case TasksBatchProcessResult(requestId, taskType, successIds, failureIds, skippedIds, bannedIds, newTasks) =>
       log.debug(s"TasksBatchProcessResult, requestId: $requestId, types: $taskType")
 
       if (successIds.nonEmpty) {
@@ -39,6 +37,12 @@ class QueueTaskBalancer(
       }
       if (failureIds.nonEmpty) {
         queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsFailed(requestId, taskType, failureIds, sender())
+      }
+      if (skippedIds.nonEmpty) {
+        queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsSkipped(requestId, taskType, skippedIds, sender())
+      }
+      if (bannedIds.nonEmpty) {
+        queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsProcessed(requestId, taskType, bannedIds, sender())
       }
       if (newTasks.nonEmpty) {
         newTasks.foreach { case (newTaskType, newTasksData) =>
@@ -62,4 +66,5 @@ object QueueTaskBalancer {
   def name(): String = "queueTaskBalancer"
 
   case object Stop
+
 }
