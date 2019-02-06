@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class HabrCrawler extends BaseCrawler {
-  val habrUrl = "https://habr.com/post"
+  val habrUrl = "https://habr.com/ru/post"
   override def crawl(
     task: CrawlTask,
     httpRequestExecutor: HttpRequestExecutor

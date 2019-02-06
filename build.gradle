@@ -39,6 +39,7 @@ allprojects {
 def scalaMajorVersion = "2.12"
 def scalaVersion = "${scalaMajorVersion}.5"
 def akkaVersion = "2.5.9"
+def elastic4sVersion = "6.5.1"
 
 subprojects {
     apply plugin: 'scala'
@@ -116,6 +117,12 @@ project(":worker") {
         compile "org.mongodb.scala:mongo-scala-driver_${scalaMajorVersion}:2.2.1"
         compile "org.asynchttpclient:async-http-client:2.4.7"
         compile "com.iheart:ficus_${scalaMajorVersion}:1.4.3"
+
+        // aws
+        compile "com.amazonaws:aws-java-sdk:1.9.20.1"
+
+        // es
+        compile "com.sksamuel.elastic4s:elastic4s-core_2.12:${elastic4sVersion}"
 
         // test
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"

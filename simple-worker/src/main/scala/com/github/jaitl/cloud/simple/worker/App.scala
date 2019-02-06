@@ -16,16 +16,16 @@ object App extends StrictLogging {
   def main(args: Array[String]): Unit = {
     implicit val habrConverter = new HabrDataMongoConverter()
     val batchSize = 10
-    val torPort = 9150
+    val torPort = 9050
 
     val habrPipeline = PipelineBuilder()
       .withTaskType("HabrTasks")
       .withBatchSize(batchSize)
       .withCrawler(new HabrCrawler)
       .withParser(new HabrParser)
-      .withSaveResultProvider(new MongoSaveParsedProvider("mongodb://localhost:27017", "CrawlResults", "HabrData"))
-      //.withSaveRawProvider(new LocalFileSystemSaveRawProvider("/data/crawler/habr"))
-      .withTor("localhost", torPort, 2, RandomTimeout(2.seconds, 1.seconds))
+      .withSaveResultProvider(new MongoSaveParsedProvider("mongodb://root:example@localhost:27017", "CrawlResults", "HabrData"))
+      .withSaveRawProvider(new LocalFileSystemSaveRawProvider("./"))
+      .withTor("127.0.0.1", torPort, 2, RandomTimeout(2.seconds, 1.seconds))
       .build()
 
     val pipelines = habrPipeline :: Nil
