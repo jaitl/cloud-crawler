@@ -7,11 +7,12 @@ import java.io.FileWriter
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class LocalFileSystemSaveRawProvider(val path: String) extends SaveRawProvider {
-  override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = {
-    raw.foreach(r => {
+  override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
+    raw.toList.par.foreach(r => {
       val fileName = path.concat(r._1.id).concat(r._1.taskType).concat(r._1.taskData)
       val file = new File(fileName)
       val bw = new BufferedWriter(new FileWriter(file))
@@ -19,6 +20,5 @@ class LocalFileSystemSaveRawProvider(val path: String) extends SaveRawProvider {
       bw.close()
       logger.debug(s"Saving crawler result to: $fileName")
     })
-    Future.successful(())
   }
 }
