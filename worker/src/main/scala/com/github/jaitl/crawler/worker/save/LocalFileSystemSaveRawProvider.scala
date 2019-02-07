@@ -1,8 +1,6 @@
 package com.github.jaitl.crawler.worker.save
 
-import java.io.File
-import java.io.BufferedWriter
-import java.io.FileWriter
+import java.io.{BufferedWriter, File, FileWriter, RandomAccessFile}
 
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
@@ -25,10 +23,9 @@ class LocalFileSystemSaveRawProvider(val path: String)
       new File(folder).mkdirs()
       val fileName = folder
         .concat(r._1.taskData)
-      val file = new File(fileName)
-      val bw = new BufferedWriter(new FileWriter(file))
-      bw.write(r._2.data)
-      bw.close()
+      val ra = new RandomAccessFile(fileName, "rw")
+      ra.write(r._2.data.getBytes)
+      ra.close()
       logger.debug(s"Saving crawler result to: $fileName")
     })
   }
