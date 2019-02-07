@@ -9,7 +9,8 @@ case class StackowerflowParsedData(
                                tags: Seq[String],
                                comments: Seq[SatckoverflowComments],
                                hints: Seq[SatckoverflowHints],
-                               user: SatckoverflowUser
+                               user: SatckoverflowUser,
+                               voteCount: Int
                              )
 
 case class SatckoverflowComments(
@@ -17,7 +18,9 @@ case class SatckoverflowComments(
                                   id: Long,
                                   date: Long,
                                   user: SatckoverflowUser,
-                                  hints: Seq[SatckoverflowHints]
+                                  hints: Seq[SatckoverflowHints],
+                                  voteCount: Int,
+                                  accepted: Boolean
                                 )
 case class SatckoverflowHints(
                                   body: String,

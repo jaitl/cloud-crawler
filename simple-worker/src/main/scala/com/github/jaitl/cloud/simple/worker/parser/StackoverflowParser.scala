@@ -27,7 +27,7 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
     val tags = doc.select("div.post-taglist div a").asScala.map {
       el => el.text()
     }
-
+    val qVote = doc.select("div.question div.js-vote-count").text().toInt
     val comments = doc.select("#answers div.answer").asScala.map {
       el =>
         val hints = el.select("ul.comments-list li").asScala.map {
@@ -39,7 +39,8 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
               .attr("title").replace("Z", "")
             ).getTime,
               SatckoverflowUser(
-                el.select("div.comment-body a.comment-user").attr("href").split("/")(2).toLong,
+                el.select("div.comment-body a.comment-user").attr("href").split("/")
+                  .lift(2).map{_.toLong}.getOrElse(0),
                 el.select("div.comment-body a.comment-user").text(),
                 el.select("div.comment-body a.comment-user").attr("href")
               )
@@ -53,20 +54,24 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
             .attr("title").replace("Z", "")
           ).getTime,
           SatckoverflowUser(
-            el.select("div.user-details a").attr("href").split("/")(2).toLong,
+            el.select("div.user-details a").attr("href").split("/")
+              .lift(2).map{_.toLong}.getOrElse(0),
             el.select("div.user-details a").text(),
             el.select("div.user-details a").attr("href")
 
           ),
-          hints
+          hints,
+          el.select("div.question div.js-vote-count").text().toInt,
+          el.select("div.js-accepted-answer-indicator").isEmpty
         )
     }
 
     val user = doc.select("div.question div.owner").asScala.map {
       el =>
         SatckoverflowUser(
-          el.select("div.user-details a").attr("href").split("/")(2).toLong,
-          el.select("div.user-details a").text(),
+          el.select("div.user-details a").attr("href").split("/")
+            .lift(2).map{_.toLong}.getOrElse(0),
+          if (el.select("div.user-details a").text().equals("")) el.select("div.user-details").text().trim else el.select("div.user-details a").text(),
           el.select("div.user-details a").attr("href")
 
         )
@@ -82,7 +87,8 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
             .attr("title").replace("Z", "")
           ).getTime,
           SatckoverflowUser(
-            el.select("div.comment-body a.comment-user").attr("href").split("/")(2).toLong,
+            el.select("div.comment-body a.comment-user").attr("href").split("/")
+              .lift(2).map{_.toLong}.getOrElse(0),
             el.select("div.comment-body a.comment-user").text(),
             el.select("div.comment-body a.comment-user").attr("href")
 
@@ -90,6 +96,6 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
         )
     }
 
-    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, hints, user))
+    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, hints, user, qVote))
   }
 }
