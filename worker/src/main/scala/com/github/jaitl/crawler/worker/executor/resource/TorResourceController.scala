@@ -23,7 +23,7 @@ import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
-
+//scalastyle:off
 private class TorResourceController(
   config: TorConfig
 ) extends Actor with ActorLogging {
@@ -32,6 +32,11 @@ private class TorResourceController(
   val executors: mutable.Map[UUID, ExecutorContext] = mutable.Map.empty
 
   var failCount: Int = 0
+
+  override def postStop(): Unit = {
+    super.postStop()
+    executors.values.foreach(_.executor.close())
+  }
 
   override def receive: Receive = {
     case RequestResource(requestId) =>
@@ -80,7 +85,6 @@ private class TorResourceController(
       executors += context.id -> context
       failCount = failCount + 1
       log.info(s"Waiting in ReturnSkippedResource ${requestId} for ${awaitTo}")
-
   }
 
   def createNewExecutorContext(): ExecutorContext = {

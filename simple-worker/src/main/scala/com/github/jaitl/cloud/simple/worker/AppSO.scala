@@ -36,8 +36,8 @@ object AppSO extends StrictLogging {
         config.getString("simple-worker.tor.port").toInt,
         config.getString("simple-worker.tor.limit").toInt,
         RandomTimeout(
-          Duration.fromNanos(config.getDuration("simple-worker.tor.timeout.up").getNano),
-          Duration.fromNanos(config.getDuration("simple-worker.tor.timeout.down").getNano)))
+          Duration.fromNanos(config.getDuration("simple-worker.tor.timeout.up").toNanos),
+          Duration.fromNanos(config.getDuration("simple-worker.tor.timeout.down").toNanos)))
       .build()
 
     val pipelines = habrPipeline :: Nil
