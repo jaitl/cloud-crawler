@@ -1,12 +1,14 @@
 package com.github.jaitl.cloud.simple.worker
 
 import com.github.jaitl.cloud.simple.worker.crawler.StackoverflowCrawler
-import com.github.jaitl.cloud.simple.worker.parser.{StackoverflowElasticsearchConverter, StackoverflowParser}
+import com.github.jaitl.cloud.simple.worker.parser.StackoverflowElasticsearchConverter
+import com.github.jaitl.cloud.simple.worker.parser.StackoverflowParser
 import com.github.jaitl.crawler.worker.WorkerApp
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
 import com.github.jaitl.crawler.worker.save.ElasticSearchSaveParsedProvider
-import com.github.jaitl.crawler.worker.save.S3SaveRawProvider
+import com.github.jaitl.crawler.worker.save.LocalFileSystemSaveRawProvider
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.duration._
@@ -14,29 +16,35 @@ import scala.concurrent.duration._
 object AppSO extends StrictLogging {
   def main(args: Array[String]): Unit = {
     implicit val elasticSearchTypeConverter = new StackoverflowElasticsearchConverter()
-    val batchSize = 10
-    val torPort = 9050
+    val config = ConfigFactory.load("simple-worker.conf")
 
     val habrPipeline = PipelineBuilder()
-      .withTaskType("StackoverflowTasks")
-      .withBatchSize(batchSize)
+      .withTaskType(config.getString("simple-worker.taskType"))
+      .withBatchSize(config.getString("simple-worker.batchSize").toInt)
       .withCrawler(new StackoverflowCrawler)
       .withParser(new StackoverflowParser)
-      .withSaveResultProvider(new ElasticSearchSaveParsedProvider("localhost", "so1", 9200, "docker-cluster"))
+      .withSaveResultProvider(
+        new ElasticSearchSaveParsedProvider(
+          config.getString("simple-worker.es.hostname"),
+          config.getString("simple-worker.es.index"),
+          config.getString("simple-worker.es.port").toInt,
+          config.getString("simple-worker.es.clustername")))
       //.withSaveRawProvider(new LocalFileSystemSaveRawProvider("./"))
-      .withSaveRawProvider(new S3SaveRawProvider(
-      "AKIAJNM66J3T7O6FZDNA",
-      "uk7BlybsPLDEWNUHHQhajoWRlM2fivaZYUvGp0fm",
-      "avc-cloud-crawler"
-    ))
-      .withTor("127.0.0.1", torPort, 2, RandomTimeout(2.seconds, 1.seconds))
+      .withSaveRawProvider(new LocalFileSystemSaveRawProvider(config.getString("simple-worker.filepath")))
+      .withTor(
+        config.getString("simple-worker.tor.host"),
+        config.getString("simple-worker.tor.port").toInt,
+        config.getString("simple-worker.tor.limit").toInt,
+        RandomTimeout(
+          Duration.fromNanos(config.getDuration("simple-worker.tor.timeout.up").getNano),
+          Duration.fromNanos(config.getDuration("simple-worker.tor.timeout.down").getNano)))
       .build()
 
     val pipelines = habrPipeline :: Nil
 
     WorkerApp
       .addPipelines(pipelines)
-      .parallelBatches(2)
+      .parallelBatches(config.getString("simple-worker.parallel").toInt)
       .run()
   }
 }

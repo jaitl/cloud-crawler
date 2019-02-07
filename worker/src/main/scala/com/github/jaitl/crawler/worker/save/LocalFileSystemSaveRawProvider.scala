@@ -14,7 +14,12 @@ import scala.concurrent.Future
 class LocalFileSystemSaveRawProvider(val path: String) extends SaveRawProvider with StrictLogging {
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
     raw.toList.par.foreach(r => {
-      val fileName = path.concat(r._1.id).concat(r._1.taskType).concat(r._1.taskData)
+      val fileName = path
+        .concat(r._1.id)
+        .concat("/")
+        .concat(r._1.taskType)
+        .concat("/")
+        .concat(r._1.taskData)
       val file = new File(fileName)
       val bw = new BufferedWriter(new FileWriter(file))
       bw.write(r._2.data)

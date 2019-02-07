@@ -132,6 +132,7 @@ project(":worker") {
         testCompile "org.scalamock:scalamock_${scalaMajorVersion}:4.1.0"
 
     }
+
 }
 
 project(":master") {
@@ -154,6 +155,15 @@ project(":master") {
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
         testCompile "org.scalamock:scalamock_${scalaMajorVersion}:4.1.0"
     }
+    jar {
+        manifest {
+            attributes "Main-Class": mainClassName
+        }
+
+        from {
+            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
 }
 
 project(":simple-worker") {
@@ -165,5 +175,14 @@ project(":simple-worker") {
         compile project(":worker")
 
         compile "org.jsoup:jsoup:1.11.3"
+    }
+    jar {
+        manifest {
+            attributes "Main-Class": mainClassName
+        }
+
+        from {
+            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        }
     }
 }
