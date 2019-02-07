@@ -32,6 +32,7 @@ class StackoverflowParserTest extends FunSuite with Matchers {
     res.comments.head.id shouldBe 54497761
     res.comments.head.user shouldBe SatckoverflowUser(1771994L, "Tom O.", "/users/1771994/tom-o")
     res.comments.head.date shouldBe 1546454682000L
+    res.comments.head.accepted shouldBe true
   }
 
   test("Stackoverflow-comment-hint") {

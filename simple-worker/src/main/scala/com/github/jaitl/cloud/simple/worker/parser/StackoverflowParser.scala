@@ -61,8 +61,8 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
 
           ),
           hints,
-          el.select("div.question div.js-vote-count").text().toInt,
-          el.select("div.js-accepted-answer-indicator").isEmpty
+          el.select("div.js-vote-count").text().toInt,
+          el.select("div.js-accepted-answer-indicator.d-none").asScala.isEmpty
         )
     }
 
