@@ -16,7 +16,8 @@ case class SatckoverflowComments(
                                   body: String,
                                   id: Long,
                                   date: Long,
-                                  user: SatckoverflowUser
+                                  user: SatckoverflowUser,
+                                  hints: Seq[SatckoverflowHints]
                                 )
 case class SatckoverflowHints(
                                   body: String,

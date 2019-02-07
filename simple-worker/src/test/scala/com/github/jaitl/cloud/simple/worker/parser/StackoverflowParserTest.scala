@@ -33,4 +33,18 @@ class StackoverflowParserTest extends FunSuite with Matchers {
     res.comments.head.user shouldBe SatckoverflowUser(1771994L, "Tom O.", "/users/1771994/tom-o")
     res.comments.head.date shouldBe 1546454682000L
   }
+
+  test("Stackoverflow-comment-hint") {
+    val content = Source.fromResource("html/so_c_h.html").mkString
+    val parser = new StackoverflowParser
+
+    val res = parser.parse(CrawlTask("1000", "StackTasks"), CrawlResult(content)).parsedData
+    res.tags.size shouldBe 2
+    res.tags shouldEqual Seq("scala", "exception")
+    res.comments.size shouldBe 5
+
+    res.comments.head.hints.size shouldBe 3
+    res.comments.head.hints.head.id shouldBe 74915838
+    res.comments.head.hints.head.user.id shouldBe 114626
+  }
 }

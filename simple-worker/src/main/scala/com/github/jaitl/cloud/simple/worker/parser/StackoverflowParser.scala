@@ -30,6 +30,22 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
 
     val comments = doc.select("#answers div.answer").asScala.map {
       el =>
+        val hints = el.select("ul.comments-list li").asScala.map {
+          h => {
+            SatckoverflowHints(
+              h.select("span.comment-copy").html(),
+              h.attr("data-comment-id").toLong,
+              dateFormat.parse(el.select("span.comment-date span")
+              .attr("title").replace("Z", "")
+            ).getTime,
+              SatckoverflowUser(
+                el.select("div.comment-body a.comment-user").attr("href").split("/")(2).toLong,
+                el.select("div.comment-body a.comment-user").text(),
+                el.select("div.comment-body a.comment-user").attr("href")
+              )
+            )
+          }
+        }
         SatckoverflowComments(
           el.select("div.post-text").html(),
           el.attr("data-answerid").toLong,
@@ -41,7 +57,8 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
             el.select("div.user-details a").text(),
             el.select("div.user-details a").attr("href")
 
-          )
+          ),
+          hints
         )
     }
 
