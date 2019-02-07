@@ -1,6 +1,7 @@
 package com.github.jaitl.crawler.worker.save
 
-import java.io.{BufferedWriter, File, FileWriter, RandomAccessFile}
+import java.io.File
+import java.io.RandomAccessFile
 
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult

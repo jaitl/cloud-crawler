@@ -58,6 +58,7 @@ private class TorResourceController(
     case ReturnSuccessResource(requestId, requestExecutor) =>
       val now = Instant.now()
       val awaitTo = now.plusMillis(config.timeout.computeRandom.toMillis)
+      log.info(s"Waiting in ReturnSuccessResource ${requestId} for ${awaitTo}")
       val context = executors(requestExecutor.getExecutorId()).copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
       if (failCount > 0) {
@@ -67,6 +68,7 @@ private class TorResourceController(
     case ReturnFailedResource(requestId, requestExecutor, t) =>
       val now = Instant.now()
       val awaitTo = now.plusMillis(config.timeout.computeRandom.toMillis)
+      log.info(s"Waiting in ReturnFailedResource ${requestId} for ${awaitTo}")
       val context = executors(requestExecutor.getExecutorId()).copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
       failCount = failCount + 1
@@ -77,6 +79,8 @@ private class TorResourceController(
       val context = executors(requestExecutor.getExecutorId()).copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
       failCount = failCount + 1
+      log.info(s"Waiting in ReturnSkippedResource ${requestId} for ${awaitTo}")
+
   }
 
   def createNewExecutorContext(): ExecutorContext = {
