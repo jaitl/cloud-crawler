@@ -15,6 +15,7 @@ import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SkippedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveCrawlResultControllerConfig
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveResults
@@ -41,6 +42,7 @@ class SaveCrawlResultController[T](
 
   var successTasks: mutable.Seq[SuccessCrawledTask] = mutable.ArraySeq.empty[SuccessCrawledTask]
   var failedTasks: mutable.Seq[FailedTask] = mutable.ArraySeq.empty[FailedTask]
+  var skippedTasks: mutable.Seq[SkippedTask] = mutable.ArraySeq.empty[SkippedTask]
 
   override def preStart(): Unit = {
     super.preStart()
@@ -60,11 +62,15 @@ class SaveCrawlResultController[T](
         case a @ FailedTask(_, _) =>
           failedTasks = failedTasks :+ a
           sender() ! SuccessAddedResults
+
+        case a @ SkippedTask(_, _) =>
+          skippedTasks = skippedTasks :+ a
+          sender() ! SuccessAddedResults
       }
   }
 
   private def waitSave: Receive = {
-    case SaveResults if successTasks.isEmpty && failedTasks.isEmpty =>
+    case SaveResults if successTasks.isEmpty && failedTasks.isEmpty && skippedTasks.isEmpty =>
       tasksBatchController ! SuccessSavedResults
 
     case SaveResults =>
@@ -98,6 +104,7 @@ class SaveCrawlResultController[T](
 
       val successIds = successTasks.map(_.task.id)
       val failureIds = failedTasks.map(_.task.id)
+      val skippedIds = skippedTasks.map(_.task.id)
       val newCrawlTasks = successTasks.flatMap(_.parseResult.map(_.newCrawlTasks).getOrElse(Seq.empty))
       val newTasks = newCrawlTasks.groupBy(_.taskType)
         .map {
@@ -111,11 +118,13 @@ class SaveCrawlResultController[T](
         taskType = pipeline.taskType,
         successIds = successIds,
         failureIds = failureIds,
+        skippedIds = skippedIds,
         newTasks = newTasks
       )
 
       successTasks = mutable.ArraySeq.empty[SuccessCrawledTask]
       failedTasks = mutable.ArraySeq.empty[FailedTask]
+      skippedTasks = mutable.ArraySeq.empty[SkippedTask]
 
       tasksBatchController ! success
 
@@ -143,6 +152,7 @@ object SaveCrawlResultController {
   trait CrawlTaskResult
   case class SuccessCrawledTask(task: Task, crawlResult: CrawlResult, parseResult: Option[ParseResult[_]]) extends CrawlTaskResult
   case class FailedTask(task: Task, t: Throwable) extends CrawlTaskResult
+  case class SkippedTask(task: Task, t: Throwable) extends CrawlTaskResult
 
   case class SaveCrawlResultControllerConfig(saveInterval: FiniteDuration)
 

@@ -21,6 +21,7 @@ private[worker] object ResourceController {
 
   case class ReturnSuccessResource(requestId: UUID, requestExecutor: HttpRequestExecutor)
   case class ReturnFailedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
+  case class ReturnSkippedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
 }
 
 case class ResourceControllerConfig(maxFailCount: Int)

@@ -10,6 +10,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFr
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.TorResourceController.ExecutorContext
@@ -64,6 +65,13 @@ private class TorResourceController(
       }
 
     case ReturnFailedResource(requestId, requestExecutor, t) =>
+      val now = Instant.now()
+      val awaitTo = now.plusMillis(config.timeout.computeRandom.toMillis)
+      val context = executors(requestExecutor.getExecutorId()).copy(isUsed = false, awaitTo = Some(awaitTo))
+      executors += context.id -> context
+      failCount = failCount + 1
+
+    case ReturnSkippedResource(requestId, requestExecutor, t) =>
       val now = Instant.now()
       val awaitTo = now.plusMillis(config.timeout.computeRandom.toMillis)
       val context = executors(requestExecutor.getExecutorId()).copy(isUsed = false, awaitTo = Some(awaitTo))

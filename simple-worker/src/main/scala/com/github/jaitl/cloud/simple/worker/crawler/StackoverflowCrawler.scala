@@ -1,9 +1,13 @@
 package com.github.jaitl.cloud.simple.worker.crawler
 
-import com.github.jaitl.crawler.worker.crawler.{BaseCrawler, CrawlResult, CrawlTask}
+import com.github.jaitl.crawler.worker.crawler.BaseCrawler
+import com.github.jaitl.crawler.worker.crawler.CrawlResult
+import com.github.jaitl.crawler.worker.crawler.CrawlTask
+import com.github.jaitl.crawler.worker.exception.PageNotFoundException
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class StackoverflowCrawler extends BaseCrawler {
   val soUrl = "https://stackoverflow.com/questions/"
@@ -14,6 +18,9 @@ class StackoverflowCrawler extends BaseCrawler {
     httpRequestExecutor.get(s"$soUrl/${task.taskData}/")
       .map { r =>
         if (r.code != 200) {
+          if(r.code == 404) {
+            throw new PageNotFoundException(s"wrong http code: ${r.code} for page: ${task.taskData}")
+          }
           throw new Exception(s"wrong http code: ${r.code}, body: ${r.body}")
         }
         r

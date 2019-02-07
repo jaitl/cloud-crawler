@@ -20,6 +20,7 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddRes
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SkippedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessAddedResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessCrawledTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessSavedResults
@@ -30,6 +31,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFr
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
@@ -115,13 +117,18 @@ private[worker] class TasksBatchController(
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
       log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
-      if (ResourceHelper.isResourceFailed(t)) {
+      if (ResourceHelper.isResourceSkipped(t)) {
+        resourceController ! ReturnSkippedResource(requestId, requestExecutor, t)
+        taskQueue += task
+        currentActiveCrawlTask = currentActiveCrawlTask - 1
+        saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
+      }
+      else if (ResourceHelper.isResourceFailed(t)) {
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
         currentActiveCrawlTask = currentActiveCrawlTask - 1
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
-
         if (task.attempt + 1 < config.maxAttempts) {
           taskQueue += task.copy(attempt = task.attempt + 1, t = task.t :+ t)
           currentActiveCrawlTask = currentActiveCrawlTask - 1
