@@ -21,7 +21,7 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
     val date = dateFormat.parse(doc.select("div.user-action-time span")
       .attr("title").replace("Z", "")).getTime
     val title = doc.select("title").text()
-    val content = doc.select("div.post-text").html()
+    val content = doc.select("div.question div.post-text").html()
     val url = doc.select("meta[property=\"og:url\"]").attr("content")
     val id = doc.select("#question").attr("data-questionid").toLong
     val tags = doc.select("div.post-taglist div a").asScala.map {
