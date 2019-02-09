@@ -14,3 +14,25 @@ A framework for building a distributed, highload system for crawling open data.
     ./gradlew :simple-worker:run -DWORKER_PORT=2561
     ./gradlew :simple-worker:run -DWORKER_PORT=2562
     ```
+
+### Worker dependency
+[bintray.com](https://bintray.com/jaitl/cloud-crawler/)
+#### sbt
+```
+resolvers += "Cloud Crawler Repository" at "https://dl.bintray.com/jaitl/cloud-crawler",
+libraryDependencies += "com.github.jaitl.crawler" %% "worker" % version
+```
+
+#### gradle
+repo:
+```
+repositories {
+    maven {
+        url  "https://dl.bintray.com/jaitl/cloud-crawler" 
+    }
+}
+```
+dependency:
+```
+compile 'com.github.jaitl.crawler:worker_2.12:version'
+```
