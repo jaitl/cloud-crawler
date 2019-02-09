@@ -14,6 +14,7 @@ buildscript {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
         classpath "gradle.plugin.com.github.maiflai:gradle-scalatest:0.19"
         classpath "gradle.plugin.com.palantir:jacoco-coverage:0.4.0"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+"
     }
 }
 
@@ -45,6 +46,8 @@ subprojects {
     apply plugin: 'scalaStyle'
     apply plugin: "com.github.maiflai.scalatest"
     apply plugin: 'jacoco'
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven-publish'
 
     dependencies {
         // scala
@@ -93,6 +96,11 @@ subprojects {
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.additionalParameters = ["-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"]
     }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
 }
 
 coveralls {
@@ -101,7 +109,35 @@ coveralls {
 }
 
 project(":models") {
+    bintray {
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
+        publications = ['Models']
 
+        pkg {
+            repo = 'cloud-crawler'
+            name = "${project.name}_${scalaMajorVersion}"
+            desc = 'Cloud crawler worker'
+            licenses = ['MIT']
+            vcsUrl = 'https://github.com/Jaitl/cloud-crawler.git'
+
+            version {
+                name = "${project.version}"
+                desc = 'Cloud crawler worker'
+            }
+        }
+    }
+
+    publishing {
+        publications {
+            Models(MavenPublication) {
+                from components.java
+                groupId 'com.github.jaitl.crawler'
+                artifactId "models_${scalaMajorVersion}"
+                version "${project.version}"
+            }
+        }
+    }
 }
 
 project(":worker") {
@@ -121,6 +157,36 @@ project(":worker") {
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
         testCompile "org.scalamock:scalamock_${scalaMajorVersion}:4.1.0"
 
+    }
+
+    bintray {
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
+        publications = ['Worker']
+
+        pkg {
+            repo = 'cloud-crawler'
+            name = "${project.name}_${scalaMajorVersion}"
+            desc = 'Cloud crawler worker'
+            licenses = ['MIT']
+            vcsUrl = 'https://github.com/Jaitl/cloud-crawler.git'
+
+            version {
+                name = "${project.version}"
+                desc = 'Cloud crawler worker'
+            }
+        }
+    }
+
+    publishing {
+        publications {
+            Worker(MavenPublication) {
+                from components.java
+                groupId 'com.github.jaitl.crawler'
+                artifactId "worker_${scalaMajorVersion}"
+                version "${project.version}"
+            }
+        }
     }
 }
 
