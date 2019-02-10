@@ -20,20 +20,22 @@ class QueueTaskRecoverTest extends ActorTestSuite {
     val config = RecoveryConfig(1.minute, 1.minute)
 
     (recoverScheduler.schedule _).expects(*, *, *).returning(Unit)
-
-    val queueTaskRecover = system.actorOf(QueueTaskRecover.props(queueTaskProvider, recoverScheduler, config))
   }
 
   "QueueTaskRecover" should {
     "Recover" in new TaskRecoverSuite {
       (queueTaskProvider.updateTasksStatusFromTo _).expects(*, *, *).returning(Future.successful(2))
 
-      EventFilter.warning("Recovered tasks: 2") intercept {
+      val queueTaskRecover = system.actorOf(QueueTaskRecover.props(queueTaskProvider, recoverScheduler, config))
+
+      EventFilter.warning(message = "Recovered tasks: 2", occurrences = 1) intercept {
         queueTaskRecover ! Recover
       }
     }
 
     "Stop" in new TaskRecoverSuite {
+      val queueTaskRecover = system.actorOf(QueueTaskRecover.props(queueTaskProvider, recoverScheduler, config))
+
       val watcher = TestProbe()
       watcher.watch(queueTaskRecover)
 
