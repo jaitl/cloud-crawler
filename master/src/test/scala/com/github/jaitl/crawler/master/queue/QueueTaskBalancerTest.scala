@@ -44,6 +44,7 @@ class QueueTaskBalancerTest extends ActorTestSuite {
         taskType = taskType,
         successIds = Seq("1", "2"),
         failureIds = Seq("3", "4"),
+        skippedIds = Seq("3", "4"),
         newTasks = Map("type2" -> Seq("tt1", "tt2"))
       )
 

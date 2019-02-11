@@ -21,7 +21,7 @@ object AppSO extends StrictLogging {
     val habrPipeline = PipelineBuilder()
       .withTaskType(config.getString("simple-worker.taskType"))
       .withBatchSize(config.getString("simple-worker.batchSize").toInt)
-      .withCrawler(new StackoverflowCrawler)
+      .withCrawler(new StackoverflowCrawler(config.getString("simple-worker.baseUrl")))
       .withParser(new StackoverflowParser)
       .withSaveResultProvider(
         new ElasticSearchSaveParsedProvider(

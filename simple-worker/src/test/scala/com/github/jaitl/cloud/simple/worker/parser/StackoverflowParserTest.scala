@@ -84,4 +84,24 @@ class StackoverflowParserTest extends FunSuite with Matchers {
       .parsedData
     res.id shouldBe 54575172
   }
+  test("Stackoverflow-comment-ru") {
+    val content = Source.fromResource("html/so_ru.html").mkString
+    val parser = new StackoverflowParser
+
+    val res = parser
+      .parse(CrawlTask("1000", "StackTasks"), CrawlResult(content))
+      .parsedData
+    res.id shouldBe 943393
+    res.hints.size shouldBe 2
+    res.comments.size shouldBe 1
+    res.user.name shouldBe "Денис"
+    res.user.id shouldBe 182006
+    res.comments.head.accepted shouldBe false
+    res.comments.head.user.id shouldBe 182006
+    res.comments.head.user.name shouldBe "Денис"
+    res.tags.size shouldBe 1
+    res.tags shouldEqual Seq("php")
+
+
+  }
 }
