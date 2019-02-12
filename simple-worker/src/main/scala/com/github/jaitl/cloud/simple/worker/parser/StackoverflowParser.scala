@@ -39,10 +39,10 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
               .attr("title").replace("Z", "")
             ).getTime,
               SatckoverflowUser(
-                el.select("div.comment-body a.comment-user").attr("href").split("/")
+                h.select("div.comment-body a.comment-user").attr("href").split("/")
                   .lift(2).map{_.toLong}.getOrElse(0),
-                el.select("div.comment-body a.comment-user").text(),
-                el.select("div.comment-body a.comment-user").attr("href")
+                h.select("div.comment-body a.comment-user").text(),
+                h.select("div.comment-body a.comment-user").attr("href")
               )
             )
           }

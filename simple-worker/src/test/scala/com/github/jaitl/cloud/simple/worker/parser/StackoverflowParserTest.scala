@@ -104,4 +104,22 @@ class StackoverflowParserTest extends FunSuite with Matchers {
 
 
   }
+  test("Stackoverflow-comment-bad-hints") {
+    val content = Source.fromResource("html/so_ru_bad_hints.html").mkString
+    val parser = new StackoverflowParser
+
+    val res = parser
+      .parse(CrawlTask("1000", "StackTasks"), CrawlResult(content))
+      .parsedData
+    res.id shouldBe 938375
+    res.hints.size shouldBe 1
+    res.comments.size shouldBe 1
+    res.comments.head.accepted shouldBe true
+    res.comments.head.hints.size shouldBe 5
+    res.comments.head.hints.tail.head.user.name shouldBe "Наталья"
+    res.comments.head.hints.tail.head.user.id shouldBe 235775
+
+
+
+  }
 }
