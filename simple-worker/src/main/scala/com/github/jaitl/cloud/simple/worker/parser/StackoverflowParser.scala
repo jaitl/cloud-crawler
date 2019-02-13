@@ -35,7 +35,7 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
             SatckoverflowHints(
               h.select("span.comment-copy").html(),
               h.attr("data-comment-id").toLong,
-              dateFormat.parse(el.select("span.comment-date span")
+              dateFormat.parse(h.select("span.comment-date span")
               .attr("title").replace("Z", "")
             ).getTime,
               SatckoverflowUser(
