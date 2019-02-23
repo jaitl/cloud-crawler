@@ -120,13 +120,11 @@ private[worker] class TasksBatchController(
       if (ResourceHelper.isResourceSkipped(t)) {
         resourceController ! ReturnSkippedResource(requestId, requestExecutor, t)
         taskQueue += task
-        currentActiveCrawlTask = currentActiveCrawlTask - 1
         saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
       }
       else if (ResourceHelper.isResourceFailed(t)) {
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
-        currentActiveCrawlTask = currentActiveCrawlTask - 1
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
         if (task.attempt + 1 < config.maxAttempts) {

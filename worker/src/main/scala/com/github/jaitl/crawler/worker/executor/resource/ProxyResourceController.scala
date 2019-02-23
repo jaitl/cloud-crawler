@@ -6,7 +6,8 @@ import java.util.UUID
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.Props
-import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.{ExecutorContext, ProxyConfig}
+import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ExecutorContext
+import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ProxyConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFreeResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
