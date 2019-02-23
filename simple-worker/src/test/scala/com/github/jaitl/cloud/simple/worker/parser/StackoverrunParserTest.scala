@@ -47,4 +47,18 @@ class StackoverrunParserTest extends FunSuite with Matchers {
     res.comments.head.accepted shouldBe false
   }
 
+  test("Stackoverrun-npe") {
+    val content = Source.fromResource("html/sr_npe.html").mkString
+    val parser = new StackoverrunParser
+
+    val res = parser
+      .parse(CrawlTask("1000", "StackoverrunTasks"), CrawlResult(content))
+      .parsedData
+    res.title shouldBe "Ошибка в рисовании графики"
+
+    res.user.name shouldBe "Anonymous"
+    res.user.id shouldBe -1
+    res.user.url shouldBe "https://codeindex.ru/user/-1"
+  }
+
 }

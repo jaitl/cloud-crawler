@@ -73,16 +73,24 @@ class StackoverrunParser extends BaseParser[StackowerflowParsedData] {
           false
         )
     }
-
-    val user = doc.select("body > main > div > div.col-lg-9.col-md-12.col-sm-12 > div > div.col-lg-11.col-md-12 > div.post-info > div.post-meta.row > p.text-secondary.createDate.col-lg-6.col-md-6.col-sm-6.col-xs-12 > small > span:nth-child(3)").asScala.map {
+    val user = doc.select("body > main > div > div.col-lg-9.col-md-12.col-sm-12 > div > div.col-lg-11.col-md-12 > div.post-info > div.post-meta.row > p.text-secondary.createDate.col-lg-6.col-md-6.col-sm-6.col-xs-12 > small")
+      .asScala.map {
       el =>
-        SatckoverflowUser(
-          el.select("a").attr("href").split("/")
-            .lift(4).map{_.toLong}.getOrElse(0),
-          el.select("a").text(),
-          el.select("a").attr("href")
+        if(el.select("a").size() == 0) {
+            SatckoverflowUser(
+              -1,
+              "Anonymous",
+              "https://codeindex.ru/user/-1"
+            )
+        } else {
+          SatckoverflowUser(
+            el.select("a").attr("href").split("/")
+              .lift(4).map{_.toLong}.getOrElse(0),
+            el.select("a").text(),
+            el.select("a").attr("href")
 
-        )
+          )
+        }
     }.head
 
 
