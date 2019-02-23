@@ -5,6 +5,7 @@ import java.util.UUID
 import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
+import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ProxyConfig
 import com.github.jaitl.crawler.worker.executor.resource.TorResourceController.TorConfig
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.worker.pipeline.Proxy
@@ -31,9 +32,10 @@ private[worker] class ResourceControllerCreator(
 ) extends OneArgumentActorCreator[ResourceType] {
   override def create(factory: ActorRefFactory, firstArg: ResourceType): ActorRef = {
     firstArg match {
-      case Proxy(_, _) =>
+      case Proxy(host, port, limit, timeout) =>
+        val config = ProxyConfig(host, port, limit, ctrlConfig.maxFailCount, timeout)
         factory.actorOf(
-          props = ProxyResourceController.props.withDispatcher("worker.blocking-io-dispatcher"),
+          props = ProxyResourceController.props(config).withDispatcher("worker.blocking-io-dispatcher"),
           name = ProxyResourceController.name
         )
       case Tor(host, port, limit, timeout) =>
