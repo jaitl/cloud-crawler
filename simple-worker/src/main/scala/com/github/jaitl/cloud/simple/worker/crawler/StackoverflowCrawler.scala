@@ -17,7 +17,7 @@ class StackoverflowCrawler(
     httpRequestExecutor: HttpRequestExecutor
   )(implicit executionContext: ExecutionContext): Future[CrawlResult] =
     httpRequestExecutor
-      .get(s"$soUrl/${task.taskData}/")
+      .get(s"$soUrl/${task.taskData}")
       .map { r =>
         if (r.code != 200) {
           if (r.code == 404) {
