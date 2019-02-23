@@ -26,7 +26,8 @@ case class SatckoverflowHints(
                                   body: String,
                                   id: Long,
                                   date: Long,
-                                  user: SatckoverflowUser
-                                )
+                                  user: SatckoverflowUser,
+                                  voteCount: Int = 0
+                             )
 
 case class SatckoverflowUser(id: Long, name: String, url: String)

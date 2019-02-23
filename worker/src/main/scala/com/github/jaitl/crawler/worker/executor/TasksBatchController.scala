@@ -154,7 +154,7 @@ private[worker] class TasksBatchController(
 
         context.stop(self)
       } else {
-        log.error(s"Can not request new tasks currentActiveCrawlTask: ${currentActiveCrawlTask}")
+        //log.error(s"Can not request new tasks currentActiveCrawlTask: ${currentActiveCrawlTask}")
       }
 
     case FailureSaveResults(t) =>

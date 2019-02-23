@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html lang="ru" itemscope itemtype="http://schema.org/QAPage">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/png" sizes="256x256" href="https://stackoverrun.com/src/images/fivicon.png">
+    <link rel="apple-touch-icon image_src" href="https://stackoverrun.com/src/images/fivicon.png">
+    <title>android - Как проверить, установлен ли AlarmManager уже установленный будильник?</title>
+    <meta name="description" content="Когда мое приложение запускается, я хочу, чтобы он проверял, установлен ли какой-либо конкретный сигнал тревоги (зарегистрированный через AlarmManager). Результаты google, похоже, указывают на то, что ...">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://stackoverrun.com/ru/q/1085109" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:domain" content="stackoverrun.com" />
+    <meta name="twitter:title" property="og:title" itemprop="name" content="Как проверить, установлен ли AlarmManager уже установленный будильник?" />
+    <meta name="twitter:description" property="og:description" itemprop="description" content="Когда мое приложение запускается, я хочу, чтобы он проверял, установлен ли какой-либо конкретный сигнал тревоги (зарегистрированный через AlarmManager). Результаты google, похоже, указывают на то, что ..." />
+    <meta name="theme-color" content="#FFF">
+    <link rel="alternate" hreflang="x-default" href="https://stackoverrun.com/" />
+    <link rel="alternate" hreflang="zh-cn" href="https://stackoverrun.com/cn/q/1085109" />
+    <link rel="alternate" hreflang="de" href="https://stackoverrun.com/de/q/1085109" />
+    <link rel="alternate" hreflang="es" href="https://stackoverrun.com/es/q/1085109" />
+    <link rel="alternate" hreflang="hi" href="https://stackoverrun.com/hi/q/1085109" />
+    <link rel="alternate" hreflang="it" href="https://stackoverrun.com/it/q/1085109" />
+    <link rel="alternate" hreflang="ja" href="https://stackoverrun.com/ja/q/1085109" />
+    <link rel="alternate" hreflang="ru" href="https://stackoverrun.com/ru/q/1085109" />
+    <link rel="alternate" hreflang="vi" href="https://stackoverrun.com/vi/q/1085109" />
+    <meta name="robots" content="noarchive" />
+</head>
+<body class="bg-white">
+<header>
+    <div class="navbar navbar-light bg-light">
+        <div class="container d-flex justify-content-between">
+            <a href="https://stackoverrun.com/" class="navbar-brand d-flex align-items-center"><img class="navbar-brand" src="https://stackoverrun.com/src/images/fivicon.png" alt="logo"><span>stack<strong>overrun</strong></span></a>
+            <a class="ml-md-auto mr-3" title="Обратная связь" data-toggle="modal" data-target="#contactModal" href="#"><i class="fa fa-envelope fa-lg"></i></a>
+            <a class="mr-3 d-lg-none search-button" title="Поиск" href="#"><i class="fa fa-search fa-lg"></i></a>
+            <a class="d-lg-none mr-3" rel="noopener" target="_blank" href="https://ru.stackoverflow.com/questions/ask" title="Задать вопрос"><i class="fa fa-question fa-lg"></i></a><div class="dropdown show mr-3 card-link" data-toggle="dropdown" role="button" aria-expanded="false"><a href="#" style="text-decoration:none"><i class="fa fa-globe fa-lg"></i> <span>RU</span></a></div><div class="dropdown-menu"><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/cn/q/1085109" title="Simplified Chinese">CN (简体中文)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/de/q/1085109" title="German">DE (Deutsch)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/es/q/1085109" title="Spanish">ES (Español)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/hi/q/1085109" title="Hindi&apos;">HI (हिन्दी)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/it/q/1085109" title="Italian">IT (Italiano)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/ja/q/1085109" title="Japanese">JA (日本語)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/vi/q/1085109" title="Vietnamese">VI (Tiếng Việt)</a></div><a style="text-decoration:none" class="d-none d-lg-flex mr-3" rel="noopener" target="_blank" href="https://ru.stackoverflow.com/questions/ask"><button class="btn btn-outline-primary btn-sm">Задать вопрос</button></a><div class="my-2 my-md-0 d-none d-lg-flex">
+            <form action="https://stackoverrun.com/ru/search/" method="get" class="input-group input-group-sm form-inline">
+                <input type="text" name="q" class="form-control">
+                <input type="text" value="ru" name="hl" class="d-none">
+                <div class="input-group-append"><button class="btn btn-outline-primary" id="search" type="submit">Поиск</button></div>
+            </form>
+        </div>
+        </div>
+    </div>
+</header>
+<div class="d-none container mb-3 mt-0 search-block">
+    <form action="https://stackoverrun.com/ru/search/" method="get" class="form-inline">
+        <input type="text" name="q" class="form-control col-12" id="search-input">
+        <input type="text" value="ru" name="hl" class="d-none">
+        <div class="d-none"><button id="search" type="submit">Поиск</button></div>
+    </form>
+</div>
+<main role="main" class="container">
+    <div class="row" itemprop="mainEntity" itemscope itemtype="http://schema.org/Question">
+        <div class="col-12">
+            <h1 itemprop="name">Как проверить, установлен ли AlarmManager уже установленный будильник?</h1><hr />
+        </div>
+        <div class="col-lg-9 col-md-12 col-sm-12">
+            <div class="row">
+                <div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">182<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div class="post-text" id="text_q1085109" itemprop="text"><p>Когда мое приложение запускается, я хочу, чтобы он проверял, установлен ли какой-либо конкретный сигнал тревоги (зарегистрированный через AlarmManager). Результаты google, похоже, указывают на то, что нет никакого способа сделать это. Это все еще правильно? Мне нужно сделать эту проверку, чтобы сообщить пользователю, прежде чем предпринимать какие-либо действия для создания нового аварийного сигнала.</p></div><div class="post-info"><div class="post-taglist"> <span class="post-tag">android</span> <span class="post-tag">alarmmanager</span><span class="post-tag view-count">73k <i class="fa fa-eye"></i></span></div>
+                <div class="post-meta row">
+                    <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/4556670">Источник</a></small>
+                        <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109">Поделиться</a></small>
+                    </p>
+                    <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <small class="float-right">Создан <span title="2010-12-29 18:20:27">29 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-29 18:20:27">2010-12-29 18:20:27</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/538847/">ron</a></span></small>
+                    </p>
+                </div>
+            </div><div class="comments comments4556670"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                <span class="exchange"><i class="fa fa-language"></i></span>
+            </div><div class="col-11"><p class="commenttext">
+                <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c70568869">Пожалуйста, подтвердите ответ, что решить проблему или разместить собственное решение.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/3503855/">AnixPasBesoin</a></span> <span title="2017-01-16 22:13:53">16 янв. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-01-16 22:13:53">2017-01-16 22:13:53</span></small></span></p></div></div></div></div></div><div class="col-12 sorting">
+                <ul class="nav nav-tabs small" role="tablist">
+                    <li class="nav-item col-sm-3 col-xs-12" id="answerCount"><h5><span itemprop="answerCount">10</span> ответов</h5></li>
+                    <li class="nav-item ml-auto" id="sort"><p class="nav-link disabled">Сортировка:</p></li>
+                    <li class="nav-item" id="first"><p id="active" class="nav-link active" data-toggle="tab" role="tab">Активность</p></li>
+                    <li class="nav-item"><p id="oldest" class="nav-link" data-toggle="tab" role="tab">Возраст</p></li>
+                    <li class="nav-item"><p id="votes" class="nav-link" data-toggle="tab" role="tab">Оценка</p></li>
+                </ul>
+            </div>
+                <div class="answersList col-12"><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="4556735"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">-3<i class="fa fa-thumbs-down"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a4556735" class="post-text"><p>Вы говорите о будильнике - какой источник вы можете скачать здесь - <a href="https://android.googlesource.com/platform/packages/apps/AlarmClock" rel="nofollow noreferrer">https://android.googlesource.com/platform/packages/apps/AlarmClock</a></p>
+                    <p>Или вы разговариваете установки времени, когда данная задача должна быть выполнена - <a href="http://developer.android.com/reference/android/app/AlarmManager.html" rel="nofollow noreferrer">http://developer.android.com/reference/android/app/AlarmManager.html</a></p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/4556735">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#4556735">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2010-12-29 18:27:35">29 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-29 18:27:35">2010-12-29 18:27:35</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/526836/">fiction</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments4556735"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c4996713">они переименовали его в DeskClock: <a href="http://android.git.kernel.org/?p=platform/packages/apps/DeskClock.git;a=summary">http://android.git.kernel.org/?p=platform/packages/apps/DeskClock.git;a=summary</a></span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/115145/">CommonsWare</a></span> <span title="2010-12-29 18:41:20">29 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-29 18:41:20">2010-12-29 18:41:20</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c4997265">Я имею в виду будильник, установленный в моем коде с помощью AlarmManager. Я не могу найти какой-либо метод, чтобы проверить, установлен ли сигнал тревоги для определенного намерения. Поскольку программа позволяет пользователю установить будильник, а затем закрыть приложение, которое я хочу знать, когда приложение открыто, установлен ли будильник и работает &laquo;вне поля зрения&raquo;.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/538847/">ron</a></span> <span title="2010-12-29 19:41:19">29 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-29 19:41:19">2010-12-29 19:41:19</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c4997622">Кажется, что класс AlarmManager не обеспечивает такую ​​функциональность. Здесь вы можете посмотреть источник AlarmManager - <a href="http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.1_r2/android/app/AlarmManager.java">http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.1_r2/android/app/AlarmManager.java</a>
+Если вы действительно в отчаянии, вы можете расширить его (или повторно реализовать IAlarmManager) и создать собственный диспетчер аварийных сигналов. Overkill.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/526836/">fiction</a></span> <span title="2010-12-29 20:18:28">29 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-29 20:18:28">2010-12-29 20:18:28</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c5004690">Обновление: из другого потока я обнаружил, что следующее задание выполняет следующее: -</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/538847/">ron</a></span> <span title="2010-12-30 13:27:22">30 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-30 13:27:22">2010-12-30 13:27:22</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+6</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c5004693">alarms = (AlarmManager) getSystemService (Context.ALARM_SERVICE);
+\t Строка ALARM_ACTION;
+ALARM_ACTION = AAAlarmReceiver.ACTION_LOAD_LISTVIEW;
+Intent intentToFire = новое намерение (ALARM_ACTION);
+boolean alarmUp = (PendingIntent.getBroadcast (cText, 0, intentToFire, PendingIntent.FLAG_NO_CREATE)! = Null);</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/538847/">ron</a></span> <span title="2010-12-30 13:27:40">30 дек. 10</span><span class="d-none" itemprop="dateCreated" datetime="2010-12-30 13:27:40">2010-12-30 13:27:40</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c82140097">Пожалуйста, ответьте только на конкретный ответ. Если вы хотите задать вопрос или что-то еще, сохраните его в комментарии.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/6452525/">Rahat Zaman</a></span> <span title="2017-12-01 10:39:08">01 дек. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-12-01 10:39:08">2017-12-01 10:39:08</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c82259858">@RahatZaman О чем ты говоришь? Одна из основных проблем переполнения стека: &laquo;Дайте человеку рыбу, и вы кормите его в течение дня. Научите человека ловить рыбу, и вы кормите его на всю жизнь &raquo;. Итак, указывая на источник lib, здесь довольно распространенная практика.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/526836/">fiction</a></span> <span title="2017-12-05 10:06:25">05 дек. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-12-05 10:06:25">2017-12-05 10:06:25</span></small></span></p></div></div></div></div><p class="hyperlink showMore" id="comments4556735"><a data-toggle="modal" href="#">показать все комментарии (7)</a></p></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="4846919"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">1<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a4846919" class="post-text"><p>Im под впечатлением, что Тереза нет способа сделать это, было бы неплохо.</p>
+                    <p>Вы можете добиться аналогичного результата, записав где-то Alarm_last_set_time, и иметь вид вещания On_boot_starter BroadcastReciever: BOOT_COMPLETED.</p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/4846919">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#4846919">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2011-01-31 01:34:43">31 янв. 11</span><span class="d-none" itemprop="dateCreated" datetime="2011-01-31 01:34:43">2011-01-31 01:34:43</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/595433/">Stephen</a></span></small>
+                        </p>
+                    </div>
+                </div></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="9575569"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">277<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a9575569" class="post-text"><p>Следуя за комментарием ron, вы найдете подробное решение. Допустим, вы зарегистрировали повторяющееся тревогу в ожидании намерения, как это:</p>
+                    <pre><code class="prettyprint-override">Intent intent = new Intent("com.my.package.MY_UNIQUE_ACTION");
+PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+             intent, PendingIntent.FLAG_UPDATE_CURRENT);
+Calendar calendar = Calendar.getInstance();
+calendar.setTimeInMillis(System.currentTimeMillis());
+calendar.add(Calendar.MINUTE, 1);
+
+AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 60, pendingIntent);
+</code></pre>
+                    <p>, как вы бы проверить, если он активен должен:</p>
+                    <pre><code class="prettyprint-override">boolean alarmUp = (PendingIntent.getBroadcast(context, 0,
+     new Intent("com.my.package.MY_UNIQUE_ACTION"),
+     PendingIntent.FLAG_NO_CREATE) != null);
+
+if (alarmUp)
+{
+    Log.d("myTag", "Alarm is already active");
+}
+</code></pre>
+                    <p>Ключевым моментом здесь является <code class="prettyprint-override">FLAG_NO_CREATE</code>, который как описано в javadoc: <code class="prettyprint-override">if the described PendingIntent **does not** already exists, then simply return null</code> (вместо создания нового)</p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/9575569">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#9575569">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2012-03-05 23:14:51">05 мар. 12</span><span class="d-none" itemprop="dateCreated" datetime="2012-03-05 23:14:51">2012-03-05 23:14:51</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/296108/">Chris Knight</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments9575569"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+8</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c12793653">Нужно ли использовать намерение только с помощью строки действий? Я попытался указать класс, новый Intent (контекст, MyClass.class), но он не работает. Он всегда возвращает значение null, даже когда будильник работает.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/312381/">toc777</a></span> <span title="2012-04-04 08:39:49">04 апр. 12</span><span class="d-none" itemprop="dateCreated" datetime="2012-04-04 08:39:49">2012-04-04 08:39:49</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+5</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c12941626">toc777, он не должен быть строкой, которая соответствует объявленному действию в вашем намеренном фильтре в манифесте.xml</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/296108/">Chris Knight</a></span> <span title="2012-04-11 08:27:24">11 апр. 12</span><span class="d-none" itemprop="dateCreated" datetime="2012-04-11 08:27:24">2012-04-11 08:27:24</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+4</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c12974030">Chris, Это была еще одна проблема, которая вызывала мою проблему. Намерение, о котором я упомянул выше, действительно работает :)</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/312381/">toc777</a></span> <span title="2012-04-12 12:25:50">12 апр. 12</span><span class="d-none" itemprop="dateCreated" datetime="2012-04-12 12:25:50">2012-04-12 12:25:50</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c36860591">Проблема, с которой я столкнулся, не вызывала отмену на BATH alarmManager и pendingIntent. I.E ~ alarmMgr.cancel (alarmIntent); alarmIntent.cancel();</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1085736/">MobileMon</a></span> <span title="2014-05-29 12:01:21">29 май. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-05-29 12:01:21">2014-05-29 12:01:21</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c38159725">@ChrisKnight: Будет ли это работать, если я проверю приложение, скажем app1, если будильник установлен и запущен в приложении2? а также, как аварийные сигналы умирают во время обновления приложения, и поэтому нам нужно снова его перезагрузить (для случая с обновлением приложения)?</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/2735209/">Basher51</a></span> <span title="2014-07-08 03:25:46">08 июл. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-07-08 03:25:46">2014-07-08 03:25:46</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c39423545">Всегда возвращает TRUE, что ожидающие намерения уже существуют. Даже после удаления и переустановки приложения. Сколько времени ожидает ожидание?</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/324446/">AKh</a></span> <span title="2014-08-13 20:33:24">13 авг. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-08-13 20:33:24">2014-08-13 20:33:24</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+30</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c40915302">Обратите внимание, что вам нужно будет вызвать '' 'alarmManager.cancel (pendingIntent)' '' и '' 'pendingIntent.cancel()' '', чтобы это решение вернуло false.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/763231/">Kevin Cooper</a></span> <span title="2014-09-29 20:00:44">29 сен. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-09-29 20:00:44">2014-09-29 20:00:44</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c42875800">для пользователей, использующих новый Intent (context, YourService.class), вы можете использовать .setAction (&laquo;ACTIONNAME&raquo;), чтобы определить действие по намерению</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1782536/">Maxim Geerinck</a></span> <span title="2014-11-28 20:11:13">28 ноя. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-11-28 20:11:13">2014-11-28 20:11:13</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c45762595">Lifesaver. Обратите внимание, что вам нужно будет создать намерение точно так же, как вы его создали раньше, за исключением флагов.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1068546/">Binoy Babu</a></span> <span title="2015-02-26 10:07:31">26 фев. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-02-26 10:07:31">2015-02-26 10:07:31</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+22</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c47696264">В этом случае это не очевидно, код в этом ответе не проверяет, что ожидающее намерение было зарегистрировано диспетчером аварийных сообщений. Код просто проверяет, что PendingIntent был создан через getBroadcast с эквивалентным целевым намерением. Вы можете это доказать, запустив код alarmUp после получения getBroadcast, но перед всеми функциями календаря и диспетчера аварийных сообщений. Это вернет true. Этот факт объясняет, почему вы должны PendingIntent.cancel, чтобы вернуть значение к false.
+Строго говоря, это не отвечает на вопрос.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/163679/">bigh_29</a></span> <span title="2015-04-21 21:09:49">21 апр. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-04-21 21:09:49">2015-04-21 21:09:49</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c51107720">Извините. Я хочу спросить, что такое MY_UNIQUE_ACTION? Откуда он?</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/4217457/">Leonard Febrianto</a></span> <span title="2015-07-23 01:14:26">23 июл. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-07-23 01:14:26">2015-07-23 01:14:26</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c56305559">@ LeonardFebrianto Я думаю, что это был ответ, давно назревший, но я уверен, что у вас есть причина. Это просто имя действия, это может быть любая постоянная действий, связанная с приемниками в вашем манифесте.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1100322/">borax12</a></span> <span title="2015-12-15 05:49:51">15 дек. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-12-15 05:49:51">2015-12-15 05:49:51</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c56413932">не работает, если тревога убита &laquo;принудительной остановкой&raquo; и т. Д. Она должна быть отменена перед использованием этого кода.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/3736955/">Jemshit Iskenderov</a></span> <span title="2015-12-17 13:55:17">17 дек. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-12-17 13:55:17">2015-12-17 13:55:17</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c56570415">Я пробовал Intent intent = new Intent (ctx, MyReceiver.class); вместо того, чтобы передавать unique_action, и это сработало :)</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1479511/">NarendraJi</a></span> <span title="2015-12-22 11:24:16">22 дек. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-12-22 11:24:16">2015-12-22 11:24:16</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c56597557">ohh его работая спасибо!</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1135548/">Hardik</a></span> <span title="2015-12-23 03:46:33">23 дек. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-12-23 03:46:33">2015-12-23 03:46:33</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c60959908">подсказка для будущих читателей - убедитесь, что вы не ошибаетесь. PendingIntent.getBroadcast (...) с PendingIntent.getService (...) - сэкономить некоторые неприятности! :)</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/4644021/">Bruno Carrier</a></span> <span title="2016-04-18 04:33:00">18 апр. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-04-18 04:33:00">2016-04-18 04:33:00</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+2</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c70110029">это первый раз, когда я вижу столь высокий рейтинг WRONG. См. Комментарий от bigh_29.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1614378/">dit</a></span> <span title="2017-01-03 20:29:37">03 янв. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-01-03 20:29:37">2017-01-03 20:29:37</span></small></span></p></div></div></div></div><p class="hyperlink showMore" id="comments9575569"><a data-toggle="modal" href="#">показать все комментарии (17)</a></p></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="15047197"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">7<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a15047197" class="post-text"><p>У меня есть 2 будильника. Я использую намерение с массовкой вместо действия, чтобы идентифицировать событие:</p>
+                    <pre><code class="prettyprint-override">Intent i = new Intent(context, AppReciever.class);
+i.putExtra("timer", "timer1");
+</code></pre>
+                    <p>вещи в том, что с дифф статистами намерение (и тревога) обыкновение быть уникальными. Таким образом, чтобы иметь возможность определить, какой сигнал активен или нет, я должен был определить Diff <code class="prettyprint-override">requestCode</code> -s:</p>
+                    <pre><code class="prettyprint-override">boolean alarmUp = (PendingIntent.getBroadcast(context, MyApp.TIMER_1, i,
+        PendingIntent.FLAG_NO_CREATE) != null);
+</code></pre>
+                    <p>и вот как была создана сигнализация:</p>
+                    <pre><code class="prettyprint-override">public static final int TIMER_1 = 1;
+public static final int TIMER_2 = 2;
+
+PendingIntent pending = PendingIntent.getBroadcast(context, TIMER_1, i,
+      PendingIntent.FLAG_CANCEL_CURRENT);
+setInexactRepeating(AlarmManager.RTC_WAKEUP,
+      cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pending);
+pending = PendingIntent.getBroadcast(context, TIMER_2, i,
+      PendingIntent.FLAG_CANCEL_CURRENT);
+setInexactRepeating(AlarmManager.RTC_WAKEUP,
+      cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pending);
+</code></pre></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/15047197">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#15047197">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2013-02-24 00:06:24">24 фев. 13</span><span class="d-none" itemprop="dateCreated" datetime="2013-02-24 00:06:24">2013-02-24 00:06:24</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1342413/">HiB</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments15047197"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c65701243">С помощью утилит намерения и это решение сработало для меня. Только одно изменение заключается в том, что я использую сервис, поэтому я изменил его на &laquo;PendingIntent.getService&raquo;</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/2715073/">Pankaj</a></span> <span title="2016-08-27 10:07:25">27 авг. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-08-27 10:07:25">2016-08-27 10:07:25</span></small></span></p></div></div></div></div></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="25050445"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">92<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a25050445" class="post-text"><p>Для других, которые могут нуждаться в этом, вот ответ.</p>
+                    <p>Использование <code class="prettyprint-override">adb shell dumpsys alarm</code></p>
+                    <p>Вы можете знать, тревога была установлена, и когда они собираются встревожена и интервал. Также сколько раз этот сигнал был вызван.</p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/25050445">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#25050445">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2014-07-31 03:37:45">31 июл. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-07-31 03:37:45">2014-07-31 03:37:45</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/3145163/">Jack Feng</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments25050445"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+4</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c41080019">. Это должен быть правильный ответ.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1406716/">user1406716</a></span> <span title="2014-10-04 22:07:13">04 окт. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-10-04 22:07:13">2014-10-04 22:07:13</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c43207779">Это точно</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/523664/">Nacho L.</a></span> <span title="2014-12-09 12:43:14">09 дек. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-12-09 12:43:14">2014-12-09 12:43:14</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+24</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c48280690">Не совсем программный ответ на ОП, а крутой отзыв. Очень хорошо знать.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1308380/">JustSomeGuy</a></span> <span title="2015-05-06 17:38:12">06 май. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-05-06 17:38:12">2015-05-06 17:38:12</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c65020268">добавьте grep для фильтрации обычно длинного списка аварийных сигналов: 'adb shell dumpsys alarm | grep &lt;например. имя пакета вашего приложения&gt; 'Также работает в новых системах Windows (я использую Win10)</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/990129/">muetzenflo</a></span> <span title="2016-08-08 10:51:30">08 авг. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-08-08 10:51:30">2016-08-08 10:51:30</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+2</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c72424630">grep выполняется на мобильном устройстве, а не на вашем ПК. Поэтому, если grep работает, зависит от ОС Android. Старые телефоны не поставляются с grep.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/2793394/">Henning</a></span> <span title="2017-03-07 13:15:26">07 мар. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-03-07 13:15:26">2017-03-07 13:15:26</span></small></span></p></div></div></div></div><p class="hyperlink showMore" id="comments25050445"><a data-toggle="modal" href="#">показать все комментарии (5)</a></p></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="28076168"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">36<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a28076168" class="post-text"><p>Рабочий пример с приемником (верхний ответ был только с действиями).</p>
+                    <pre><code class="prettyprint-override">//starting
+AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+Intent intent = new Intent(getActivity(), MyReceiver.class);
+intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);//my custom string action name
+PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_CANCEL_CURRENT);//used unique ID as 1001
+alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), aroundInterval, pendingIntent);//first start will start asap
+
+//and stopping
+Intent intent = new Intent(getActivity(), MyReceiver.class);//the same as up
+intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);//the same as up
+PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_CANCEL_CURRENT);//the same as up
+alarmManager.cancel(pendingIntent);//important
+pendingIntent.cancel();//important
+
+//checking if alram is working with pendingIntent
+Intent intent = new Intent(getActivity(), MyReceiver.class);//the same as up
+intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);//the same as up
+boolean isWorking = (PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_NO_CREATE) != null);//just changed the flag
+Log.d(TAG, "alarm is " + (isWorking ? "" : "not") + " working...");
+</code></pre>
+                    <p>Я описал также на моем <a href="http://blog.mokrzycki.io/?p=147" rel="noreferrer">blog</a></p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/28076168">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#28076168">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2015-01-21 20:23:40">21 янв. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-01-21 20:23:40">2015-01-21 20:23:40</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/619673/">deadfish</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments28076168"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">+1</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c62955182">Я не уверен, что этого достаточно. В случае, когда PendingIntent зарегистрирован в AlarmManager, а затем остановлен с помощью обоих методов отмены, &laquo;isWorking&raquo; выше будет по-прежнему истинным. Ожидается, что PendingIntent не будет удален из AlarmManager и продолжит возвращать экземпляр. Как мы тогда точно знаем, когда аварийные сигналы были включены/выключены?</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/112127/">johnDisplayClass</a></span> <span title="2016-06-10 07:36:29">10 июн. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-06-10 07:36:29">2016-06-10 07:36:29</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c62993638">Это действительно сработало отлично. Следует отметить: setAction() и requestCode() должны быть одинаковыми во всех getBroadcast(), и его стоит удалить приложение с вашего устройства. Это меня поймало. Спасибо</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/112127/">johnDisplayClass</a></span> <span title="2016-06-11 10:12:42">11 июн. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-06-11 10:12:42">2016-06-11 10:12:42</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c65878925">Отлично работает. Благодаря!</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1545435/">Ambran</a></span> <span title="2016-09-01 12:59:48">01 сен. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-09-01 12:59:48">2016-09-01 12:59:48</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment d-none"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c76962952">Хороший пример, но я бы не использовал 1001 как частный код запроса. Просто 0, чтобы сделать пример более очевидным.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1531765/">Chris</a></span> <span title="2017-07-09 08:12:57">09 июл. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-07-09 08:12:57">2017-07-09 08:12:57</span></small></span></p></div></div></div></div><p class="hyperlink showMore" id="comments28076168"><a data-toggle="modal" href="#">показать все комментарии (4)</a></p></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="29783499"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">29<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a29783499" class="post-text"><p>Примечание Эта цитата из документации для менеджера сигнализации:</p>
+                    <blockquote>
+                        <p>Если уже есть сигнал для этого Намерения запланированного (с
+                            равенство двух намерений определяется Intent.filterEquals), то он
+                            будет удален и заменен этим.</p>
+                    </blockquote>
+                    <p>Не беспокойтесь о том, существует ли будильник, если вы пытаетесь решить, создавать ли сигнал тревоги или нет. Просто создавайте его каждый раз, когда ваше приложение загружается. Вы замените все прошлые аварийные сигналы, которые вы настроили.</p>
+                    <p>Вам нужен другой подход, если вы пытаетесь рассчитать, сколько времени осталось для ранее созданного аварийного сигнала, или если вам действительно нужно знать, существует ли такая сигнализация даже. Чтобы ответить на эти вопросы, подумайте об экономии общих данных pref во время создания тревоги. Вы можете сохранить временную метку часов в тот момент, когда была установлена ​​тревога, время, в течение которого вы ожидаете, что будильник погаснет, и период повторения (если вы настроите повторяющийся сигнал).</p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/29783499">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#29783499">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2015-04-21 21:31:58">21 апр. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-04-21 21:31:58">2015-04-21 21:31:58</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/163679/">bigh_29</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments29783499"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c62176440">По-моему, это должен быть принятый ответ. Если у ОП не возникла особая ситуация, которая оправдывает не повторение тревоги</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/858626/">Jose_GD</a></span> <span title="2016-05-19 16:11:12">19 май. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-05-19 16:11:12">2016-05-19 16:11:12</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c77445237">В моем случае я хочу знать, установлен ли будильник, и поэтому я не хочу создавать новый или перезапускать существующий аварийный сигнал.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/3922544/">Imran Aslam</a></span> <span title="2017-07-21 14:00:12">21 июл. 17</span><span class="d-none" itemprop="dateCreated" datetime="2017-07-21 14:00:12">2017-07-21 14:00:12</span></small></span></p></div></div></div></div></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="30982769"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">3<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a30982769" class="post-text"><p>Я сделал простой (глупый или не) скрипт bash, который извлекает длинные строки из оболочки adb, преобразует их в метки времени и показывает их красным цветом.</p>
+                    <pre><code class="prettyprint-override">echo "Please set a search filter"
+read search
+
+adb shell dumpsys alarm | grep $search | (while read i; do echo $i; _DT=$(echo $i | grep -Eo 'when\s+([0-9]{10})' | tr -d '[[:alpha:][:space:]]'); if [ $_DT ]; then echo -e "\e[31m$(date -d @$_DT)\e[0m"; fi; done;)
+</code></pre>
+                    <p>попробовать;)</p></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/30982769">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#30982769">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2015-06-22 14:38:10">22 июн. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-06-22 14:38:10">2015-06-22 14:38:10</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/4621462/">Jan Ni</a></span></small>
+                        </p>
+                    </div>
+                </div></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="32096400"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">2<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a32096400" class="post-text"><pre><code class="prettyprint-override">Intent intent = new Intent("com.my.package.MY_UNIQUE_ACTION");
+      PendingIntent pendingIntent = PendingIntent.getBroadcast(
+        sqlitewraper.context, 0, intent,
+        PendingIntent.FLAG_NO_CREATE);
+</code></pre>
+                    <p>FLAG_NO_CREATE не создают ожидающий намерения, так что это дает логическое значение ложь.</p>
+                    <pre><code class="prettyprint-override">  boolean alarmUp = (PendingIntent.getBroadcast(sqlitewraper.context, 0,
+        new Intent("com.my.package.MY_UNIQUE_ACTION"),
+        PendingIntent.FLAG_NO_CREATE) != null);
+
+      if (alarmUp) {
+       System.out.print("k");
+
+      }
+
+      AlarmManager alarmManager = (AlarmManager) sqlitewraper.context
+        .getSystemService(Context.ALARM_SERVICE);
+      alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+        System.currentTimeMillis(), 1000 * 60, pendingIntent);
+</code></pre>
+                    <p>После AlarmManager проверить значение Pending Намерение это дает верно, потому что AlarmManager Update Флаг ожидании Намерения.</p>
+                    <pre><code class="prettyprint-override">  boolean alarmUp1 = (PendingIntent.getBroadcast(sqlitewraper.context, 0,
+        new Intent("com.my.package.MY_UNIQUE_ACTION"),
+        PendingIntent.FLAG_UPDATE_CURRENT) != null);
+      if (alarmUp1) {
+       System.out.print("k");
+
+      }
+</code></pre></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/32096400">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#32096400">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2015-08-19 13:07:13">19 авг. 15</span><span class="d-none" itemprop="dateCreated" datetime="2015-08-19 13:07:13">2015-08-19 13:07:13</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/3732643/">MIkka Marmik</a></span></small>
+                        </p>
+                    </div>
+                </div></div></div><hr /></div><div itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer" class="answer-block" id="38578812"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">5<i class="fa fa-thumbs-up"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a38578812" class="post-text"><p>Просто найти другое решение, кажется, работает для меня</p>
+                    <pre><code class="prettyprint-override">Intent myIntent = new Intent(MainActivity.this, MyReceiver.class);
+
+boolean isWorking = (PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, PendingIntent.FLAG_NO_CREATE) != null);
+if (isWorking) {Log.d("alarm", "is working");} else {Log.d("alarm", "is not working");}
+
+if(!isWorking) {
+    pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+    int timeNotif = 5 * 60 * 1000;//time in ms, 7*24*60*60*1000 for 1 week
+    Log.d("Notif", "Notification every (ms): " + timeNotif);
+    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeNotif, pendingIntent);
+    }
+</code></pre></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/38578812">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/1085109#38578812">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2016-07-25 23:18:22">25 июл. 16</span><span class="d-none" itemprop="dateCreated" datetime="2016-07-25 23:18:22">2016-07-25 23:18:22</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/3856297/">user3856297</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments38578812"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c84634844">Иногда, на Marshmallow, после того, как вы принудительно остановите приложение, getBroadcast() вернет ненулевое значение, но будильник не установлен.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/390718/">hopia</a></span> <span title="2018-02-15 20:14:10">15 фев. 18</span><span class="d-none" itemprop="dateCreated" datetime="2018-02-15 20:14:10">2018-02-15 20:14:10</span></small></span></p></div></div></div></div></div></div><hr /></div> </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-12 col-sm-12">
+            <div class="mb-3 related-links"><p class="lead">Похожие вопросы</p><ul class="list-unstyled"><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/1199100"><button type="button" class="btn btn-outline-success btn-sm">9 </button>Проблема с AlarmManager Android с настройкой и сбросом тревоги</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/2963879"><button type="button" class="btn btn-outline-success btn-sm">2 </button>Android AlarmManager начался с BOOT_COMPLETED, а затем взаимодействовал с помощью приложения</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/3272224"><button type="button" class="btn btn-outline-success btn-sm">3 </button>Как проверить, если сигнализация была установлена ​​и работает</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/5362648"><button type="button" class="btn btn-outline-success btn-sm">1 </button>Запуск службы Android с помощью AlarmManager и широковещательного приемника</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/7290243"><button type="button" class="btn btn-outline-success btn-sm">2 </button>AlarmManager не останавливается после перезапуска приложения.</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/7568950"><button type="button" class="btn btn-outline-success btn-sm">0 </button>AlarmMenager Проверка срабатывания сигнализации</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/9573187"><button type="button" class="btn btn-outline-success btn-sm">72 </button>AlarmManager не работает в нескольких устройствах</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/10629563"><button type="button" class="btn btn-outline-success btn-sm">-1 </button>AlarmManager start Alarm Мгновенно</a></li></ul></div><hr /><div class="mb-3 related-links"><p class="lead">Популярные вопросы</p><ul class="list-unstyled"><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/17667"><button type="button" class="btn btn-outline-success btn-sm">1481 </button>Создать файл Excel (.XLS и .XLSX) с C#</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/15858"><button type="button" class="btn btn-outline-success btn-sm">481 </button>Какой лучший инструмент для визуального слияния для Git?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/6320077"><button type="button" class="btn btn-outline-success btn-sm">459 </button>Как преобразовать поток Java 8 в массив?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/81932"><button type="button" class="btn btn-outline-success btn-sm">201 </button>Удалить файл из SVN-репозитория без удаления локальной копии</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/1085109"><button type="button" class="btn btn-outline-success btn-sm">182 </button>Как проверить, установлен ли AlarmManager уже установленный будильник?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/28391"><button type="button" class="btn btn-outline-success btn-sm">168 </button>Создайте экземпляр класса из строки</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/143225"><button type="button" class="btn btn-outline-success btn-sm">159 </button>Различные способы очистки списков</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/133489"><button type="button" class="btn btn-outline-success btn-sm">147 </button>CodeIgniter: Создать нового помощника?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/1366417"><button type="button" class="btn btn-outline-success btn-sm">125 </button>Обновить строку, если она существует в Else Insert Logic с платформой Entity</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/7819212"><button type="button" class="btn btn-outline-success btn-sm">118 </button>Как отрегулировать текст кнопки в Swift</a></li></ul></div> </div>
+    </div>
+</main>
+<footer class="text-muted bg-dark">
+    <div class="container">
+        <div class="row">
+            <p class="col-md-4 col-12">2018 stackoverrun.com</p>
+            <p class="col-md-8 col-12" id="license">Licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license">cc by-sa 3.0</a> with <a href="https://stackoverflow.blog/2009/06/25/attribution-required/" rel="license">attribution required</a>.</p>
+        </div>
+    </div>
+</footer>
+<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="contactModalLabel">Связаться с нами</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <form role="form" id="contactForm">
+                <div class="col-lg-12">
+                    <textarea minlength="10" id="messa9e" class="form-control" rows="5"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <div id="msgSend" class="mr-auto d-none">Сообщение отправлено!</div>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://stackoverrun.com/src/js/all.js"></script>
+<script>
+    $(".exchange,.exchange-mob").click(function(){
+        if($(this).find(".fa-flip-horizontal").length > 0){
+            $(this).find(".fa").removeClass("fa-flip-horizontal");
+        }else{
+            $(this).find(".fa").addClass("fa-flip-horizontal");}});
+
+    var trans = [];
+    $('body').on('click','.exchange,.exchange-mob',function(b){
+        if($(this).attr('class') == 'exchange'){
+            var el = $(this).parent().next().find('.post-text:eq(0)');
+        }else{
+            var el = $(this).next('.post-text');
+        }
+        var id = el.attr('id').substr(5);
+        if(!trans.hasOwnProperty(id) || !trans[id].hasOwnProperty('original')){
+            trans[id] = [];
+            $.ajax({type: "POST",
+                url: "https://stackoverrun.com/",
+                data: "lang=&original="+id,
+                success : function(response){
+                    if(response.length>1){
+                        trans[id]['original'] = response;
+                        trans[id]['text'] = el.prop('outerHTML');
+                        trans[id]['status'] = 0;
+                        el.html(response);
+                        PR.prettyPrint();}}});
+        }else if(trans[id]['status'] == 0){
+            el.html(trans[id]['text']);
+            trans[id]['status'] = 1;
+        }else if(trans[id]['status'] == 1){
+            el.html(trans[id]['original']);
+            trans[id]['status'] = 0;
+        }PR.prettyPrint();});
+
+    var page = 1;
+    var action = 'more';
+    $("#loadMore").click(function(){
+        page = page + 1;
+        $('#loadIcon').css('display','block');
+        $('#loadMore').css('display','none');
+        var x = new XMLHttpRequest();
+        x.open("POST", "https://stackoverrun.com/", true);
+        x.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        x.send("more="+page+"&language=ru");
+        x.onload = function (){if(x.responseText){
+            $('#loadMore').css('display','block');
+            $(x.responseText).appendTo($(".questions"));}
+            $('#loadIcon').css('display','none');}
+        x.send(null);});
+
+    $('body').on('click','.share-url',function(b){
+        $('.share-input').remove();
+        $('<p class="col-12"><input type="text" class="form-control form-control-sm share-input" value="'+$(this).attr('href') + '"></p>').insertAfter($(this).parents('.post-meta').find('.createDate'));
+        $('.share-input').focus().select();
+        b.stopPropagation();
+        return !1;});
+    $('body').on('blur','.share-input',function(){$(this).remove()});
+
+    $("#active,#oldest,#votes").click(function(){
+        var sort = $(this).attr('id');
+        var newHtml = '';
+        var idSort = [];
+        idSort['active'] = [4556735,4846919,9575569,15047197,25050445,28076168,29783499,30982769,32096400,38578812];
+        idSort['oldest'] = [4556735,4846919,9575569,15047197,25050445,28076168,29783499,30982769,32096400,38578812];
+        idSort['votes'] = [9575569,25050445,28076168,29783499,15047197,38578812,30982769,32096400,4846919,4556735];
+        for (var i=0;i<idSort[sort].length;++i){
+            newHtml += $("#"+idSort[sort][i]).prop('outerHTML');}
+        $(".answersList").html('');
+//setTimeout(function(){$(".answersList").html(newHtml)}, 100);
+        $(".answersList").html(newHtml);
+        $("html,body").animate({scrollTop:$(".sorting").offset().top},500);});
+
+    $('.snippet-code').each(function(i,el){
+        if($(el).children('.lang-html').length>0 || $(el).children('.lang-js').length>0){
+            $(el).append('<div class="snippet-result"><div class="snippet-ctas"><button class="btn btn-primary btn-sm showFrame" type="button"><i class="fa fa-play-circle"></i> Выполнить фрагмент кода</button><button type="button" class="btn btn-outline-secondary btn-sm d-none hideFrame"><i class="fa fa-times-circle"></i> Скрыть результаты</button></div><div class="snippet-result-code d-none"><iframe sandbox="allow-forms allow-modals allow-scripts" class="snippet-box-edit" frameborder="0"></iframe><div class="popout"><i class="fa fa-arrows-alt"></i> <a>На весь экран</a></div><div class="popin"><a>Закрыть</a></div></div></div>');}});
+
+    $('body').on('click','.popout',function(){
+        var el = $(this).parents('.snippet-result');
+        el.find('iframe').css({'position':'fixed'});
+        $("body").css({'overflow':'hidden'});
+        el.find('.popin').css({'display':'inline-block'});});
+
+    $('body').on('click','.popin',function(){
+        var el = $(this).parents('.snippet-result');
+        el.find('iframe').css({'position':''});
+        $("body").css({'overflow':''});
+        el.find('.popin').css({'display':'none'});});
+
+    $('body').on('click','.hideFrame',function(){
+        var el = $(this).parents('.snippet-result');
+        el.find(".snippet-result-code").addClass("d-none");
+        el.find(".hideFrame").addClass("d-none");});
+
+    $('body').on('click','.showFrame',function(){
+        var id = $(this).parents('.snippet-code').attr('id');
+        var code = '';
+        $('#'+id).find('pre').each(function(i,el){
+            if($(el).find('code').length>0){
+                if($(el).is('.lang-js') == true){
+                    code += $("<textarea/>").html('&lt;script src=&quot;https://stackoverrun.com/src/js/snippet-javascript-console.min.js&quot;&gt;&lt;/script&gt;&lt;script type=&quot;text/javascript&quot;&gt;').text()+$(el).find('code').text()+$("<textarea/>").html('&lt;/script&gt;').text();
+                }else if($(el).is('.lang-css') == true){
+                    code += $("<textarea/>").html('&lt;style&gt;').text()+$(el).find('code').text()+$("<textarea/>").html('&lt;/style&gt;').text();
+                }else{
+                    code += $(el).find('code').text();
+                }}});
+        $(this).parents('.snippet-result').find('iframe').attr('srcdoc',code);
+        $(this).parents('.snippet-result').find(".snippet-result-code").removeClass("d-none");
+        $(this).parents('.snippet-result').find(".hideFrame").removeClass("d-none");});
+
+    $('body').on('click','.showMore',function(){
+        $("."+$(this).attr('id')).find(".post-comment").removeClass("d-none");
+        $(this).find("a").addClass("d-none");});
+
+    $("#contactForm").submit(function(event){
+        event.preventDefault();
+        var message = $("#messa9e").val();
+        if(message.length>10){
+            $.ajax({
+                type: "POST",
+                url: "https://stackoverrun.com/",
+                data: "action=contact&message="+message,
+                success : function(response){
+                    if (response == "ok"){
+                        $("#msgSend").removeClass("d-none");}}});}});
+
+    function repeatXI(callback, interval, repeat, immediate) {
+        repeat = typeof repeat == 'undefined' ? -1 : repeat;
+        interval = interval <= 0 ? 1000 : interval;
+        immediate = typeof immediate == 'undefined' ? false : immediate;
+        var offset = immediate ? 0 : 1;
+        var id = null;
+        if (repeat > 0) {
+            for (var i = 0; i < repeat; i++) {
+                id = setTimeout(callback, interval * (i + offset));
+            }
+        } else {
+            id = setInterval(callback, interval);
+        }
+        return id;
+    }
+    function faFlip() {
+        $(".exchange,.exchange-mob").find(".fa").addClass("fa-flip-horizontal");
+        setTimeout(function(){
+            $(".exchange,.exchange-mob").find(".fa").removeClass("fa-flip-horizontal");
+        }, 250);
+    }
+    window.onfocus = function(){
+        setTimeout(function(){
+            repeatXI(faFlip, 1000, 1, true);
+        }, 1000);
+    }
+    $(document).ready(function(){
+        setTimeout(function(){
+            repeatXI(faFlip, 1000, 1, true);
+        }, 2000);
+    });
+
+    $('body').on('click','.search-button',function(){
+        $('.search-block').removeClass("d-none");
+        $('#search-input').focus();
+    });
+    $('body').on('blur','#search-input',function(){
+        $('.search-block').addClass("d-none")
+    });
+</script>
+<script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "WebSite",
+        "url": "https://stackoverrun.com/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://stackoverrun.com/ru/search/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+</script>
+<link async href="https://stackoverrun.com/src/css/all.css" rel="stylesheet">
+<link async href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"></body>
+</html>

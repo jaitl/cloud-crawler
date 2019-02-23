@@ -54,6 +54,7 @@ private class TorResourceController(
         context match {
           case Some(c) =>
             executors += c.id -> c.copy(isUsed = true)
+            log.info(s"Get executor Id ${c.id} with ${c.awaitTo}")
             sender() ! SuccessRequestResource(requestId, c.executor)
           case None =>
             sender() ! NoFreeResource(requestId)

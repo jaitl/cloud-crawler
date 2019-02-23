@@ -14,6 +14,7 @@ buildscript {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
         classpath "gradle.plugin.com.github.maiflai:gradle-scalatest:0.19"
         classpath "gradle.plugin.com.palantir:jacoco-coverage:0.4.0"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
     }
 }
 
@@ -106,6 +107,7 @@ project(":models") {
 }
 
 project(":worker") {
+    apply plugin: "com.github.johnrengelman.shadow"
     dependencies {
         compile project(":models")
 
@@ -137,6 +139,8 @@ project(":worker") {
 
 project(":master") {
     apply plugin: 'application'
+    apply plugin: "com.github.johnrengelman.shadow"
+
 
     mainClassName = "com.github.jaitl.crawler.master.MasterApp"
     dependencies {
@@ -155,34 +159,24 @@ project(":master") {
         testCompile "com.typesafe.akka:akka-testkit_${scalaMajorVersion}:${akkaVersion}"
         testCompile "org.scalamock:scalamock_${scalaMajorVersion}:4.1.0"
     }
-    jar {
-        manifest {
-            attributes "Main-Class": mainClassName
-        }
-
-        from {
-            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-        }
-    }
 }
+
+
 
 project(":simple-worker") {
     apply plugin: 'application'
+    apply plugin: "com.github.johnrengelman.shadow"
 
     mainClassName = "com.github.jaitl.cloud.simple.worker.AppSO"
 
     dependencies {
         compile project(":worker")
-
         compile "org.jsoup:jsoup:1.11.3"
     }
-    jar {
-        manifest {
-            attributes "Main-Class": mainClassName
-        }
 
-        from {
-            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    shadowJar {
+        transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+            resource = 'reference.conf'
         }
     }
 }
