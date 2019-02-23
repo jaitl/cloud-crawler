@@ -47,8 +47,8 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
-  def withProxy(proxyLimit: Int, timeout: RandomTimeout): this.type = {
-    resourceType = Some(Proxy(proxyLimit, timeout))
+  def withProxy(host: String, post: Int, limit: Int, timeout: RandomTimeout): this.type = {
+    resourceType = Some(Proxy(host, post, limit, timeout))
     this
   }
 
