@@ -117,7 +117,6 @@ private[worker] class TasksBatchController(
       }
 
       else if (ResourceHelper.isResourceFailed(t)) {
-        currentActiveCrawlTask = currentActiveCrawlTask - 1
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
       } else {
