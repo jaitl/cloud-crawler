@@ -16,24 +16,11 @@ import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveResults
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SkippedTask
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessAddedResults
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessCrawledTask
-import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessSavedResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.{AddResults, BannedTask, FailedTask, FailureSaveResults, SaveResults, SkippedTask, SuccessAddedResults, SuccessCrawledTask, SuccessSavedResults}
 import com.github.jaitl.crawler.worker.executor.TasksBatchController.ExecuteTask
 import com.github.jaitl.crawler.worker.executor.TasksBatchController.QueuedTask
 import com.github.jaitl.crawler.worker.executor.TasksBatchController.TasksBatchControllerConfig
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFreeResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.{NoFreeResource, NoResourcesAvailable, RequestResource, ReturnBannedResource, ReturnFailedResource, ReturnSkippedResource, ReturnSuccessResource, SuccessRequestResource}
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
@@ -122,7 +109,15 @@ private[worker] class TasksBatchController(
         taskQueue += task
         saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
       }
+
+      if (ResourceHelper.isBotBanned(t)) {
+        resourceController ! ReturnBannedResource(requestId, requestExecutor, t)
+        taskQueue += task
+        saveCrawlResultController ! AddResults(BannedTask(task.task, t))
+      }
+
       else if (ResourceHelper.isResourceFailed(t)) {
+        currentActiveCrawlTask = currentActiveCrawlTask - 1
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
       } else {

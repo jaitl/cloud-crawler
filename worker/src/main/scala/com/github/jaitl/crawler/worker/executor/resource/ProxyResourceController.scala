@@ -8,13 +8,7 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ExecutorContext
 import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ProxyConfig
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFreeResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.{NoFreeResource, NoResourcesAvailable, RequestResource, ReturnBannedResource, ReturnFailedResource, ReturnSkippedResource, ReturnSuccessResource, SuccessRequestResource}
 import com.github.jaitl.crawler.worker.http.agent.UserAgentGenerator
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutorConfig
@@ -91,6 +85,15 @@ private class ProxyResourceController(
       executors += context.id -> context
       failCount = failCount + 1
       log.info(s"Waiting in ReturnSkippedResource $requestId for $awaitTo")
+
+    case ReturnBannedResource(requestId, requestExecutor, t) =>
+      val now = Instant.now()
+      val awaitTo = now.plusSeconds(30 * 60)
+      val context = executors(requestExecutor.getExecutorId())
+        .copy(isUsed = false, awaitTo = Some(awaitTo))
+      executors += context.id -> context
+      failCount = failCount + 1
+      log.info(s"Waiting in ReturnBannedResource $requestId for $awaitTo")
   }
 
   def createNewExecutorContext(): ExecutorContext = {
