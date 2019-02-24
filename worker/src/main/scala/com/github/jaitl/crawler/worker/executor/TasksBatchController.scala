@@ -108,15 +108,12 @@ private[worker] class TasksBatchController(
         resourceController ! ReturnSkippedResource(requestId, requestExecutor, t)
         taskQueue += task
         saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
-      }
-
-      if (ResourceHelper.isBotBanned(t)) {
+      } else if (ResourceHelper.isBotBanned(t)) {
         resourceController ! ReturnBannedResource(requestId, requestExecutor, t)
         taskQueue += task
         saveCrawlResultController ! AddResults(BannedTask(task.task, t))
-      }
-
-      else if (ResourceHelper.isResourceFailed(t)) {
+      } else if (ResourceHelper.isResourceFailed(t)) {
+        currentActiveCrawlTask = currentActiveCrawlTask - 1
         resourceController ! ReturnFailedResource(requestId, requestExecutor, t)
         taskQueue += task
       } else {
