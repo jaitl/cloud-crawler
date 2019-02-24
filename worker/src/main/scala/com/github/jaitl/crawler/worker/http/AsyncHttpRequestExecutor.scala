@@ -30,7 +30,8 @@ class AsyncHttpRequestExecutor(
       case _ =>
         new ProxyServer.Builder(executorConfig.host, executorConfig.port)
           .setProxyType(proxyType)
-          .setRealm(new Realm.Builder(executorConfig.login, executorConfig.password))
+          .setRealm(new Realm.Builder(executorConfig.login, executorConfig.password)
+          .setScheme(Realm.AuthScheme.BASIC))
           .build()
     }
 
