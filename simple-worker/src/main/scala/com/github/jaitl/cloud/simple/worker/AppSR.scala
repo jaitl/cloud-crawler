@@ -41,9 +41,9 @@ object AppSR extends StrictLogging {
         config.getString("simple-worker.proxy.limit").toInt,
         RandomTimeout(
           Duration.fromNanos(
-            config.getDuration("simple-worker.tor.timeout.up").toNanos),
+            config.getDuration("simple-worker.proxy.timeout.up").toNanos),
           Duration.fromNanos(
-            config.getDuration("simple-worker.tor.timeout.down").toNanos)
+            config.getDuration("simple-worker.proxy.timeout.down").toNanos)
         ),
         config.getString("simple-worker.proxy.login"),
         config.getString("simple-worker.proxy.password")
