@@ -33,8 +33,8 @@ private[worker] class ResourceControllerCreator(
 ) extends OneArgumentActorCreator[ResourceType] {
   override def create(factory: ActorRefFactory, firstArg: ResourceType): ActorRef = {
     firstArg match {
-      case Proxy(host, port, limit, timeout) =>
-        val config = ProxyConfig(host, port, limit, ctrlConfig.maxFailCount, timeout)
+      case Proxy(host, port, limit, timeout, login, password) =>
+        val config = ProxyConfig(host, port, limit, ctrlConfig.maxFailCount, timeout, login, password)
         factory.actorOf(
           props = ProxyResourceController.props(config).withDispatcher("worker.blocking-io-dispatcher"),
           name = ProxyResourceController.name

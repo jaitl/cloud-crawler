@@ -104,7 +104,9 @@ private class ProxyResourceController(
       host = config.host,
       port = config.port,
       proxyType = ProxyType.Http,
-      userAgent = userAgent
+      userAgent = userAgent,
+      login = config.login,
+      password = config.password
     )
 
     val executor = HttpRequestExecutor.getExecutor(executorConfig)
@@ -131,7 +133,9 @@ private object ProxyResourceController {
     port: Int,
     limit: Int,
     maxFailCount: Int,
-    timeout: RandomTimeout)
+    timeout: RandomTimeout,
+    login: String = "",
+    password: String = "")
 
   def props(config: ProxyConfig): Props =
     Props(new ProxyResourceController(config))

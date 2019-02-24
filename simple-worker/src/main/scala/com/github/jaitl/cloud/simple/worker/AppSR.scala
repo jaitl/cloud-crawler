@@ -36,15 +36,17 @@ object AppSR extends StrictLogging {
       .withSaveRawProvider(new LocalFileSystemSaveRawProvider(
         config.getString("simple-worker.filepath")))
       .withProxy(
-        config.getString("simple-worker.tor.host"),
-        config.getString("simple-worker.tor.port").toInt,
-        config.getString("simple-worker.tor.limit").toInt,
+        config.getString("simple-worker.proxy.host"),
+        config.getString("simple-worker.proxy.port").toInt,
+        config.getString("simple-worker.proxy.limit").toInt,
         RandomTimeout(
           Duration.fromNanos(
             config.getDuration("simple-worker.tor.timeout.up").toNanos),
           Duration.fromNanos(
             config.getDuration("simple-worker.tor.timeout.down").toNanos)
-        )
+        ),
+        config.getString("simple-worker.proxy.login"),
+        config.getString("simple-worker.proxy.password")
       )
       .build()
 

@@ -52,6 +52,11 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
+  def withProxy(host: String, post: Int, limit: Int, timeout: RandomTimeout, login:String, password:String): this.type = {
+    resourceType = Some(Proxy(host, post, limit, timeout, login, password))
+    this
+  }
+
   def withTor(host: String, post: Int, limit: Int, timeout: RandomTimeout): this.type = {
     resourceType = Some(Tor(host, post, limit, timeout))
     this
