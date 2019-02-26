@@ -106,7 +106,6 @@ private[worker] class TasksBatchController(
       log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
       if (ResourceHelper.isResourceSkipped(t)) {
         resourceController ! ReturnSkippedResource(requestId, requestExecutor, t)
-        taskQueue += task
         saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
       } else if (ResourceHelper.isBotBanned(t)) {
         resourceController ! ReturnBannedResource(requestId, requestExecutor, t)

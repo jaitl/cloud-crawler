@@ -83,7 +83,6 @@ private class ProxyResourceController(
       val context = executors(requestExecutor.getExecutorId())
         .copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
-      failCount = failCount + 1
       log.info(s"Waiting in ReturnSkippedResource $requestId for $awaitTo")
 
     case ReturnBannedResource(requestId, requestExecutor, t) =>
@@ -92,7 +91,6 @@ private class ProxyResourceController(
       val context = executors(requestExecutor.getExecutorId())
         .copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
-      failCount = failCount + 1
       log.info(s"Waiting in ReturnBannedResource $requestId for $awaitTo")
   }
 
