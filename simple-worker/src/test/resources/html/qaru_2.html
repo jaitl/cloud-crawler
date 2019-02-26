@@ -1,0 +1,1175 @@
+
+<!DOCTYPE HTML>
+<html lang="ru-RU">
+<head>
+    <title>git - Как удалить ветвь Git как локально, так и удаленно? - Qaru</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width">
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="yandex-verification" content="68f8c2202f8948e2" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="csrf-param" content="csrf">
+    <meta name="csrf-token" content="vKNQPG90gh5llcXT4-C74Zz6Exewa4JAqjr1i0bvl46BRtQi5rrIFInmHYQ1HB2c7wmvT9VBeV6ADQmH2vn1jg==">
+    <meta name="description" content="Я хочу удалить ветвь как локально, так и в моей удаленной проектной вилке на GitHub.
+
+ Не удалось удалить удаленную ветвь
+
+$ git branch -d remotes/origin/bugfix
+error: branch &#039;remotes/origin/bugfix&#039; not found.
+
+$ git branch -d origin/bugfix
+error: br">
+    <link href="http://qaru.site/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely" rel="canonical">
+    <link href="/assets/all-9cf39ec290a25e1f0ade37806174f0b3.css" rel="stylesheet">
+    <link href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/styles/darcula.min.css" rel="stylesheet"> <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <script async src="https://yastatic.net/pcode/adfox/header-bidding.js"></script>
+    <script async src="https://yastatic.net/pcode/adfox/header-bidding.js"></script>
+    <script>
+        var adfoxBiddersMap = {
+            "betweenDigital": "895633",
+            "myTarget": "895498"
+        };
+        var adUnits = [
+            {
+                "code": "adfox_154697900567147088",
+                "bids": [
+                    {
+                        "bidder": "myTarget",
+                        "params": {
+                            "placementId": "361716"
+                        }
+                    },
+                    {
+                        "bidder": "betweenDigital",
+                        "sizes": [
+                            [728,90],
+                            [468,60],
+                            [300,250],
+                            [300,50],
+                            [300,100]
+                        ],
+                        "params": {
+                            "placementId": "2857187"
+                        }
+                    }
+                ],
+                "sizes": [
+                    [728,90],
+                    [468,60],
+                    [300,250],
+                    [300,50],
+                    [300,100]
+                ]
+            }
+            // {
+            //     "code": "adfox_1547187797599103",
+            //     "bids": [
+            //         {
+            //             "bidder": "myTarget",
+            //             "params": {
+            //                 "placementId": "362626"
+            //             }
+            //         },
+            //         {
+            //             "bidder": "betweenDigital",
+            //             "sizes": [
+            //                 [728,90],
+            //                 [468,60],
+            //                 [300,250],
+            //                 [300,50],
+            //                 [300,100]
+            //             ],
+            //             "params": {
+            //                 "placementId": "2861465"
+            //             }
+            //         }
+            //     ],
+            //     "sizes": [
+            //         [728,90],
+            //         [468,60],
+            //         [300,250],
+            //         [300,50],
+            //         [300,100]
+            //     ]
+            // }
+        ];
+        var userTimeout = 700;
+        window.YaHeaderBiddingSettings = {
+            biddersMap: adfoxBiddersMap,
+            adUnits: adUnits,
+            timeout: userTimeout
+        };
+    </script>
+    <script src="https://yastatic.net/pcode/adfox/loader.js" crossorigin="anonymous"></script>
+
+    <script>(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter44607970 = new Ya.Metrika2({ id:44607970, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://cdn.jsdelivr.net/npm/yandex-metrica-watch/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2");</script>
+
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-99598005-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <script async id="__lxGc__rtr" type="text/javascript" src="//s.clickiocdn.com/t/213079/360.js"></script>
+    <script async type="text/javascript" src="//s.clickiocdn.com/t/common_258.js"></script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        window.__gcse = {
+            callback: function() {
+                $('#___gcse_0 .gsc-clear-button').remove();
+                $('#___gcse_0 .gsc-search-button').remove();
+                $('#___gcse_0 .gsib_b').remove();
+                $('#___gcse_0 .gsc-input input').attr('placeholder', 'Поиск...');
+            }
+        };
+        (function() {
+            var cx = '011151660133384015389:9fypgkndwsa';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+        })();
+    </script>
+</head>
+<body>
+<noscript><div><img src="https://mc.yandex.ru/watch/44607970" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<nav id="w0" class="navbar-default navbar-fixed-top navbar"><div class="container"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w0-collapse"><span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span></button><a class="navbar-brand" href="/"><img class="dark" src="/img/logo-dark.svg" alt="qaru.site" /><div class="name">qa<span class="cl-orange">.ru</span></div></a></div><div id="w0-collapse" class="collapse navbar-collapse"><ul id="w1" class="navbar-nav navbar-right nav"><li class="active"><a href="/questions">Вопросы</a></li>
+    <li><a href="/tags">Теги</a></li>
+    <li class="blue hidden-xs hidden-sm" onclick="yaCounter44607970.reachGoal(&#039;register_menu_click&#039;); return true;"><a href="/want-register">Регистрация</a></li>
+    <li class="qase hidden-xs hidden-sm" rel="nofollow noindex" onclick="yaCounter44607970.reachGoal(&#039;qase_click&#039;); return true;"><a href="https://qase.io/?utm_source=qaru&amp;utm_medium=button"><img src="/files/qase.png"></a></li></ul><div class="search"><gcse:searchbox-only resultsUrl="/search" filter="0" sort_by=""></gcse:searchbox-only></div>
+</div></div></nav><div class="wrap">
+    <div class="container">
+        <div itemscope itemtype="http://schema.org/QAPage">
+            <div class="right-col">
+                <div class="hidden-xs hidden-sm sidebar">
+                    <style>
+                        .ccbdfeda6697b0ba5951abd279ee01028 {
+                            max-width: 300px;
+                        }
+                    </style>
+                    <div class="ccbdfeda6697b0ba5951abd279ee01028">
+                        <ins class="adsbygoogle" style="width:300px;height:600px;" data-ad-client="ca-pub-9882502965778689" data-ad-slot="1447358630">
+                        </ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        <ins class="adsbygoogle" style="width:300px;height:600px;;margin-top: 20px;" data-ad-client="ca-pub-1191230850516122" data-ad-slot="8423199226">
+                        </ins>
+                        <script>
+                            (adsbygoogle=window.adsbygoogle || []).push({});
+                        </script>
+                        <div id="yandex_rtb_R-A-248011-22" style="margin-top: 20px;width: 300px;"></div>
+                        <script type="text/javascript">
+                            (function(w, d, n, s, t) {
+                                w[n] = w[n] || [];
+                                w[n].push(function() {
+                                    Ya.Context.AdvManager.render({
+                                        blockId: "R-A-248011-22",
+                                        renderTo: "yandex_rtb_R-A-248011-22",
+                                        async: true
+                                    });
+                                });
+                                t = d.getElementsByTagName("script")[0];
+                                s = d.createElement("script");
+                                s.type = "text/javascript";
+                                s.src = "//an.yandex.ru/system/context.js";
+                                s.async = true;
+                                t.parentNode.insertBefore(s, t);
+                            })(this, this.document, "yandexContextAsyncCallbacks");
+                        </script>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function(){
+                            window.navHeight = $('#w0').outerHeight();
+                            window.wh = $(window).height();
+                            setInterval(function () {
+                                window.navHeight = $('#w0').outerHeight();
+                                window.wh = $(window).height();
+                            });
+
+                            var awrap = $('.ccbdfeda6697b0ba5951abd279ee01028'),
+                                lastScrollTop = 0;
+
+                            $(window).on('scroll', function () {
+                                var st = $(this).scrollTop(),
+                                    ot = awrap.offset().top,
+                                    h = awrap.height(),
+                                    dh = $(document).height();
+
+                                if (st <= 0) {
+                                    awrap.css({position : 'initial'});
+                                } else {
+                                    if (h > window.wh) {
+                                        if (st > lastScrollTop
+                                            && (st + window.wh) >= h + ot + 20
+                                        ) {
+                                            if ((st + window.wh) <= dh - 152) {
+                                                awrap.css({position: 'fixed'});
+                                                awrap.css({bottom: 0});
+                                                awrap.css({top: 'initial'});
+                                            } else {
+                                                awrap.css({position : 'absolute'});
+                                                awrap.css({top : dh - h - 152 - 20});
+                                                awrap.css({bottom: 'initial'});
+                                            }
+                                        } else if (st < lastScrollTop && st <= ot-20-window.navHeight) {
+                                            awrap.css({position: 'fixed'});
+                                            awrap.css({top: 20+window.navHeight});
+                                            awrap.css({bottom: 'initial'});
+                                        } else if (awrap.css('position') !== 'absolute' && awrap.css('position') !== 'initial' && awrap.css('position') !== 'static') {
+                                            awrap.css({position : 'absolute'});
+                                            awrap.css({top : ot});
+                                            awrap.css({bottom: 'initial'});
+                                        }
+                                    } else {
+                                        awrap.css({position: 'fixed'});
+                                        awrap.css({top: 20+window.navHeight});
+                                        awrap.css({bottom: 'initial'});
+                                    }
+                                }
+                                lastScrollTop = st;
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="main-col" itemprop="mainEntity" itemscope itemtype="http://schema.org/Question">
+                <div class="question-header">
+                    <h1 itemprop="name">Как удалить ветвь Git как локально, так и удаленно?</h1>
+                </div>
+                <div id="adfox_154697900567147088" style="margin-bottom: 10px"></div>
+                <script>
+                    window.Ya.adfoxCode.create({
+                        ownerId: 280150,
+                        containerId: 'adfox_154697900567147088',
+                        params: {
+                            pp: 'g',
+                            ps: 'dccp',
+                            p2: 'gfke'
+                        }
+                    });
+                </script>
+                <div class="question">
+                    <div class="question-row">
+                        <div class="question-text">
+                            <div class="description" itemprop="text">
+                                <p>Я хочу удалить ветвь как локально, так и в моей удаленной проектной вилке на <a href="http://en.wikipedia.org/wiki/GitHub" rel="nofollow noreferrer">GitHub</a>.</p>
+                                <h3> Не удалось удалить удаленную ветвь</h3>
+                                <pre class="prettyprint-override"><code>$ git branch -d remotes/origin/bugfix
+error: branch 'remotes/origin/bugfix' not found.
+
+$ git branch -d origin/bugfix
+error: branch 'origin/bugfix' not found.
+
+$ git branch -rd origin/bugfix
+Deleted remote branch origin/bugfix (was 2a14ef7).
+
+$ git push
+Everything up-to-date
+
+$ git pull
+From github.com:gituser/gitproject
+* [new branch] bugfix -&gt; origin/bugfix
+Already up-to-date.
+</code></pre>
+                                <p>Что мне нужно сделать по-другому, чтобы успешно удалить
+                                    <code>remotes/origin/bugfix</code> как локально, так и на GitHub?</p> </div>
+                            <div class="votes-question">
+                                <div class="vote-count" itemprop="upvoteCount">14380</div><i class="fa fa-thumbs-o-up"></i>
+                            </div>
+                            <div class="tags">
+                                <a href="/questions/tagged/git" class="tag" title="показать вопросы с меткой 'git'" rel="tag">git</a>
+                                <a href="/questions/tagged/git-branch" class="tag" title="показать вопросы с меткой 'git-branch'" rel="tag">git-branch</a>
+                                <a href="/questions/tagged/git-remote" class="tag" title="показать вопросы с меткой 'git-remote'" rel="tag">git-remote</a>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="action-time">
+                                задан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/95592/matthew-rankin" rel="noopener" target="_blank">Matthew Rankin</a></span></span> <span title="2010-01-05 04:12"> 05 янв. &#39;10 в 4:12</span><span class="hidden" itemprop="dateCreated" datetime="2010-01-05 04:12">2010-01-05 04:12</span>
+                            </div>
+                            <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely" target="_blank" rel="noopener">источник</a>
+                            <a class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely" title="поделиться">поделиться</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="answers" id="answers">
+                    <div class="answers-header">
+                        <span class="pull-left"><span itemprop="answerCount">40</span> ответов</span>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="answer-pager">
+                        <ul class="pagination pagination-sm"><li class="prev hidden"><span><i class="fa fa-long-arrow-left"></i></span></li>
+                            <li class="first hidden"><span>1</span></li>
+                            <li class="active"><span>1</span></li>
+                            <li><a href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely?page=2#answers" data-page="1">2</a></li>
+                            <li class="last hidden"><span>2</span></li>
+                            <li class="next"><a href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely?page=2#answers" rel="next" data-page="1"><i class="fa fa-long-arrow-right"></i></a></li></ul> </div>
+                    <div class="answer accepted" id="75" itemscope itemtype="http://schema.org/Answer" itemprop="acceptedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <h1> Управляющее резюме</h1> <pre><code>$ git push --delete &lt;remote_name&gt; &lt;branch_name&gt;
+$ git branch -d &lt;branch_name&gt;
+</code></pre> <p> Обратите внимание, что в большинстве случаев удаленное имя является <code>origin</code>.</p> <h1> Удалить локальную ветку</h1> <p> Чтобы удалить локальную ветку, используйте одно из следующих:</p> <pre><code>$ git branch -d branch_name
+$ git branch -D branch_name
+</code></pre> <p> <strong>Примечание.</strong> Параметр <code>-d</code> является псевдонимом для <code>--delete</code>, который удаляет ветвь только в том случае, если она уже полностью объединена с вышестоящей ветвью. Вы также можете использовать <code>-d</code>, который является псевдонимом для <code>--delete --force</code>, который удаляет ветку "независимо от ее объединенного статуса". [Источник: <code>man git-branch</code> ]</p> <h1> Удалить удаленную ветку [Обновлено 8 сентября 2017 года]</h1> <p> Начиная с <a href="https://github.com/gitster/git/blob/master/Documentation/RelNotes/1.7.0.txt" rel="nofollow noreferrer">Git v1.7.0</a>, вы можете удалить <strong>удаленную</strong> ветку, используя</p> <pre><code>$ git push &lt;remote_name&gt; --delete &lt;branch_name&gt;
+</code></pre> <p> что может быть легче запомнить, чем</p>
+                                    <ins class="adsbygoogle" style="display:block;margin-bottom:10px;" data-ad-client="ca-pub-1191230850516122" data-ad-format="auto" data-ad-slot="8423199226">
+                                    </ins>
+                                    <script>
+                                        (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script> <pre><code>$ git push &lt;remote_name&gt; :&lt;branch_name&gt;
+</code></pre> <p> который был добавлен в <a href="https://github.com/gitster/git/blob/master/Documentation/RelNotes/1.5.0.txt" rel="nofollow noreferrer">Git v1.5.0</a> "для удаления удаленной ветки или тега".</p> <p> Начиная с <a href="https://github.com/git/git/blob/master/Documentation/RelNotes/2.8.0.txt" rel="nofollow noreferrer">Git v2.8.0</a> вы также можете использовать <code>git push</code> с <code>-d</code> в качестве псевдонима для <code>--delete</code>.</p> <p> Таким образом, версия Git, которую вы установили, будет определять, нужно ли вам использовать более простой или сложный синтаксис.</p> <h2> Удалить удаленную ветку [Оригинальный ответ от 5 января 2010]</h2> <p> Из главы 3 <a href="http://git-scm.com/book/en/Git-Branching-Remote-Branches" rel="nofollow noreferrer">Pro Git</a> Скотта Чакона:</p> <blockquote> <h3> Удаление удаленных веток</h3> <p> Предположим, что вы закончили с удаленной веткой - скажем, вы и ваши соавторы закончили с функцией и объединили ее с вашей главной веткой удаленных (или любой другой веткой, в которой находится ваша стабильная строка кода). Вы можете удалить удаленную ветку, используя довольно тупой синтаксис <code>git push [remotename] :[branch]</code>. Если вы хотите удалить ветку исправления сервера с сервера, выполните следующее:</p> <pre><code>$ git push origin :serverfix
+To git@github.com:schacon/simplegit.git
+ - [deleted]         serverfix
+</code></pre> <p> Boom. Нет больше ветки на вашем сервере. Возможно, вы захотите просмотреть эту страницу, потому что вам понадобится эта команда, и вы, скорее всего, забудете синтаксис. Чтобы запомнить эту команду, <code>git push [remotename] [localbranch]:[remotebranch]</code> синтаксис <code>git push [remotename] [localbranch]:[remotebranch]</code> который мы рассмотрели чуть ранее. Если вы <code>[localbranch]</code> часть <code>[localbranch]</code>, то в основном говорите: "Ничего не бери на моей стороне и сделай его <code>[remotebranch]</code> ".</p></blockquote> <p> Я выпустил <code>git push origin :bugfix</code> и он работал прекрасно. Скотт Чакон был прав - я захочу <a href="http://en.wiktionary.org/wiki/dogear#Verb%23Verb" rel="nofollow noreferrer">выслушать</a> эту страницу (или, фактически, собачье ухо, ответив на это в Переполнении стека).</p> <p> Затем вы должны выполнить это на других машинах</p> <pre><code>git fetch --all --prune
+</code></pre> <p> распространять изменения.</p> </div>
+                                <div class="votes-answer accepted">
+                                    <div class="vote-count" itemprop="upvoteCount">17997</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/95592/matthew-rankin" rel="noopener" target="_blank">Matthew Rankin</a></span></span> <span title="2010-01-05 04:13"> 05 янв. &#39;10 в 4:13</span><span class="hidden" itemprop="dateCreated" datetime="2010-01-05 04:13">2010-01-05 04:13</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/2003515#2003515" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/75#75" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="78" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Ответ Matthew отлично подходит для удаления удаленных ветвей, и я также благодарен за объяснение, но для простого различия между двумя командами:</p>
+                                    <p>Чтобы удалить локальную ветвь <strong></strong> с вашего устройства:</p>
+                                    <p> <code>git branch -d {the_local_branch}</code> (используйте <code>-D</code> вместо того, чтобы принудительно удалить ветвь без проверки объединенного состояния)</p>
+                                    <ins class="adsbygoogle" style="display:block;margin-bottom:10px;" data-ad-client="ca-pub-9882502965778689" data-ad-slot="6733731217" data-ad-format="auto">
+                                    </ins>
+                                    <script>
+                                        (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script>
+                                    <p>Чтобы удалить сервер <strong> удаленную ветвь</strong> с сервера:</p>
+                                    <p> <code>git push origin --delete {the_remote_branch}</code></p>
+                                    <p>Ссылка: <a href="https://makandracards.com/makandra/621-git-delete-a-branch-local-or-remote" rel="nofollow noreferrer">https://makandracards.com/makandra/621-git-delete-a-branch-local-or-remote</a></p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">2944</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/385559/eric-brotto" rel="noopener" target="_blank">Eric Brotto</a></span></span> <span title="2012-06-12 17:51"> 12 июня &#39;12 в 17:51</span><span class="hidden" itemprop="dateCreated" datetime="2012-06-12 17:51">2012-06-12 17:51</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/10999165#10999165" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/78#78" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="88" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <h1> Краткие ответы</h1>
+                                    <p>Если вы хотите получить более подробные объяснения следующих команд, см. длинные ответы в следующем разделе.</p>
+                                    <p>Удаление удаленной ветки:</p>
+                                    <pre class="lang-bash prettyprint-override"><code>git push origin --delete &lt;branch&gt;  # Git version 1.7.0 or newer
+git push origin :&lt;branch&gt;          # Git versions older than 1.7.0
+</code></pre>
+                                    <p>Удаление локальной ветки:</p>
+                                    <pre class="lang-bash prettyprint-override"><code>git branch --delete &lt;branch&gt;
+git branch -d &lt;branch&gt; # Shorter version
+git branch -D &lt;branch&gt; # Force delete un-merged branches
+</code></pre>
+                                    <p>Удаление локальной ветки удаленного отслеживания:</p>
+                                    <pre class="lang-bash prettyprint-override"><code>git branch --delete --remotes &lt;remote&gt;/&lt;branch&gt;
+git branch -dr &lt;remote&gt;/&lt;branch&gt; # Shorter
+
+git fetch &lt;remote&gt; --prune # Delete multiple obsolete tracking branches
+git fetch &lt;remote&gt; -p      # Shorter
+</code></pre>
+                                    <h1> Длинный ответ: есть три разных ветки для удаления!</h1>
+                                    <p>Когда вы имеете дело с удалением ветвей как локально, так и удаленно, имейте в виду, что <strong> задействованы 3 разных ветки</strong>:</p>
+                                    <ul><li> Локальная ветвь <code>X</code>.</li>
+                                        <li> Удаленная ветвь происхождения <code>X</code>.</li>
+                                        <li> Локальная ветвь удаленного отслеживания <code>origin/X</code>, которая отслеживает удаленную ветвь <code>X</code>.</li>
+                                    </ul><p> <img src="/img/1b59a6aba646ecf4d33cfed28cb2ff4d.png" alt="Visualization of 3 branches" /></p>
+                                    <p>Оригинальный плакат, используемый</p>
+                                    <pre class="prettyprint-override"><code>git branch -rd origin/bugfix
+</code></pre>
+                                    <p> который удалил только <strong> локальную ветвь удаленного отслеживания</strong> <code>origin/bugfix</code>, а не фактическую удаленную ветвь <code>bugfix</code> на <code>origin</code>.</p>
+                                    <p> <img src="/img/487cc4d194986f85a128664a2f39cc71.png" alt="Diagram 2" /></p>
+                                    <p> <strong> Чтобы удалить текущую удаленную ветвь</strong>, вам нужно</p>
+                                    <pre class="prettyprint-override"><code>git push origin --delete bugfix
+</code></pre>
+                                    <p> <img src="/img/0f234a85796e0d3af995d3d53d194254.png" alt="Diagram 3" /></p>
+                                    <h1> Дополнительные сведения</h1>
+                                    <p>В следующих разделах описываются дополнительные сведения, которые следует учитывать при удалении ветвей удаленного и удаленного отслеживания.</p>
+                                    <h2> Нажатие на удаление удаленных веток также удаляет ветки удаленного отслеживания</h2>
+                                    <p>Обратите внимание, что удаление удаленной ветки <code>X</code> из командной строки с помощью <code>git push</code> <strong> также удалит локальную ветвь удаленного отслеживания</strong> <code>origin/X</code>, поэтому нет необходимости обрезать устаревшее ветвь удаленного отслеживания с <code>git fetch --prune</code> или <code>git fetch -p</code>, хотя это не повредит, если вы все равно это сделаете.</p>
+                                    <p>Вы можете проверить, что ветвь удаленного отслеживания <code>origin/X</code> также была удалена, выполнив следующее:</p>
+                                    <pre class="lang-bash prettyprint-override"><code># View just remote-tracking branches
+git branch --remotes
+git branch -r
+
+# View both strictly local as well as remote-tracking branches
+git branch --all
+git branch -a
+</code></pre>
+                                    <h2> Обрезка устаревшего локального источника удаленной отслеживания /X </h2>
+                                    <p>Если вы не удалили удаленную ветвь <code>X</code> из командной строки (например, выше), то ваше местное репо все равно будет содержать (теперь устаревшую) ветку удаленного отслеживания <code>origin/X</code>. Это может произойти, если вы удалили удаленную ветку непосредственно через веб-интерфейс GitHub, например.</p>
+                                    <p>Типичный способ удаления этих устаревших ветвей удаленного отслеживания (начиная с Git версии 1.6.6) - просто запустить <code>git fetch</code> с <code>--prune</code> или короче <code>-p</code>. <strong> Обратите внимание, что это удаляет все устаревшие локальные ветки удаленного отслеживания для любых удаленных веток, которые больше не существуют на удаленном</strong>:</p>
+                                    <pre class="lang-bash prettyprint-override"><code>git fetch origin --prune
+git fetch origin -p # Shorter
+</code></pre>
+                                    <p>Вот соответствующая цитата из <a href="https://github.com/git/git/blob/v2.0.0/Documentation/RelNotes/1.6.6.txt#L162-L166" rel="nofollow noreferrer">1.6.6 примечания к выпуску</a> (внимание мое):</p>
+                                    <blockquote> <p> <strong> "git fetch" узнал</strong> <code>--all</code> и <code>--multiple</code> параметры, чтобы запустить выборку из много репозиториев и <strong> <code>--prune</code> для удаления удаленного отслеживания ветки, которые стали устаревшими.</strong> Они делают "git удаленное обновление" и "gitудаленная чернослив" меньше необходимости (нет плана для удаления "удаленных обновление" или "удаленная обрезка" ).</p>
+                                    </blockquote>
+                                    <h3> Альтернативная автоматическая обрезка для устаревших ветвей удаленного отслеживания</h3>
+                                    <p>В качестве альтернативы вместо обрезания устаревших локальных ветвей удаленного отслеживания через <code>git fetch -p</code> вы можете избежать дополнительной работы в сети, просто удалив ветвь (ветки) с помощью флагов <code>--remote</code> или <code>-r</code>:</p>
+                                    <pre class="lang-bash prettyprint-override"><code>git branch --delete --remotes origin/X
+git branch -dr origin/X # Shorter
+</code></pre>
+                                    <h2> См. также</h2>
+                                    <ul><li> <a href="https://jk.gs/git-branch.html" rel="nofollow noreferrer">git -branch (1) Страница руководства</a>.</li>
+                                        <li> <a href="https://jk.gs/git-fetch.html" rel="nofollow noreferrer">git -fetch (1) Страница руководства</a>.</li>
+                                        <li> <a href="https://git-scm.com/book/en/Git-Branching-Remote-Branches" rel="nofollow noreferrer">Pro Git &amp; sect; 3.5 Git Ветвление - удаленные ветки</a>.</li>
+                                    </ul> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">1697</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">user456814</span></span> <span title="2014-05-30 21:32"> 30 мая &#39;14 в 21:32</span><span class="hidden" itemprop="dateCreated" datetime="2014-05-30 21:32">2014-05-30 21:32</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/23961231#23961231" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/88#88" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="71518" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <h3> Шаги по удалению ветки:</h3> <p> для удаления <strong>удаленной ветки:</strong></p> <pre><code>git push origin --delete &lt;your_branch&gt;
+</code></pre> <p> Для удаления <strong>локальной ветки у</strong> вас есть <strong>три способа</strong>:</p> <pre><code>1: git branch -D &lt;branch_name&gt;
+
+2: git branch --delete --force &lt;branch_name&gt;  //same as -D
+
+3: git branch --delete  &lt;branch_name&gt;         //error on unmerge
+</code></pre> <p> <strong>Объясните:</strong> хорошо, просто объясните, что здесь происходит!</p> <p> Просто выполните <code>git push origin --delete</code> чтобы <strong>удалить ТОЛЬКО удаленную ветвь</strong>, добавьте имя ветки в конце, и это одновременно удалит и отправит ее на удаленную ветку...</p> <p> Также, <code>git branch -D</code>, который просто удаляет <strong>ТОЛЬКО</strong> локальную ветку!...</p> <p> <code>-D</code> обозначает <code>--delete --force</code> которая удаляет ветку, даже если она не объединена (принудительное удаление), но вы также можете использовать <code>-D</code> что обозначает <code>--delete</code> которая <code>--delete</code> ошибку, соответствующую состоянию слияния ветки...</p> <p> Я также создаю изображение ниже, чтобы показать шаги:</p> <p> <a href="/img/324d2f41faf26b58b97bfd818045bb38.jpg"><img src="/img/324d2f41faf26b58b97bfd818045bb38.jpg" alt="delete a remote and local branch in git" /></a></p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">962</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/5423108/alireza" rel="noopener" target="_blank">Alireza</a></span></span> <span title="2017-06-27 16:13"> 27 июня &#39;17 в 16:13</span><span class="hidden" itemprop="dateCreated" datetime="2017-06-27 16:13">2017-06-27 16:13</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/44781228#44781228" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/71518#71518" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="76" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Вы также можете использовать следующее, чтобы удалить удаленную ветку</p> <pre><code>git push --delete origin serverfix
+</code></pre> <p> Который делает то же самое, что и</p> <pre><code>git push origin :serverfix
+</code></pre> <p> но это может быть легче запомнить.</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">719</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/447884/pagetribe" rel="noopener" target="_blank">pagetribe</a></span></span> <span title="2011-10-28 01:22"> 28 окт. &#39;11 в 1:22</span><span class="hidden" itemprop="dateCreated" datetime="2011-10-28 01:22">2011-10-28 01:22</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/7923161#7923161" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/76#76" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="90" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Если вы хотите удалить ветвь, сначала выйдите в ветку, отличную от ветки, которую нужно удалить.</p>
+                                    <pre class="prettyprint-override"><code>git checkout other_than_branch_to_be_deleted
+</code></pre>
+                                    <p>Удаление локальной ветки:</p>
+                                    <pre class="prettyprint-override"><code>git branch -D branch_to_be_deleted
+</code></pre>
+                                    <p>Удаление удаленной ветки:</p>
+                                    <pre class="prettyprint-override"><code>git push origin --delete branch_to_be_deleted
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">350</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1351195/praveen-hiremath" rel="noopener" target="_blank">Praveen Hiremath</a></span></span> <span title="2014-10-07 16:52"> 07 окт. &#39;14 в 16:52</span><span class="hidden" itemprop="dateCreated" datetime="2014-10-07 16:52">2014-10-07 16:52</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/26237660#26237660" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/90#90" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="79" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Совет: при удалении веток с помощью</p> <pre class="lang-bash prettyprint-override"><code>git branch -d &lt;branchname&gt; # deletes local branch
+</code></pre> <p> или же</p> <pre class="lang-bash prettyprint-override"><code>git push origin :&lt;branchname&gt; # deletes remote branch
+</code></pre> <p> удаляются только ссылки. Несмотря на то, что ветка на самом деле удалена, ссылки на нее все еще существуют в локальных репозиториях членов вашей команды. Это означает, что для других членов команды удаленные ветки все еще видны, когда они делают <code>git branch -a</code>.</p> <p> Чтобы решить эту проблему, члены вашей команды могут удалить удаленные ветки с помощью</p> <pre><code>git remote prune &lt;repository&gt;
+</code></pre> <p> Обычно это <code>git remote prune origin</code>.</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">338</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/350644/pfrenssen" rel="noopener" target="_blank">pfrenssen</a></span></span> <span title="2012-11-07 16:02"> 07 нояб. &#39;12 в 16:02</span><span class="hidden" itemprop="dateCreated" datetime="2012-11-07 16:02">2012-11-07 16:02</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/13270340#13270340" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/79#79" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="85" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+<pre class="prettyprint-override"><code>git branch -D &lt;name-of-branch&gt;
+git branch -D -r origin/&lt;name-of-branch&gt;
+git push origin :&lt;name-of-branch&gt;
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">250</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/450148/felipe" rel="noopener" target="_blank">Felipe</a></span></span> <span title="2013-10-24 20:36"> 24 окт. &#39;13 в 20:36</span><span class="hidden" itemprop="dateCreated" datetime="2013-10-24 20:36">2013-10-24 20:36</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/19572740#19572740" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/85#85" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="91" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Это просто: просто запустите следующую команду:</p>
+                                    <p>Чтобы удалить ветвь Git как локально, так и удаленно, сначала удалите локальную ветку с помощью команды:</p>
+                                    <pre class="prettyprint-override"><code>git branch -d example
+</code></pre>
+                                    <p>(здесь <code>example</code> - имя ветки)</p>
+                                    <p>И после этого удалите удаленную ветку с помощью команды:</p>
+                                    <pre class="prettyprint-override"><code>git push origin :example
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">215</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1468773/syeful-islam" rel="noopener" target="_blank">Syeful Islam</a></span></span> <span title="2015-02-15 18:20"> 15 февр. &#39;15 в 18:20</span><span class="hidden" itemprop="dateCreated" datetime="2015-02-15 18:20">2015-02-15 18:20</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/28527604#28527604" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/91#91" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="80" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Другой подход:</p> <pre><code>git push --prune origin
+</code></pre> <p> <strong>ВНИМАНИЕ:</strong> Это удалит все удаленные ветки, которые не существуют локально. Или более всесторонне,</p> <pre><code>git push --mirror
+</code></pre> <p> эффективно сделает удаленный репозиторий похожим на локальную копию репозитория (локальные заголовки, пульты и теги отражаются на удаленном).</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">181</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1193481/imanuelcostigan" rel="noopener" target="_blank">imanuelcostigan</a></span></span> <span title="2012-11-18 09:11"> 18 нояб. &#39;12 в 9:11</span><span class="hidden" itemprop="dateCreated" datetime="2012-11-18 09:11">2012-11-18 09:11</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/13437928#13437928" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/80#80" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="83" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Я использую следующее в моих настройках <a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29" rel="nofollow noreferrer">Bash</a>:</p> <pre><code>alias git-shoot="git push origin --delete"
+</code></pre> <p> Тогда вы можете позвонить:</p> <pre><code>git-shoot branchname
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">152</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/134077/crizcraig" rel="noopener" target="_blank">crizCraig</a></span></span> <span title="2013-04-03 01:11"> 03 апр. &#39;13 в 1:11</span><span class="hidden" itemprop="dateCreated" datetime="2013-04-03 01:11">2013-04-03 01:11</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/15775364#15775364" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/83#83" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="84" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> С января 2013 года GitHub включал кнопку <kbd>Delete branch</kbd> рядом с каждой веткой на странице "Ветви".</p> <p> Соответствующее сообщение в блоге: <a href="https://github.com/blog/1377-create-and-delete-branches" rel="nofollow noreferrer">создание и удаление веток</a></p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">120</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1026132/nacho-coloma" rel="noopener" target="_blank">Nacho Coloma</a></span></span> <span title="2013-04-29 13:39"> 29 апр. &#39;13 в 13:39</span><span class="hidden" itemprop="dateCreated" datetime="2013-04-29 13:39">2013-04-29 13:39</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/16276586#16276586" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/84#84" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="81" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Если вы хотите выполнить оба этих действия с помощью одной команды, вы можете сделать для нее псевдоним, добавив ниже к вашему <code>~/.gitconfig</code>:</p>
+                                    <pre class="prettyprint-override"><code>[alias]
+    rmbranch = "!f(){ git branch -d ${1} &amp;&amp; git push origin --delete ${1}; };f"
+</code></pre>
+                                    <p>В качестве альтернативы вы можете добавить это в свою глобальную конфигурацию из командной строки, используя</p>
+                                    <pre class="lang-bash prettyprint-override"><code>git config --global alias.rmbranch \
+'!f(){ git branch -d ${1} &amp;&amp; git push origin --delete ${1}; };f'
+</code></pre>
+                                    <p> <strong> ПРИМЕЧАНИЕ</strong>. При использовании <code>-d</code> (нижний регистр d) ветвь будет удалена только в том случае, если она была объединена. Чтобы принудительно выполнить удаление, вам нужно будет использовать <code>-d</code> (в верхнем регистре D).</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">112</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/370671/ryan-kohn" rel="noopener" target="_blank">Ryan Kohn</a></span></span> <span title="2013-01-15 22:05"> 15 янв. &#39;13 в 22:05</span><span class="hidden" itemprop="dateCreated" datetime="2013-01-15 22:05">2013-01-15 22:05</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/14345010#14345010" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/81#81" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="98" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Чтобы удалить филиал локально и удаленно</p>
+                                    <ul><li> <p>Оформить покупку в ветке - <code>git checkout master</code></p></li>
+                                        <li> <p>Удалите удаленную ветку - <code>git push origin --delete &lt;branch-name&gt;</code></p></li>
+                                        <li> <p>Удалите локальную ветку - <code>git branch --delete &lt;branch-name&gt;</code></p></li>
+                                    </ul> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">106</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/5733263/mfathy00" rel="noopener" target="_blank">mfathy00</a></span></span> <span title="2016-01-04 00:08"> 04 янв. &#39;16 в 0:08</span><span class="hidden" itemprop="dateCreated" datetime="2016-01-04 00:08">2016-01-04 00:08</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/34581636#34581636" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/98#98" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="94" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> <strong>Удалить локально:</strong></p> <p> Чтобы удалить локальную ветку, вы можете использовать:</p> <pre><code>git branch -d &lt;branch_name&gt;
+</code></pre> <p> Чтобы принудительно удалить ветку, используйте <code>-D</code> вместо <code>-D</code>.</p> <pre><code>git branch -D &lt;branch_name&gt;
+</code></pre> <p> <strong>Удалить удаленно:</strong></p> <p> Есть два варианта:</p> <pre><code>git push origin :branchname
+
+git push origin --delete branchname
+</code></pre> <p> Я бы предложил вам использовать 2-й способ, так как он более интуитивно понятен.</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">103</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/4921103/rahul-gupta" rel="noopener" target="_blank">Rahul Gupta</a></span></span> <span title="2015-05-23 11:56"> 23 мая &#39;15 в 11:56</span><span class="hidden" itemprop="dateCreated" datetime="2015-05-23 11:56">2015-05-23 11:56</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/30410815#30410815" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/94#94" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="82" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Вы также можете сделать это, используя <code>git remote prune origin</code></p> <pre><code>$ git remote prune origin
+Pruning origin
+URL: git@example.com/yourrepo.git
+ * [pruned] origin/some-branchs
+</code></pre> <p> Он удаляет и удаляет ветки удаленного отслеживания из списка <code>git branch -r</code>.</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">97</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1317035/nickleefly" rel="noopener" target="_blank">nickleefly</a></span></span> <span title="2013-03-12 17:57"> 12 марта &#39;13 в 17:57</span><span class="hidden" itemprop="dateCreated" datetime="2013-03-12 17:57">2013-03-12 17:57</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/15364667#15364667" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/82#82" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="77" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> В дополнение к другим ответам я часто использую инструмент <a href="https://github.com/webmat/git_remote_branch" rel="nofollow noreferrer">git_remote_branch</a>. Это дополнительная установка, но она дает вам удобный способ взаимодействия с удаленными веткими. В этом случае удалить:</p> <pre><code>grb delete branch
+</code></pre> <p> Я нахожу, что я также часто использую команды <code>publish</code> и <code>track</code></p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">95</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/21593/u2622" rel="noopener" target="_blank">u2622</a></span></span> <span title="2012-03-24 05:21"> 24 марта &#39;12 в 5:21</span><span class="hidden" itemprop="dateCreated" datetime="2012-03-24 05:21">2012-03-24 05:21</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/9848609#9848609" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/77#77" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="96" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> <a href="http://www.git-tower.com/learn/git/ebook/command-line/remote-repositories/deleting-branches" rel="nofollow noreferrer">Удаление ветвей</a></p>
+                                    <blockquote> <p>Предположим, что наша работа над веткой "контакт-форма" выполнена, и мы уже интегрировали ее в "мастер". Поскольку нам это больше не нужно, мы можем удалить его (локально):</p>
+                                        <pre class="prettyprint-override"><code>$ git branch -d contact-form
+</code></pre>
+                                    </blockquote>
+                                    <p>И для удаления удаленной ветки:</p>
+                                    <pre class="prettyprint-override"><code>git push origin --delete contact-form
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">86</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1639385/ulysses-alves" rel="noopener" target="_blank">Ulysses Alves</a></span></span> <span title="2015-10-30 15:39"> 30 окт. &#39;15 в 15:39</span><span class="hidden" itemprop="dateCreated" datetime="2015-10-30 15:39">2015-10-30 15:39</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/33436213#33436213" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/96#96" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="105" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> <strong> Одна команда liner</strong> удаляет как локальные, так и удаленные:</p>
+                                    <p> <code>D=branch-name; git branch -D $D; git push origin :$D</code></p>
+                                    <p>или добавьте псевдоним ниже в ~/.gitconfig; использование: <code>git kill branch-name</code></p>
+                                    <pre class="prettyprint-override"><code>[alias]
+    kill = "!f(){ git branch -D \"$1\";  git push origin --delete \"$1\"; };f"
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">85</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1580610/vinnie-james" rel="noopener" target="_blank">Vinnie James</a></span></span> <span title="2016-11-17 04:03"> 17 нояб. &#39;16 в 4:03</span><span class="hidden" itemprop="dateCreated" datetime="2016-11-17 04:03">2016-11-17 04:03</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/40645071#40645071" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/105#105" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="97" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Удалить удаленную ветвь</p>
+                                    <p> <code>git push origin :&lt;branchname&gt;</code></p>
+                                    <p>Удалить локальную ветвь</p>
+                                    <p> <code>git branch -D &lt;branchname&gt;</code></p>
+                                    <p>Удалить шаги локального перехода:</p>
+                                    <ul><li> проверка на другую ветку</li>
+                                        <li> удалить локальную ветвь</li>
+                                    </ul> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">82</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1116453/jayxhj" rel="noopener" target="_blank">jayxhj</a></span></span> <span title="2015-12-31 12:22"> 31 дек. &#39;16 в 12:22</span><span class="hidden" itemprop="dateCreated" datetime="2015-12-31 12:22">2015-12-31 12:22</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/34544089#34544089" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/97#97" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="92" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Просто скажите:</p>
+                                    <pre class="prettyprint-override"><code>git branch -d &lt;branch-name&gt;
+git push origin :&lt;branch-name&gt;
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">80</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/3568378/piyushmandovra" rel="noopener" target="_blank">piyushmandovra</a></span></span> <span title="2015-04-23 21:06"> 23 апр. &#39;15 в 21:06</span><span class="hidden" itemprop="dateCreated" datetime="2015-04-23 21:06">2015-04-23 21:06</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/29831148#29831148" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/92#92" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="95" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Теперь вы можете сделать это с помощью <a href="https://desktop.github.com/" rel="nofollow noreferrer">приложения GitHub Desktop</a>.</p>
+                                    <p>После запуска приложения</p>
+                                    <ul><li> Нажмите проект, содержащий ветку</li>
+                                        <li> Перейдите к ветке, которую вы хотите удалить <a href="/img/24c0723deb0c9c5c5442dc55020d5efa.png"><img src="/img/24c0723deb0c9c5c5442dc55020d5efa.png" alt="ветвь переключения" /></a></li>
+                                        <li> В меню "Отладка" выберите "Отменить публикацию...", чтобы ветвь удалилась с серверов GitHub. <a href="/img/706a715fc37ec68f00c98a7aac9e5cca.png"><img src="/img/706a715fc37ec68f00c98a7aac9e5cca.png" alt="unublish branch" /></a></li>
+                                        <li> В меню "Ветка" выберите "Удалить" имя_каталога "...", чтобы ветвь удалилась с вашего локального компьютера (ака машина, над которой вы сейчас работаете) <a href="/img/2442193d8e41fff8522147f59cfacc5e.png"><img src="/img/2442193d8e41fff8522147f59cfacc5e.png" alt="удалить локальную ветвь" /></a></li>
+                                    </ul> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">76</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/473290/eric" rel="noopener" target="_blank">Eric</a></span></span> <span title="2015-10-22 10:38"> 22 окт. &#39;15 в 10:38</span><span class="hidden" itemprop="dateCreated" datetime="2015-10-22 10:38">2015-10-22 10:38</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/33275647#33275647" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/95#95" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="71517" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> <strong> Чтобы удалить локально - (Обычный),</strong></p>
+                                    <pre class="prettyprint-override"><code>git branch -d my_branch
+</code></pre>
+                                    <p>Если ваша ветка в процессе восстановления/слияния и что это не было сделано правильно, вы получите сообщение об ошибке <code>Rebase/Merge in progress</code>, поэтому в этом случае вы не сможете удалить свою ветку.</p>
+                                    <p>Таким образом, либо ваша необходимость разрешать переполнение/слияние в противном случае вы можете принудительно удалить, используя</p>
+                                    <pre class="prettyprint-override"><code>git branch -d my_branch
+</code></pre>
+                                    <p> <strong> Чтобы удалить в Remote:</strong></p>
+                                    <pre class="prettyprint-override"><code>git push --delete origin my_branch
+</code></pre>
+                                    <p> <strong> может использовать то же самое,</strong></p>
+                                    <pre class="prettyprint-override"><code>git push origin :my_branch   # easy to remember both will do the same.
+</code></pre>
+                                    <p> <strong> Графическое представление</strong></p>
+                                    <p> <a href="/img/61142314783cb18e8cdf06af8a3338e2.png"><img src="/img/61142314783cb18e8cdf06af8a3338e2.png" alt="введите описание изображения здесь" /></a></p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">71</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/4453737/mohideen-ibn-mohammed" rel="noopener" target="_blank">Mohideen ibn Mohammed</a></span></span> <span title="2017-06-23 09:42"> 23 июня &#39;17 в 9:42</span><span class="hidden" itemprop="dateCreated" datetime="2017-06-23 09:42">2017-06-23 09:42</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/44714712#44714712" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/71517#71517" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="93" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+<pre><code>git push origin --delete &lt;branch Name&gt;
+</code></pre> <p> легче запомнить, чем</p> <pre><code>git push origin :branchName
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">68</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/4845054/smila" rel="noopener" target="_blank">Smila</a></span></span> <span title="2015-05-02 13:59"> 02 мая &#39;15 в 13:59</span><span class="hidden" itemprop="dateCreated" datetime="2015-05-02 13:59">2015-05-02 13:59</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/30001477#30001477" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/93#93" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="89" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> <strong>Это не будет работать, если у вас есть тег с тем же именем, что и ветка на пульте:</strong></p> <pre><code>$ git push origin :branch-or-tag-name
+error: dst refspec branch-or-tag-name matches more than one.
+error: failed to push some refs to 'git@github.com:SomeName/some-repo.git'
+</code></pre> <p> В этом случае вам нужно указать, что вы хотите удалить ветку, а не тег:</p> <pre><code>git push origin :refs/heads/branch-or-tag-name
+</code></pre> <p> Точно так же, чтобы удалить тег вместо ветки, вы должны использовать:</p> <pre><code>git push origin :refs/tags/branch-or-tag-name
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">60</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/745250/amiramix" rel="noopener" target="_blank">Amiramix</a></span></span> <span title="2014-07-29 12:02"> 29 июля &#39;14 в 12:02</span><span class="hidden" itemprop="dateCreated" datetime="2014-07-29 12:02">2014-07-29 12:02</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/25011664#25011664" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/89#89" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="100" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Мне досадно было заглянуть за этот ответ, поэтому я сделал аналогичный подход
+                                        на <a href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/83#83">ответ, который ранее опубликовал crizCraig</a></p>
+                                    <p>В мой профиль Bash добавлено следующее:</p>
+                                    <pre class="prettyprint-override"><code>function gitdelete(){
+    git push origin --delete $1
+    git branch -D $1
+}
+</code></pre>
+                                    <p>Затем каждый раз, когда я делаю это с веткой (например, слияние в <code>master</code>), я запускаю в моем терминале следующее:</p>
+                                    <pre class="prettyprint-override"><code>gitdelete my-branch-name
+</code></pre>
+                                    <p>... который затем удаляет <code>my-branch-name</code> из <code>origin</code> как локально.</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">48</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/551436/arthurakay" rel="noopener" target="_blank">arthurakay</a></span></span> <span title="2016-02-10 22:47"> 10 февр. &#39;16 в 22:47</span><span class="hidden" itemprop="dateCreated" datetime="2016-02-10 22:47">2016-02-10 22:47</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/35324551#35324551" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/100#100" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="87" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Многие другие ответы приведут к ошибкам/предупреждениям. Этот подход является относительно <code>git branch -D branch_to_delete</code> хотя вам все еще может понадобиться <code>git branch -D branch_to_delete</code> если он не полностью слит, например, в <code>some_other_branch</code>.</p> <pre><code>git checkout some_other_branch
+git push origin :branch_to_delete
+git branch -d branch_to_delete
+</code></pre> <p> Удаленное удаление не требуется, если вы удалили удаленную ветку. Он использовался только для получения самых современных пультов дистанционного управления, доступных в отслеживаемом вами хранилище. Я заметил, что <code>git fetch</code> добавит пульты, а не удалит их. Вот пример того, когда <code>git remote prune origin</code> действительно что-то сделает:</p> <p> Пользователь А выполняет шаги, описанные выше. Пользователь B будет запускать следующие команды, чтобы увидеть самые последние удаленные ветки</p> <pre><code>git fetch
+git remote prune origin
+git branch -r
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">47</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/418828/brandon-cook" rel="noopener" target="_blank">Brandon Cook</a></span></span> <span title="2013-11-27 06:04"> 27 нояб. &#39;13 в 6:04</span><span class="hidden" itemprop="dateCreated" datetime="2013-11-27 06:04">2013-11-27 06:04</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/20233127#20233127" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/87#87" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="103" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Перед выполнением</p>
+                                    <pre class="prettyprint-override"><code>git branch --delete &lt;branch&gt;
+</code></pre>
+                                    <p>убедитесь, что вы сначала определили, что такое EXACT имя удаленной ветки, выполнив:</p>
+                                    <pre class="prettyprint-override"><code>git ls-remote
+</code></pre>
+                                    <p>Это скажет вам, что вводить ТОЧНО для значения <code>&lt;branch&gt;</code>. (<code>branch</code> чувствителен к регистру!)</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">44</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/3256123/joey" rel="noopener" target="_blank">joey</a></span></span> <span title="2016-05-21 00:42"> 21 мая &#39;16 в 0:42</span><span class="hidden" itemprop="dateCreated" datetime="2016-05-21 00:42">2016-05-21 00:42</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/37356297#37356297" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/103#103" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer" id="101" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+<pre class="prettyprint-override"><code>git push origin :bugfix  # Deletes remote branch
+git branch -d bugfix     # Must delete local branch manually
+</code></pre>
+                                    <p>Если вы уверены, что хотите его удалить, запустите</p>
+                                    <pre class="prettyprint-override"><code>git branch -D bugfix
+</code></pre>
+                                    <p>Теперь очистка удаленных удаленных ветвей выполняется</p>
+                                    <pre class="prettyprint-override"><code>git remote prune origin
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">43</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1850723/vivek" rel="noopener" target="_blank">Vivek</a></span></span> <span title="2016-04-21 19:49"> 21 апр. &#39;16 в 19:49</span><span class="hidden" itemprop="dateCreated" datetime="2016-04-21 19:49">2016-04-21 19:49</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/36775924#36775924" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/101#101" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer last" id="86" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p> Mashup всех других ответов. Требуется <code>Ruby 1.9.3+</code>, протестировано <strong>только</strong> на OS X.</p> <p> Назовите этот файл <code>git-remove</code>, сделайте его исполняемым и поместите его по своему пути. Затем используйте, например, <code>git remove temp</code>.</p> <pre class="lang-ruby prettyprint-override"><code>#!/usr/bin/env ruby
+require 'io/console'
+
+if __FILE__ == $0
+      branch_name = ARGV[0] if (ARGV[0])
+      print "Press Y to force delete local and remote branch #{branch_name}..."
+    response = STDIN.getch
+    if ['Y', 'y', 'yes'].include?(response)
+      puts "\nContinuing."
+      'git branch -D #{branch_name}'
+      'git branch -D -r origin/#{branch_name}'
+      'git push origin --delete #{branch_name}'
+    else
+      puts "\nQuitting."
+    end
+end
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">41</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/8047/dan-rosenstark" rel="noopener" target="_blank">Dan Rosenstark</a></span></span> <span title="2013-11-20 00:02"> 20 нояб. &#39;13 в 0:02</span><span class="hidden" itemprop="dateCreated" datetime="2013-11-20 00:02">2013-11-20 00:02</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely/20081966#20081966" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely/86#86" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        .bfpg { width: 336px; height: 280px; }
+                        @media(min-width: 610px) { .bfpg { width: 728px; height: 90px; } }
+                    </style>
+                    <ins class="adsbygoogle bfpg" style="display:inline-block" data-ad-client="ca-pub-9882502965778689" data-full-width-responsive="true" data-ad-slot="4255068574"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script> <div class="answer-pager">
+                    <ul class="pagination pagination-sm"><li class="prev hidden"><span><i class="fa fa-long-arrow-left"></i></span></li>
+                        <li class="first hidden"><span>1</span></li>
+                        <li class="active"><span>1</span></li>
+                        <li><a href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely?page=2#answers" data-page="1">2</a></li>
+                        <li class="last hidden"><span>2</span></li>
+                        <li class="next"><a href="/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely?page=2#answers" rel="next" data-page="1"><i class="fa fa-long-arrow-right"></i></a></li></ul> </div>
+                    <style>
+                        .ufpg { width: 336px; height: 280px; }
+                        @media(min-width: 610px) { .ufpg { width: 580px; height: 400px; } }
+                    </style>
+                    <ins class="adsbygoogle ufpg" style="display:inline-block" data-ad-client="ca-pub-1191230850516122" data-full-width-responsive="true" data-ad-slot="8423199226"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                <div class="bottom-notice m-b-50">
+                    <p>Другие вопросы по меткам <a href="/questions/tagged/git" class="tag" title="показать вопросы с меткой 'git'" rel="tag">git</a>
+                        <a href="/questions/tagged/git-branch" class="tag" title="показать вопросы с меткой 'git-branch'" rel="tag">git-branch</a>
+                        <a href="/questions/tagged/git-remote" class="tag" title="показать вопросы с меткой 'git-remote'" rel="tag">git-remote</a>
+                        или
+                        <a class="btn btn-sm btn-block btn-primary m-t-5" href="/want-register" onclick="yaCounter44607970.reachGoal(&#039;register_qeustion_bottom_click&#039;); return true;">Задайте вопрос</a> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="pull-left">
+            <div class="license">
+                licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="nofollow license">cc by-sa 3.0</a>
+                with attribution.
+            </div>
+        </div>
+        <div class="pull-right logo">
+            <a class="hidden-xs mail" href="mailto:info@qaru.site">info@qaru.site</a>
+            <a href="#">
+                <img src="/img/logo-dark.svg" alt="qaru.site">
+                <div class="name">qa<span class="cl-orange">.ru</span></div>
+            </a>
+        </div>
+    </div>
+</footer>
+<script src="/assets/all-602ff289a5503d7da87e840acd4c7d95.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/highlight.min.js"></script></body>
+<script type="text/javascript">
+    (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script")
+    ;r.type="text/javascript";r.async=true
+    ;r.src="https://cdn.amplitude.com/libs/amplitude-4.4.0-min.gz.js"
+    ;r.onload=function(){if(e.amplitude.runQueuedFunctions){
+        e.amplitude.runQueuedFunctions()}else{
+        console.log("[Amplitude] Error: could not load SDK")}}
+    ;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)
+    ;function s(e,t){e.prototype[t]=function(){
+        this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+        var o=function(){this._q=[];return this}
+        ;var a=["add","append","clearAll","prepend","set","setOnce","unset"]
+        ;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[]
+            ;return this}
+        ;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"]
+        ;for(var p=0;p<l.length;p++){s(c,l[p])}n.Revenue=c
+        ;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","logEventWithTimestamp","logEventWithGroups","setSessionId","resetSessionId"]
+        ;function v(e){function t(t){e[t]=function(){
+            e._q.push([t].concat(Array.prototype.slice.call(arguments,0)))}}
+            for(var n=0;n<d.length;n++){t(d[n])}}v(n);n.getInstance=function(e){
+            e=(!e||e.length===0?"$default_instance":e).toLowerCase()
+            ;if(!n._iq.hasOwnProperty(e)){n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]}
+        ;e.amplitude=n})(window,document);
+
+    amplitude.getInstance().init("3a6ec943ecbcaf730a89b7132c26e5fc");
+    var tagNames = [],
+        tags = document.getElementsByClassName('tag');
+
+    for (var i = 0; i < tags.length; i++) {
+        if (!tagNames.includes(tags[i].text)) {
+            tagNames.push(tags[i].text);
+        }
+    }
+
+    var question_id = null;
+
+    if (matches = window.location.href.match(/\/([\d]+)\//i)) {
+        question_id = matches[1];
+    }
+
+    var d = document,
+        eventProperties = {
+            'user_agent': navigator.userAgent,
+            'referrer': document.referrer,
+            'href': window.location.href,
+            'question_id': question_id,
+            'is_question': d.getElementsByClassName('question-header').length,
+            'answer_count': d.getElementsByClassName('answer').length,
+            'have_accepted': d.getElementsByClassName('answer accepted').length,
+            'tags': tagNames
+        };
+
+    amplitude.getInstance().logEvent('PAGE_VIEW', eventProperties)
+</script>
+</html>

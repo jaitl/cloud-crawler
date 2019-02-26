@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+<html lang="ru" itemscope itemtype="http://schema.org/QAPage">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/png" sizes="256x256" href="https://stackoverrun.com/src/images/fivicon.png">
+    <link rel="apple-touch-icon image_src" href="https://stackoverrun.com/src/images/fivicon.png">
+    <title>java - Удалить случайную строку между двумя строками android</title>
+    <meta name="description" content="Я хочу удалить ненужные ссылки с вики-страницы. Каждая ссылка, которую я хочу удалить, начинается с [&lt;a href= и заканчивается ]. Но в то же время есть и некоторые ссылки, такие как [1]. Я хочу сохранить ...">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://stackoverrun.com/ru/q/6319683" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:domain" content="stackoverrun.com" />
+    <meta name="twitter:title" property="og:title" itemprop="name" content="Удалить случайную строку между двумя строками android" />
+    <meta name="twitter:description" property="og:description" itemprop="description" content="Я хочу удалить ненужные ссылки с вики-страницы. Каждая ссылка, которую я хочу удалить, начинается с [&lt;a href= и заканчивается ]. Но в то же время есть и некоторые ссылки, такие как [1]. Я хочу сохранить ..." />
+    <meta name="theme-color" content="#FFF">
+    <link rel="alternate" hreflang="x-default" href="https://stackoverrun.com/" />
+    <link rel="alternate" hreflang="zh-cn" href="https://stackoverrun.com/cn/q/6319683" />
+    <link rel="alternate" hreflang="ko" href="https://stackoverrun.com/ko/q/6319683" />
+    <link rel="alternate" hreflang="ru" href="https://stackoverrun.com/ru/q/6319683" />
+    <meta name="robots" content="noarchive" />
+</head>
+<body class="bg-white">
+<header>
+    <div class="navbar navbar-light bg-light">
+        <div class="container d-flex justify-content-between">
+            <a href="https://stackoverrun.com/" class="navbar-brand d-flex align-items-center"><img class="navbar-brand" src="https://stackoverrun.com/src/images/fivicon.png" alt="logo"><span>stack<strong>overrun</strong></span></a>
+            <a class="ml-md-auto mr-3" title="Обратная связь" data-toggle="modal" data-target="#contactModal" href="#"><i class="fa fa-envelope fa-lg"></i></a>
+            <a class="mr-3 d-lg-none search-button" title="Поиск" href="#"><i class="fa fa-search fa-lg"></i></a>
+            <a class="d-lg-none mr-3" rel="noopener" target="_blank" href="https://ru.stackoverflow.com/questions/ask" title="Задать вопрос"><i class="fa fa-question fa-lg"></i></a><div class="dropdown show mr-3 card-link" data-toggle="dropdown" role="button" aria-expanded="false"><a href="#" style="text-decoration:none"><i class="fa fa-globe fa-lg"></i> <span>RU</span></a></div><div class="dropdown-menu"><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/cn/q/6319683" title="Simplified Chinese">CN (简体中文)</a><a class="dropdown-item col-lg-4 col-md-6 col-sm-12" href="https://stackoverrun.com/ko/q/6319683" title="Korean">KO (한국어)</a></div><a style="text-decoration:none" class="d-none d-lg-flex mr-3" rel="noopener" target="_blank" href="https://ru.stackoverflow.com/questions/ask"><button class="btn btn-outline-primary btn-sm">Задать вопрос</button></a><div class="my-2 my-md-0 d-none d-lg-flex">
+            <form action="https://stackoverrun.com/ru/search/" method="get" class="input-group input-group-sm form-inline">
+                <input type="text" name="q" class="form-control">
+                <input type="text" value="ru" name="hl" class="d-none">
+                <div class="input-group-append"><button class="btn btn-outline-primary" id="search" type="submit">Поиск</button></div>
+            </form>
+        </div>
+        </div>
+    </div>
+</header>
+<div class="d-none container mb-3 mt-0 search-block">
+    <form action="https://stackoverrun.com/ru/search/" method="get" class="form-inline">
+        <input type="text" name="q" class="form-control col-12" id="search-input">
+        <input type="text" value="ru" name="hl" class="d-none">
+        <div class="d-none"><button id="search" type="submit">Поиск</button></div>
+    </form>
+</div>
+<main role="main" class="container">
+    <div class="row" itemprop="mainEntity" itemscope itemtype="http://schema.org/Question">
+        <div class="col-12">
+            <h1 itemprop="name">Удалить случайную строку между двумя строками android</h1><hr />
+        </div>
+        <div class="col-lg-9 col-md-12 col-sm-12">
+            <div class="row">
+                <div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">-7<i class="fa fa-thumbs-down"></i></span><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div class="post-text" id="text_q6319683" itemprop="text"><p>Я хочу удалить ненужные ссылки с вики-страницы. Каждая ссылка, которую я хочу удалить, начинается с <code class="prettyprint-override">[&lt;a href=</code> и заканчивается <code class="prettyprint-override">]</code>. Но в то же время есть и некоторые ссылки, такие как <code class="prettyprint-override">[1]</code>. Я хочу сохранить эти ссылки. Как я могу это достичь?</p></div><div class="post-info"><div class="post-taglist"> <span class="post-tag">java</span> <span class="post-tag">android</span><span class="post-tag view-count">55 <i class="fa fa-eye"></i></span></div>
+                <div class="post-meta row">
+                    <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/23077568">Источник</a></small>
+                        <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/6319683">Поделиться</a></small>
+                    </p>
+                    <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <small class="float-right">Создан <span title="2014-04-15 07:47:25">15 апр. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-04-15 07:47:25">2014-04-15 07:47:25</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/934820/">user934820</a></span></small>
+                    </p>
+                </div>
+            </div><div class="comments comments23077568"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                <span class="exchange"><i class="fa fa-language"></i></span>
+            </div><div class="col-11"><p class="commenttext">
+                <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c35269352">Я обновил этот вопрос. Извините Мой вопрос был опубликован наполовину из-за форматирования stackoverflow.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/934820/">user934820</a></span> <span title="2014-04-15 07:49:17">15 апр. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-04-15 07:49:17">2014-04-15 07:49:17</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                <span class="exchange"><i class="fa fa-language"></i></span>
+            </div><div class="col-11"><p class="commenttext">
+                <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c35269540">Пожалуйста, дайте нам два примера - одну из нескольких ссылок, другую - ссылку, содержащую ссылки. Тогда было бы легче дать вам правильный ответ.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1065145/">Denis Kulagin</a></span> <span title="2014-04-15 07:55:35">15 апр. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-04-15 07:55:35">2014-04-15 07:55:35</span></small></span></p></div></div></div><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                <span class="exchange"><i class="fa fa-language"></i></span>
+            </div><div class="col-11"><p class="commenttext">
+                <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c35276103">что вы пробовали до сих пор</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1650785/">codercat</a></span> <span title="2014-04-15 10:53:42">15 апр. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-04-15 10:53:42">2014-04-15 10:53:42</span></small></span></p></div></div></div></div></div><div class="col-12 sorting">
+                <ul class="nav nav-tabs small" role="tablist">
+                    <li class="nav-item col-sm-3 col-xs-12" id="answerCount"><h5><span itemprop="answerCount">1</span> ответ</h5></li>
+                    <li class="nav-item ml-auto" id="sort"><p class="nav-link disabled">Сортировка:</p></li>
+                    <li class="nav-item" id="first"><p id="active" class="nav-link active" data-toggle="tab" role="tab">Активность</p></li>
+                    <li class="nav-item"><p id="oldest" class="nav-link" data-toggle="tab" role="tab">Возраст</p></li>
+                    <li class="nav-item"><p id="votes" class="nav-link" data-toggle="tab" role="tab">Оценка</p></li>
+                </ul>
+            </div>
+                <div class="answersList col-12"><div itemscope itemtype="http://schema.org/Answer" itemprop="acceptedAnswer" class="answer-block" id="23077658"><div class="row"><div class="voteInfo col-1 d-none d-lg-block"><span class="count" itemprop="upvoteCount">3<i class="fa fa-thumbs-up"></i></span><i class="fa fa-check fa-2x"></i><span class="exchange"><i class="fa fa-language fa-3x"></i></span></div><div class="col-lg-11 col-md-12"><span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><div itemprop="text" id="text_a23077658" class="post-text"><p>Вы можете использовать <a href="http://developer.android.com/reference/java/lang/String.html#replaceAll%28java.lang.String,%20java.lang.String%29" rel="nofollow"><code class="prettyprint-override">String#replaceAll()</code></a> для этого:</p>
+                    <pre><code class="prettyprint-override">String cleanPage = wikiPage.replaceAll("\\[a href=.*?\\]", ""));
+</code></pre></div><div class="post-info">
+                    <div class="post-meta row">
+                        <p class="text-secondary col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small><a itemprop="url" rel="noopener" target="_blank" href="https://stackoverflow.com/q/23077658">Источник</a></small>
+                            <small><a class="share-url" target="_blank" href="https://stackoverrun.com/ru/q/6319683#23077658">Поделиться</a></small>
+                        </p>
+                        <p class="text-secondary createDate col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <small class="float-right">Создан <span title="2014-04-15 07:53:01">15 апр. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-04-15 07:53:01">2014-04-15 07:53:01</span> <span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/1343161/">Keppil</a></span></small>
+                        </p>
+                    </div>
+                </div><div class="comments comments23077658"><div itemprop="comment" class="post-comment"><div class="row"><div class="col-1 d-none d-lg-block"><span class="text-secondary">&nbsp;&nbsp;0</span>
+                    <span class="exchange"><i class="fa fa-language"></i></span>
+                </div><div class="col-11"><p class="commenttext">
+                    <span class="exchange-mob d-lg-none"><i class="fa fa-language"></i></span><span class="post-text" id="text_c35269543">Это сделало трюк спасибо.</span> &ndash; <span class="text-secondary"><small><span itemprop="author" itemscope itemtype="http://schema.org/Person"><a itemprop="name" rel="noopener" target="_blank" href="https://stackoverflow.com/users/934820/">user934820</a></span> <span title="2014-04-15 07:55:39">15 апр. 14</span><span class="d-none" itemprop="dateCreated" datetime="2014-04-15 07:55:39">2014-04-15 07:55:39</span></small></span></p></div></div></div></div></div></div><hr /></div> </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-12 col-sm-12">
+            <div class="mb-3 related-links"><p class="lead">Похожие вопросы</p><ul class="list-unstyled"><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/28384"><button type="button" class="btn btn-outline-success btn-sm">973 </button>Итерация по коллекции, избегая ConcurrentModificationException при удалении в цикле</a></li><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/1337853"><button type="button" class="btn btn-outline-success btn-sm">546 </button>Удаление пробелов из строк в Java</a></li></ul></div><hr /><div class="mb-3 related-links"><p class="lead">Популярные вопросы</p><ul class="list-unstyled"><li class="hyperlink"><a href="https://stackoverrun.com/ru/q/17667"><button type="button" class="btn btn-outline-success btn-sm">1481 </button>Создать файл Excel (.XLS и .XLSX) с C#</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/15858"><button type="button" class="btn btn-outline-success btn-sm">481 </button>Какой лучший инструмент для визуального слияния для Git?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/6320077"><button type="button" class="btn btn-outline-success btn-sm">459 </button>Как преобразовать поток Java 8 в массив?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/81932"><button type="button" class="btn btn-outline-success btn-sm">201 </button>Удалить файл из SVN-репозитория без удаления локальной копии</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/1085109"><button type="button" class="btn btn-outline-success btn-sm">182 </button>Как проверить, установлен ли AlarmManager уже установленный будильник?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/28391"><button type="button" class="btn btn-outline-success btn-sm">168 </button>Создайте экземпляр класса из строки</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/143225"><button type="button" class="btn btn-outline-success btn-sm">159 </button>Различные способы очистки списков</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/133489"><button type="button" class="btn btn-outline-success btn-sm">147 </button>CodeIgniter: Создать нового помощника?</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/1366417"><button type="button" class="btn btn-outline-success btn-sm">125 </button>Обновить строку, если она существует в Else Insert Logic с платформой Entity</a></li>
+            <li class="hyperlink"><a href="https://stackoverrun.com/ru/q/7819212"><button type="button" class="btn btn-outline-success btn-sm">118 </button>Как отрегулировать текст кнопки в Swift</a></li></ul></div> </div>
+    </div>
+</main>
+<footer class="text-muted bg-dark">
+    <div class="container">
+        <div class="row">
+            <p class="col-md-4 col-12">2018 stackoverrun.com</p>
+            <p class="col-md-8 col-12" id="license">Licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license">cc by-sa 3.0</a> with <a href="https://stackoverflow.blog/2009/06/25/attribution-required/" rel="license">attribution required</a>.</p>
+        </div>
+    </div>
+</footer>
+<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="contactModalLabel">Связаться с нами</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <form role="form" id="contactForm">
+                <div class="col-lg-12">
+                    <textarea minlength="10" id="messa9e" class="form-control" rows="5"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <div id="msgSend" class="mr-auto d-none">Сообщение отправлено!</div>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://stackoverrun.com/src/js/all.js"></script>
+<script>
+    $(".exchange,.exchange-mob").click(function(){
+        if($(this).find(".fa-flip-horizontal").length > 0){
+            $(this).find(".fa").removeClass("fa-flip-horizontal");
+        }else{
+            $(this).find(".fa").addClass("fa-flip-horizontal");}});
+
+    var trans = [];
+    $('body').on('click','.exchange,.exchange-mob',function(b){
+        if($(this).attr('class') == 'exchange'){
+            var el = $(this).parent().next().find('.post-text:eq(0)');
+        }else{
+            var el = $(this).next('.post-text');
+        }
+        var id = el.attr('id').substr(5);
+        if(!trans.hasOwnProperty(id) || !trans[id].hasOwnProperty('original')){
+            trans[id] = [];
+            $.ajax({type: "POST",
+                url: "https://stackoverrun.com/",
+                data: "lang=&original="+id,
+                success : function(response){
+                    if(response.length>1){
+                        trans[id]['original'] = response;
+                        trans[id]['text'] = el.prop('outerHTML');
+                        trans[id]['status'] = 0;
+                        el.html(response);
+                        PR.prettyPrint();}}});
+        }else if(trans[id]['status'] == 0){
+            el.html(trans[id]['text']);
+            trans[id]['status'] = 1;
+        }else if(trans[id]['status'] == 1){
+            el.html(trans[id]['original']);
+            trans[id]['status'] = 0;
+        }PR.prettyPrint();});
+
+    var page = 1;
+    var action = 'more';
+    $("#loadMore").click(function(){
+        page = page + 1;
+        $('#loadIcon').css('display','block');
+        $('#loadMore').css('display','none');
+        var x = new XMLHttpRequest();
+        x.open("POST", "https://stackoverrun.com/", true);
+        x.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        x.send("more="+page+"&language=ru");
+        x.onload = function (){if(x.responseText){
+            $('#loadMore').css('display','block');
+            $(x.responseText).appendTo($(".questions"));}
+            $('#loadIcon').css('display','none');}
+        x.send(null);});
+
+    $('body').on('click','.share-url',function(b){
+        $('.share-input').remove();
+        $('<p class="col-12"><input type="text" class="form-control form-control-sm share-input" value="'+$(this).attr('href') + '"></p>').insertAfter($(this).parents('.post-meta').find('.createDate'));
+        $('.share-input').focus().select();
+        b.stopPropagation();
+        return !1;});
+    $('body').on('blur','.share-input',function(){$(this).remove()});
+
+    $("#active,#oldest,#votes").click(function(){
+        var sort = $(this).attr('id');
+        var newHtml = '';
+        var idSort = [];
+        idSort['active'] = [23077658];
+        idSort['oldest'] = [23077658];
+        idSort['votes'] = [23077658];
+        for (var i=0;i<idSort[sort].length;++i){
+            newHtml += $("#"+idSort[sort][i]).prop('outerHTML');}
+        $(".answersList").html('');
+//setTimeout(function(){$(".answersList").html(newHtml)}, 100);
+        $(".answersList").html(newHtml);
+        $("html,body").animate({scrollTop:$(".sorting").offset().top},500);});
+
+    $('.snippet-code').each(function(i,el){
+        if($(el).children('.lang-html').length>0 || $(el).children('.lang-js').length>0){
+            $(el).append('<div class="snippet-result"><div class="snippet-ctas"><button class="btn btn-primary btn-sm showFrame" type="button"><i class="fa fa-play-circle"></i> Выполнить фрагмент кода</button><button type="button" class="btn btn-outline-secondary btn-sm d-none hideFrame"><i class="fa fa-times-circle"></i> Скрыть результаты</button></div><div class="snippet-result-code d-none"><iframe sandbox="allow-forms allow-modals allow-scripts" class="snippet-box-edit" frameborder="0"></iframe><div class="popout"><i class="fa fa-arrows-alt"></i> <a>На весь экран</a></div><div class="popin"><a>Закрыть</a></div></div></div>');}});
+
+    $('body').on('click','.popout',function(){
+        var el = $(this).parents('.snippet-result');
+        el.find('iframe').css({'position':'fixed'});
+        $("body").css({'overflow':'hidden'});
+        el.find('.popin').css({'display':'inline-block'});});
+
+    $('body').on('click','.popin',function(){
+        var el = $(this).parents('.snippet-result');
+        el.find('iframe').css({'position':''});
+        $("body").css({'overflow':''});
+        el.find('.popin').css({'display':'none'});});
+
+    $('body').on('click','.hideFrame',function(){
+        var el = $(this).parents('.snippet-result');
+        el.find(".snippet-result-code").addClass("d-none");
+        el.find(".hideFrame").addClass("d-none");});
+
+    $('body').on('click','.showFrame',function(){
+        var id = $(this).parents('.snippet-code').attr('id');
+        var code = '';
+        $('#'+id).find('pre').each(function(i,el){
+            if($(el).find('code').length>0){
+                if($(el).is('.lang-js') == true){
+                    code += $("<textarea/>").html('&lt;script src=&quot;https://stackoverrun.com/src/js/snippet-javascript-console.min.js&quot;&gt;&lt;/script&gt;&lt;script type=&quot;text/javascript&quot;&gt;').text()+$(el).find('code').text()+$("<textarea/>").html('&lt;/script&gt;').text();
+                }else if($(el).is('.lang-css') == true){
+                    code += $("<textarea/>").html('&lt;style&gt;').text()+$(el).find('code').text()+$("<textarea/>").html('&lt;/style&gt;').text();
+                }else{
+                    code += $(el).find('code').text();
+                }}});
+        $(this).parents('.snippet-result').find('iframe').attr('srcdoc',code);
+        $(this).parents('.snippet-result').find(".snippet-result-code").removeClass("d-none");
+        $(this).parents('.snippet-result').find(".hideFrame").removeClass("d-none");});
+
+    $('body').on('click','.showMore',function(){
+        $("."+$(this).attr('id')).find(".post-comment").removeClass("d-none");
+        $(this).find("a").addClass("d-none");});
+
+    $("#contactForm").submit(function(event){
+        event.preventDefault();
+        var message = $("#messa9e").val();
+        if(message.length>10){
+            $.ajax({
+                type: "POST",
+                url: "https://stackoverrun.com/",
+                data: "action=contact&message="+message,
+                success : function(response){
+                    if (response == "ok"){
+                        $("#msgSend").removeClass("d-none");}}});}});
+
+    function repeatXI(callback, interval, repeat, immediate) {
+        repeat = typeof repeat == 'undefined' ? -1 : repeat;
+        interval = interval <= 0 ? 1000 : interval;
+        immediate = typeof immediate == 'undefined' ? false : immediate;
+        var offset = immediate ? 0 : 1;
+        var id = null;
+        if (repeat > 0) {
+            for (var i = 0; i < repeat; i++) {
+                id = setTimeout(callback, interval * (i + offset));
+            }
+        } else {
+            id = setInterval(callback, interval);
+        }
+        return id;
+    }
+    function faFlip() {
+        $(".exchange,.exchange-mob").find(".fa").addClass("fa-flip-horizontal");
+        setTimeout(function(){
+            $(".exchange,.exchange-mob").find(".fa").removeClass("fa-flip-horizontal");
+        }, 250);
+    }
+    window.onfocus = function(){
+        setTimeout(function(){
+            repeatXI(faFlip, 1000, 1, true);
+        }, 1000);
+    }
+    $(document).ready(function(){
+        setTimeout(function(){
+            repeatXI(faFlip, 1000, 1, true);
+        }, 2000);
+    });
+
+    $('body').on('click','.search-button',function(){
+        $('.search-block').removeClass("d-none");
+        $('#search-input').focus();
+    });
+    $('body').on('blur','#search-input',function(){
+        $('.search-block').addClass("d-none")
+    });
+</script>
+<script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "WebSite",
+        "url": "https://stackoverrun.com/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://stackoverrun.com/ru/search/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+</script>
+<link async href="https://stackoverrun.com/src/css/all.css" rel="stylesheet">
+<link async href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"></body>
+</html>

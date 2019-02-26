@@ -1,0 +1,552 @@
+
+<!DOCTYPE HTML>
+<html lang="ru-RU">
+<head>
+    <title>artificial-intelligence - Однослойная нейронная сеть - Qaru</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width">
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="yandex-verification" content="68f8c2202f8948e2" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="csrf-param" content="csrf">
+    <meta name="csrf-token" content="dlYqYhIQKkivjM1521-SLsVatAum68y1P6RnUkCJhS1Ls658m95gQkP_FS4NozRTtqkIU8PBN6sVk5te3J_nLQ==">
+    <meta name="description" content="Для реализации однослойной нейронной сети у меня есть два файла данных.
+
+In:
+    0.832 64.643
+    0.818 78.843
+
+Out:
+    0 0 1
+    0 0 1
+
+
+Вышеуказанный формат 2 файлов данных.
+
+Конечный результат: &quot;1 для определенного класса, которому принадлежит со">
+    <link href="http://qaru.site/questions/3190434/single-layer-neural-network" rel="canonical">
+    <link href="/assets/all-9cf39ec290a25e1f0ade37806174f0b3.css" rel="stylesheet">
+    <link href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/styles/darcula.min.css" rel="stylesheet"> <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <script async src="https://yastatic.net/pcode/adfox/header-bidding.js"></script>
+    <script async src="https://yastatic.net/pcode/adfox/header-bidding.js"></script>
+    <script>
+        var adfoxBiddersMap = {
+            "betweenDigital": "895633",
+            "myTarget": "895498"
+        };
+        var adUnits = [
+            {
+                "code": "adfox_154697900567147088",
+                "bids": [
+                    {
+                        "bidder": "myTarget",
+                        "params": {
+                            "placementId": "361716"
+                        }
+                    },
+                    {
+                        "bidder": "betweenDigital",
+                        "sizes": [
+                            [728,90],
+                            [468,60],
+                            [300,250],
+                            [300,50],
+                            [300,100]
+                        ],
+                        "params": {
+                            "placementId": "2857187"
+                        }
+                    }
+                ],
+                "sizes": [
+                    [728,90],
+                    [468,60],
+                    [300,250],
+                    [300,50],
+                    [300,100]
+                ]
+            }
+            // {
+            //     "code": "adfox_1547187797599103",
+            //     "bids": [
+            //         {
+            //             "bidder": "myTarget",
+            //             "params": {
+            //                 "placementId": "362626"
+            //             }
+            //         },
+            //         {
+            //             "bidder": "betweenDigital",
+            //             "sizes": [
+            //                 [728,90],
+            //                 [468,60],
+            //                 [300,250],
+            //                 [300,50],
+            //                 [300,100]
+            //             ],
+            //             "params": {
+            //                 "placementId": "2861465"
+            //             }
+            //         }
+            //     ],
+            //     "sizes": [
+            //         [728,90],
+            //         [468,60],
+            //         [300,250],
+            //         [300,50],
+            //         [300,100]
+            //     ]
+            // }
+        ];
+        var userTimeout = 700;
+        window.YaHeaderBiddingSettings = {
+            biddersMap: adfoxBiddersMap,
+            adUnits: adUnits,
+            timeout: userTimeout
+        };
+    </script>
+    <script src="https://yastatic.net/pcode/adfox/loader.js" crossorigin="anonymous"></script>
+
+    <script>(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter44607970 = new Ya.Metrika2({ id:44607970, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://cdn.jsdelivr.net/npm/yandex-metrica-watch/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2");</script>
+
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-99598005-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <script async id="__lxGc__rtr" type="text/javascript" src="//s.clickiocdn.com/t/213079/360.js"></script>
+    <script async type="text/javascript" src="//s.clickiocdn.com/t/common_258.js"></script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        window.__gcse = {
+            callback: function() {
+                $('#___gcse_0 .gsc-clear-button').remove();
+                $('#___gcse_0 .gsc-search-button').remove();
+                $('#___gcse_0 .gsib_b').remove();
+                $('#___gcse_0 .gsc-input input').attr('placeholder', 'Поиск...');
+            }
+        };
+        (function() {
+            var cx = '011151660133384015389:9fypgkndwsa';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+        })();
+    </script>
+</head>
+<body>
+<noscript><div><img src="https://mc.yandex.ru/watch/44607970" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<nav id="w0" class="navbar-default navbar-fixed-top navbar"><div class="container"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w0-collapse"><span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span></button><a class="navbar-brand" href="/"><img class="dark" src="/img/logo-dark.svg" alt="qaru.site" /><div class="name">qa<span class="cl-orange">.ru</span></div></a></div><div id="w0-collapse" class="collapse navbar-collapse"><ul id="w1" class="navbar-nav navbar-right nav"><li class="active"><a href="/questions">Вопросы</a></li>
+    <li><a href="/tags">Теги</a></li>
+    <li class="blue hidden-xs hidden-sm" onclick="yaCounter44607970.reachGoal(&#039;register_menu_click&#039;); return true;"><a href="/want-register">Регистрация</a></li>
+    <li class="qase hidden-xs hidden-sm" rel="nofollow noindex" onclick="yaCounter44607970.reachGoal(&#039;qase_click&#039;); return true;"><a href="https://qase.io/?utm_source=qaru&amp;utm_medium=button"><img src="/files/qase.png"></a></li></ul><div class="search"><gcse:searchbox-only resultsUrl="/search" filter="0" sort_by=""></gcse:searchbox-only></div>
+</div></div></nav><div class="wrap">
+    <div class="container">
+        <div itemscope itemtype="http://schema.org/QAPage">
+            <div class="right-col">
+                <div class="hidden-xs hidden-sm sidebar">
+                    <style>
+                        .c1c3b94909b518428f74153b5906b9d7a {
+                            max-width: 300px;
+                        }
+                    </style>
+                    <div class="c1c3b94909b518428f74153b5906b9d7a">
+                        <ins class="adsbygoogle" style="width:300px;height:600px;" data-ad-client="ca-pub-9882502965778689" data-ad-slot="1447358630">
+                        </ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        <ins class="adsbygoogle" style="width:300px;height:600px;;margin-top: 20px;" data-ad-client="ca-pub-1191230850516122" data-ad-slot="8423199226">
+                        </ins>
+                        <script>
+                            (adsbygoogle=window.adsbygoogle || []).push({});
+                        </script>
+                        <div id="yandex_rtb_R-A-248011-22" style="margin-top: 20px;width: 300px;"></div>
+                        <script type="text/javascript">
+                            (function(w, d, n, s, t) {
+                                w[n] = w[n] || [];
+                                w[n].push(function() {
+                                    Ya.Context.AdvManager.render({
+                                        blockId: "R-A-248011-22",
+                                        renderTo: "yandex_rtb_R-A-248011-22",
+                                        async: true
+                                    });
+                                });
+                                t = d.getElementsByTagName("script")[0];
+                                s = d.createElement("script");
+                                s.type = "text/javascript";
+                                s.src = "//an.yandex.ru/system/context.js";
+                                s.async = true;
+                                t.parentNode.insertBefore(s, t);
+                            })(this, this.document, "yandexContextAsyncCallbacks");
+                        </script>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function(){
+                            window.navHeight = $('#w0').outerHeight();
+                            window.wh = $(window).height();
+                            setInterval(function () {
+                                window.navHeight = $('#w0').outerHeight();
+                                window.wh = $(window).height();
+                            });
+
+                            var awrap = $('.c1c3b94909b518428f74153b5906b9d7a'),
+                                lastScrollTop = 0;
+
+                            $(window).on('scroll', function () {
+                                var st = $(this).scrollTop(),
+                                    ot = awrap.offset().top,
+                                    h = awrap.height(),
+                                    dh = $(document).height();
+
+                                if (st <= 0) {
+                                    awrap.css({position : 'initial'});
+                                } else {
+                                    if (h > window.wh) {
+                                        if (st > lastScrollTop
+                                            && (st + window.wh) >= h + ot + 20
+                                        ) {
+                                            if ((st + window.wh) <= dh - 152) {
+                                                awrap.css({position: 'fixed'});
+                                                awrap.css({bottom: 0});
+                                                awrap.css({top: 'initial'});
+                                            } else {
+                                                awrap.css({position : 'absolute'});
+                                                awrap.css({top : dh - h - 152 - 20});
+                                                awrap.css({bottom: 'initial'});
+                                            }
+                                        } else if (st < lastScrollTop && st <= ot-20-window.navHeight) {
+                                            awrap.css({position: 'fixed'});
+                                            awrap.css({top: 20+window.navHeight});
+                                            awrap.css({bottom: 'initial'});
+                                        } else if (awrap.css('position') !== 'absolute' && awrap.css('position') !== 'initial' && awrap.css('position') !== 'static') {
+                                            awrap.css({position : 'absolute'});
+                                            awrap.css({top : ot});
+                                            awrap.css({bottom: 'initial'});
+                                        }
+                                    } else {
+                                        awrap.css({position: 'fixed'});
+                                        awrap.css({top: 20+window.navHeight});
+                                        awrap.css({bottom: 'initial'});
+                                    }
+                                }
+                                lastScrollTop = st;
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="main-col" itemprop="mainEntity" itemscope itemtype="http://schema.org/Question">
+                <div class="question-header">
+                    <h1 itemprop="name">Однослойная нейронная сеть</h1>
+                </div>
+                <div id="adfox_154697900567147088" style="margin-bottom: 10px"></div>
+                <script>
+                    window.Ya.adfoxCode.create({
+                        ownerId: 280150,
+                        containerId: 'adfox_154697900567147088',
+                        params: {
+                            pp: 'g',
+                            ps: 'dccp',
+                            p2: 'gfke'
+                        }
+                    });
+                </script>
+                <div class="question">
+                    <div class="question-row">
+                        <div class="question-text">
+                            <div class="description" itemprop="text">
+                                <p>Для реализации однослойной нейронной сети у меня есть два файла данных.</p>
+                                <pre class="prettyprint-override"><code>In:
+    0.832 64.643
+    0.818 78.843
+
+Out:
+    0 0 1
+    0 0 1
+</code></pre>
+                                <p>Вышеуказанный формат 2 файлов данных.</p>
+                                <p>Конечный результат: "1 для определенного класса, которому принадлежит соответствующий вход, и" 0 для остальных 2 выходов.</p>
+                                <p>Проблема заключается в следующем:</p>
+                                <blockquote> <p>Ваша однослойная нейронная сеть будет найти матрицу A (3 на 2) и b (3 на 1 вектор) в Y = A * X + b, где Y - [C1, C2, C3] ', а X - [x1, x2]'.</p> <p>Чтобы решить проблему выше с помощью нейронной сети, мы можем переписать уравнение: Y = A '* X', где A '= [A b] (матрица 3 на 3), а X' - [x1, x2, 1] '</p> <p>Теперь вы можете использовать нейронную сеть с три входных узла (один для x1, x2 и 1 соответственно) и три выхода (C1, C2, C3).</p> <p>Полученное 9 (так как мы имеем 9 соединения между 3 входами и 3 выходы) веса будут эквивалентны элементов матрицы А '.</p>
+                                </blockquote>
+                                <p>В основном, я пытаюсь сделать что-то подобное, но он не работает:</p>
+                                <pre class="prettyprint-override"><code>function neuralNetwork
+    load X_Q2.data
+    load T_Q2.data
+    x = X_Q2(:,1);
+    y = X_Q2(:,2);
+
+    learningrate = 0.2;
+    max_iteration = 50;
+
+    % initialize parameters
+    count = length(x);
+    weights = rand(1,3); % creates a 1-by-3 array with random weights
+    globalerror = 0;
+    iter = 0;
+    while globalerror ~= 0 &amp;&amp; iter &lt;= max_iteration
+        iter = iter + 1;
+        globalerror = 0;
+        for p = 1:count
+            output = calculateOutput(weights,x(p),y(p));
+            localerror = T_Q2(p) - output
+            weights(1)= weights(1) + learningrate *localerror*x(p);
+            weights(2)= weights(1) + learningrate *localerror*y(p);
+            weights(3)= weights(1) + learningrate *localerror;
+            globalerror = globalerror + (localerror*localerror);
+        end
+    end
+</code></pre>
+                                <p>Я пишу эту функцию в другом файле и вызываю ее в своем предыдущем коде.</p>
+                                <pre class="prettyprint-override"><code>function result = calculateOutput (weights, x, y)
+    s = x * weights(1) + y * weights(2) + weights(3);
+    if s &gt;= 0
+        result = 1;
+    else
+        result = -1;
+    end
+</code></pre> </div>
+                            <div class="votes-question">
+                                <div class="vote-count" itemprop="upvoteCount">-73</div><i class="fa fa-thumbs-o-down"></i>
+                            </div>
+                            <div class="tags">
+                                <a href="/questions/tagged/artificial-intelligence" class="tag" title="показать вопросы с меткой 'artificial-intelligence'" rel="tag">artificial-intelligence</a>
+                                <a href="/questions/tagged/matlab" class="tag" title="показать вопросы с меткой 'matlab'" rel="tag">matlab</a>
+                                <a href="/questions/tagged/classification" class="tag" title="показать вопросы с меткой 'classification'" rel="tag">classification</a>
+                                <a href="/questions/tagged/perceptron" class="tag" title="показать вопросы с меткой 'perceptron'" rel="tag">perceptron</a>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="action-time">
+                                задан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/414981/user414981" rel="noopener" target="_blank">user414981</a></span></span> <span title="2010-08-11 09:02"> 11 авг. &#39;10 в 9:02</span><span class="hidden" itemprop="dateCreated" datetime="2010-08-11 09:02">2010-08-11 09:02</span>
+                            </div>
+                            <a class="aa-link" href="https://stackoverflow.com/questions/3455660/single-layer-neural-network" target="_blank" rel="noopener">источник</a>
+                            <a class="s-link" href="/questions/3190434/single-layer-neural-network" title="поделиться">поделиться</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="answers" id="answers">
+                    <div class="answers-header">
+                        <span class="pull-left"><span itemprop="answerCount">1</span> ответ</span>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="answer-pager hidden">
+                    </div>
+                    <div class="answer last" id="7868921" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="ecaebbdaedabadcc">
+                                <div class="desc" itemprop="text">
+                                    <p>Я могу обнаружить несколько проблем с кодом. Основная проблема заключается в том, что целью является <a href="http://en.wikipedia.org/wiki/Multiclass_classification" rel="nofollow noreferrer">multi-class</a> (не <a href="http://en.wikipedia.org/wiki/Binary_classification" rel="nofollow noreferrer">binary</a>), поэтому вам нужно либо использовать 3 выходных узла по одному для каждого класса (называемый <a href="http://en.wikipedia.org/wiki/Indicator_function" rel="nofollow noreferrer">1-of-N encoding</a>), либо использовать один выход node с другой функцией активации <a href="http://en.wikipedia.org/wiki/Activation_function" rel="nofollow noreferrer">(что-то может быть больше, чем просто двоичный выход -1/1 или 0/1)</a></p>
+                                    <p>В приведенном ниже решении <a href="http://en.wikipedia.org/wiki/Linear_perceptron" rel="nofollow noreferrer">perceptron</a> имеет следующую структуру:</p>
+                                    <p> <img src="/img/211604afd22bb2ed3d11087394199e07.png" alt="perceptron_strucutre" /></p>
+                                    <pre class="prettyprint-override"><code>%# load your data
+input = [
+    0.832 64.643
+    0.818 78.843
+    1.776 45.049
+    0.597 88.302
+    1.412 63.458
+];
+target = [
+    0 0 1
+    0 0 1
+    0 1 0
+    0 0 1
+    0 0 1
+];
+
+%# parameters of the learning algorithm
+LEARNING_RATE = 0.1;
+MAX_ITERATIONS = 100;
+MIN_ERROR = 1e-4;
+
+[numInst numDims] = size(input);
+numClasses = size(target,2);
+
+%# three output nodes connected to two-dimensional input nodes + biases
+weights = randn(numClasses, numDims+1);
+
+isDone = false;               %# termination flag
+iter = 0;                     %# iterations counter
+while ~isDone
+    iter = iter + 1;
+
+    %# for each instance
+    err = zeros(numInst,numClasses);
+    for i=1:numInst
+        %# compute output: Y = W*X + b, then apply threshold activation
+        output = ( weights * [input(i,:)';1] &gt;= 0 );                       %#'
+
+        %# error: err = T - Y
+        err(i,:) = target(i,:)' - output;                                  %#'
+
+        %# update weights (delta rule): delta(W) = alpha*(T-Y)*X
+        weights = weights + LEARNING_RATE * err(i,:)' * [input(i,:) 1];    %#'
+    end
+
+    %# Root mean squared error
+    rmse = sqrt(sum(err.^2,1)/numInst);
+    fprintf(['Iteration %d: ' repmat('%f ',1,numClasses) '\n'], iter, rmse);
+
+    %# termination criteria
+    if ( iter &gt;= MAX_ITERATIONS || all(rmse &lt; MIN_ERROR) )
+        isDone = true;
+    end
+end
+
+%# plot points and one-against-all decision boundaries
+[~,group] = max(target,[],2);                     %# actual class of instances
+gscatter(input(:,1), input(:,2), group), hold on
+xLimits = get(gca,'xlim'); yLimits = get(gca,'ylim');
+for i=1:numClasses
+    ezplot(sprintf('%f*x + %f*y + %f', weights(i,:)), xLimits, yLimits)
+end
+title('Perceptron decision boundaries')
+hold off
+</code></pre>
+                                    <ins class="adsbygoogle" style="display:block;margin-bottom:10px;" data-ad-client="ca-pub-1191230850516122" data-ad-format="auto" data-ad-slot="8423199226">
+                                    </ins>
+                                    <script>
+                                        (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script>
+                                    <p>результаты обучения по пяти представленным вами образцам:</p>
+                                    <pre class="prettyprint-override"><code>Iteration 1: 0.447214 0.632456 0.632456
+Iteration 2: 0.000000 0.447214 0.447214
+...
+Iteration 49: 0.000000 0.447214 0.447214
+Iteration 50: 0.000000 0.632456 0.000000
+Iteration 51: 0.000000 0.447214 0.000000
+Iteration 52: 0.000000 0.000000 0.000000
+</code></pre>
+                                    <p> <img src="/img/12db8545a33c9c592ccd6753ef340500.png" alt="plot" /></p>
+                                    <p>Обратите внимание, что данные, используемые в приведенном выше примере, содержат только 5 выборок. Вы получили бы более значимые результаты, если бы у вас было больше учебных экземпляров в каждом классе.</p> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">222</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/97160/amro" rel="noopener" target="_blank">Amro</a></span></span> <span title="2010-08-11 15:07"> 11 авг. &#39;10 в 15:07</span><span class="hidden" itemprop="dateCreated" datetime="2010-08-11 15:07">2010-08-11 15:07</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/3455660/single-layer-neural-network/3458036#3458036" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/3190434/single-layer-neural-network/7868921#7868921" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        .bfpg { width: 336px; height: 280px; }
+                        @media(min-width: 610px) { .bfpg { width: 728px; height: 90px; } }
+                    </style>
+                    <ins class="adsbygoogle bfpg" style="display:inline-block" data-ad-client="ca-pub-9882502965778689" data-full-width-responsive="true" data-ad-slot="4255068574"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script> <div class="answer-pager hidden">
+                </div>
+                    <style>
+                        .ufpg { width: 336px; height: 280px; }
+                        @media(min-width: 610px) { .ufpg { width: 580px; height: 400px; } }
+                    </style>
+                    <ins class="adsbygoogle ufpg" style="display:inline-block" data-ad-client="ca-pub-1191230850516122" data-full-width-responsive="true" data-ad-slot="8423199226"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                <div class="bottom-notice m-b-50">
+                    <p>Другие вопросы по меткам <a href="/questions/tagged/artificial-intelligence" class="tag" title="показать вопросы с меткой 'artificial-intelligence'" rel="tag">artificial-intelligence</a>
+                        <a href="/questions/tagged/matlab" class="tag" title="показать вопросы с меткой 'matlab'" rel="tag">matlab</a>
+                        <a href="/questions/tagged/classification" class="tag" title="показать вопросы с меткой 'classification'" rel="tag">classification</a>
+                        <a href="/questions/tagged/perceptron" class="tag" title="показать вопросы с меткой 'perceptron'" rel="tag">perceptron</a>
+                        или
+                        <a class="btn btn-sm btn-block btn-primary m-t-5" href="/want-register" onclick="yaCounter44607970.reachGoal(&#039;register_qeustion_bottom_click&#039;); return true;">Задайте вопрос</a> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="pull-left">
+            <div class="license">
+                licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="nofollow license">cc by-sa 3.0</a>
+                with attribution.
+            </div>
+        </div>
+        <div class="pull-right logo">
+            <a class="hidden-xs mail" href="mailto:info@qaru.site">info@qaru.site</a>
+            <a href="#">
+                <img src="/img/logo-dark.svg" alt="qaru.site">
+                <div class="name">qa<span class="cl-orange">.ru</span></div>
+            </a>
+        </div>
+    </div>
+</footer>
+<script src="/assets/all-602ff289a5503d7da87e840acd4c7d95.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/highlight.min.js"></script></body>
+<script type="text/javascript">
+    (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script")
+    ;r.type="text/javascript";r.async=true
+    ;r.src="https://cdn.amplitude.com/libs/amplitude-4.4.0-min.gz.js"
+    ;r.onload=function(){if(e.amplitude.runQueuedFunctions){
+        e.amplitude.runQueuedFunctions()}else{
+        console.log("[Amplitude] Error: could not load SDK")}}
+    ;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)
+    ;function s(e,t){e.prototype[t]=function(){
+        this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+        var o=function(){this._q=[];return this}
+        ;var a=["add","append","clearAll","prepend","set","setOnce","unset"]
+        ;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[]
+            ;return this}
+        ;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"]
+        ;for(var p=0;p<l.length;p++){s(c,l[p])}n.Revenue=c
+        ;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","logEventWithTimestamp","logEventWithGroups","setSessionId","resetSessionId"]
+        ;function v(e){function t(t){e[t]=function(){
+            e._q.push([t].concat(Array.prototype.slice.call(arguments,0)))}}
+            for(var n=0;n<d.length;n++){t(d[n])}}v(n);n.getInstance=function(e){
+            e=(!e||e.length===0?"$default_instance":e).toLowerCase()
+            ;if(!n._iq.hasOwnProperty(e)){n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]}
+        ;e.amplitude=n})(window,document);
+
+    amplitude.getInstance().init("3a6ec943ecbcaf730a89b7132c26e5fc");
+    var tagNames = [],
+        tags = document.getElementsByClassName('tag');
+
+    for (var i = 0; i < tags.length; i++) {
+        if (!tagNames.includes(tags[i].text)) {
+            tagNames.push(tags[i].text);
+        }
+    }
+
+    var question_id = null;
+
+    if (matches = window.location.href.match(/\/([\d]+)\//i)) {
+        question_id = matches[1];
+    }
+
+    var d = document,
+        eventProperties = {
+            'user_agent': navigator.userAgent,
+            'referrer': document.referrer,
+            'href': window.location.href,
+            'question_id': question_id,
+            'is_question': d.getElementsByClassName('question-header').length,
+            'answer_count': d.getElementsByClassName('answer').length,
+            'have_accepted': d.getElementsByClassName('answer accepted').length,
+            'tags': tagNames
+        };
+
+    amplitude.getInstance().logEvent('PAGE_VIEW', eventProperties)
+</script>
+</html>

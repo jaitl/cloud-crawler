@@ -60,5 +60,17 @@ class StackoverrunParserTest extends FunSuite with Matchers {
     res.user.id shouldBe -1
     res.user.url shouldBe "https://codeindex.ru/user/-1"
   }
+  test("Stackoverrun-parse") {
+    val content = Source.fromResource("html/sr_parse.html").mkString
+    val parser = new StackoverrunParser
+
+    val res = parser
+      .parse(CrawlTask("1000", "StackoverrunTasks"), CrawlResult(content))
+      .parsedData
+    res.title shouldBe "Удалить случайную строку между двумя строками android"
+
+    res.user.name shouldBe "user934820"
+    res.user.id shouldBe 934820
+  }
 
 }
