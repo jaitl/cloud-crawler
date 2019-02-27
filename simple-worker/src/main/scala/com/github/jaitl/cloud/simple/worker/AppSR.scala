@@ -50,6 +50,8 @@ object AppSR extends StrictLogging {
       )
       .build()
 
+    logger.info(s"Parameters: $config")
+
     val pipelines = habrPipeline :: Nil
 
     WorkerApp
