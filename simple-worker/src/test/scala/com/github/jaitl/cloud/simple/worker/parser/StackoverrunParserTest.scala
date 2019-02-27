@@ -18,7 +18,8 @@ class StackoverrunParserTest extends FunSuite with Matchers {
 
     res.tags.size shouldBe 2
     res.tags shouldEqual Seq("android", "alarmmanager")
-    res.url shouldBe "https://stackoverflow.com/q/4556670"
+    res.url shouldBe "https://stackoverrun.com/ru/q/1085109"
+    res.sourceUrl shouldBe "https://stackoverflow.com/q/4556670"
     res.date shouldBe 1264778427000L
     res.title shouldBe "Как проверить, установлен ли AlarmManager уже установленный будильник?"
 

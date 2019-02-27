@@ -19,6 +19,7 @@ class QaRuParserTest extends FunSuite with Matchers {
     res.tags.size shouldBe 4
     res.tags shouldEqual Seq("artificial-intelligence", "matlab", "classification", "perceptron")
     res.url shouldBe "http://qaru.site/questions/3190434/single-layer-neural-network"
+    res.sourceUrl shouldBe "https://stackoverflow.com/questions/3455660/single-layer-neural-network"
     //res.date shouldBe 1264778427000L
     res.title shouldBe "artificial-intelligence - Однослойная нейронная сеть - Qaru"
 
@@ -46,6 +47,7 @@ class QaRuParserTest extends FunSuite with Matchers {
     res.tags.size shouldBe 3
     res.tags shouldEqual Seq("git", "git-branch", "git-remote")
     res.url shouldBe "http://qaru.site/questions/3/how-to-delete-a-git-branch-both-locally-and-remotely"
+    res.sourceUrl shouldBe "https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely"
     //res.date shouldBe 1264778427000L
     res.title shouldBe "git - Как удалить ветвь Git как локально, так и удаленно? - Qaru"
     res.id shouldBe 3

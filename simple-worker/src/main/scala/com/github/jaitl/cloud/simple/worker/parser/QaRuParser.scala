@@ -24,6 +24,7 @@ class QaRuParser extends BaseParser[StackowerflowParsedData] {
 
     val content = doc.select("div.question-text").html()
     val url = doc.select("link[rel=\"canonical\"]").attr("href")
+    val sourceUrl = doc.select("div.question a.aa-link").attr("href")
     val id = doc.select("link[rel=\"canonical\"]").attr("href").split("/")(4).toLong
 
     val tags = doc.select("div.question-text div.tags a")
@@ -74,6 +75,6 @@ class QaRuParser extends BaseParser[StackowerflowParsedData] {
         }
     }.head
 
-    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, Seq(), user, qVote))
+    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, Seq(), user, qVote, sourceUrl))
   }
 }

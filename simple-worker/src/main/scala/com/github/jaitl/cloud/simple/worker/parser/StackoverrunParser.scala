@@ -24,7 +24,8 @@ class StackoverrunParser extends BaseParser[StackowerflowParsedData] {
     val title = doc.select("h1").text()
 
     val content = doc.select("div.row div.row div.post-text").get(0).html()
-    val url = doc.select("body > main > div > div.col-lg-9.col-md-12.col-sm-12 > div > div.col-lg-11.col-md-12 > div.post-info > div.post-meta.row > p:nth-child(1) > small:nth-child(1) > a").attr("href")
+    val sourceUrl = doc.select("body > main > div > div.col-lg-9.col-md-12.col-sm-12 > div > div.col-lg-11.col-md-12 > div.post-info > div.post-meta.row > p:nth-child(1) > small:nth-child(1) > a").attr("href")
+    val url = doc.select("meta[property=\"og:url\"]").attr("content")
     val id = doc.select("body > main > div > div.col-lg-9.col-md-12.col-sm-12 > div > div.col-lg-11.col-md-12 div.post-text")
       .attr("id").replace("text_q", "").toLong
 
@@ -112,6 +113,6 @@ class StackoverrunParser extends BaseParser[StackowerflowParsedData] {
         )
     }
 
-    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, hints, user, qVote))
+    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, hints, user, qVote, sourceUrl))
   }
 }

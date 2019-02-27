@@ -50,7 +50,7 @@ private[worker] class TasksBatchController(
 
   override def preStart(): Unit = {
     super.preStart()
-    log.info(s"Start new TasksBatchController, batch id: ${batch.id}")
+    log.info(s"Start new TasksBatchController, batch id: ${batch.id} with ")
 
     resourceController = resourceControllerCreator.create(this.context, pipeline.resourceType)
     saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self)
