@@ -46,7 +46,7 @@ private[worker] class WorkerManager(
   private def balancerActions: Receive = {
     case RequestBatch =>
       if (context.children.size < config.parallelBatches) {
-        log.info(s"Children size: $context.children.size params: $config.parallelBatches")
+        log.info(s"Children size: ${context.children.size} params: ${config.parallelBatches}")
         queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), taskTypes)
       }
 
