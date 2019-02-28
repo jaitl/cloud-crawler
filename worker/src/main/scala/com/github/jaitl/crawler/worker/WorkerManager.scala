@@ -34,7 +34,7 @@ private[worker] class WorkerManager(
   tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]],
   batchRequestScheduler: Scheduler,
   batchExecutionTimeoutScheduler: Scheduler
-) extends Actor with ActorLogging with StrictLogging {
+) extends Actor with ActorLogging {
   val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
   val batchControllers: mutable.Map[ActorRef, TaskBatchContext] = mutable.Map.empty
 
@@ -46,7 +46,7 @@ private[worker] class WorkerManager(
   private def balancerActions: Receive = {
     case RequestBatch =>
       if (context.children.size < config.parallelBatches) {
-        logger.info(s"Children size: $context.children.size params: $config.parallelBatches")
+        log.info(s"Children size: $context.children.size params: $config.parallelBatches")
         queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), taskTypes)
       }
 
