@@ -49,11 +49,6 @@ private[worker] class WorkerManager(
         val id = UUID.randomUUID()
         log.info(s"RequestBatch size: ${context.children.size} params: ${config.parallelBatches}, id: $id")
         queueTaskBalancer ! RequestTasksBatch(UUID.randomUUID(), taskTypes)
-        try {
-          throw new IllegalArgumentException
-        } catch {
-          case e: Exception => e.printStackTrace()
-        }
       }
 
     case SuccessTasksBatchRequest(requestId, taskType, tasksBatch) =>
