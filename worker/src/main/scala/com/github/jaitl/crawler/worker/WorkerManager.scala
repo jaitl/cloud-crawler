@@ -23,7 +23,6 @@ import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchController
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
-import com.typesafe.scalalogging.StrictLogging
 
 import scala.collection.mutable
 
@@ -65,6 +64,7 @@ private[worker] class WorkerManager(
 
   private def monitors: Receive = {
     case Terminated(ctrl) =>
+      log.error(s"Force stop task batch controller: ${ctrl}")
       batchControllers -= ctrl
 
     case CheckTimeout =>
