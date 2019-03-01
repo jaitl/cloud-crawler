@@ -39,7 +39,7 @@ allprojects {
 
 def scalaMajorVersion = "2.12"
 def scalaVersion = "${scalaMajorVersion}.5"
-def akkaVersion = "2.5.21"
+def akkaVersion = "2.5.9"
 def elastic4sVersion = "6.3.3"
 
 subprojects {
