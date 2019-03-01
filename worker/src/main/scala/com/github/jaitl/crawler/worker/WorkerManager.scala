@@ -54,7 +54,7 @@ private[worker] class WorkerManager(
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
       context.watch(tasksBatchController)
       tasksBatchController ! TasksBatchController.ExecuteTask
-
+      log.info(s"Children size: ${context.children.size} batchControllers: ${batchControllers.size}")
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
 
     case NoTasks(requestId, taskType) =>
