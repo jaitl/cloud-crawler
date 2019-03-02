@@ -167,7 +167,7 @@ project(":simple-worker") {
     apply plugin: 'application'
     apply plugin: "com.github.johnrengelman.shadow"
 
-    mainClassName = "com.github.jaitl.cloud.simple.worker.AppSR"
+    mainClassName = "com.github.jaitl.cloud.simple.worker.AppSRMongo"
 
     dependencies {
         compile project(":worker")
