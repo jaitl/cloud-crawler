@@ -96,6 +96,6 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
         )
     }
 
-    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, hints, user, qVote))
+    ParseResult(StackowerflowParsedData(title, content, url, id, date, tags, comments, hints, user, qVote, url))
   }
 }
