@@ -21,7 +21,7 @@ class QaRuParser extends BaseParser[StackowerflowParsedData] {
 
     val title = doc.select("title").text()
 
-    val content = doc.select("div.question-text").html()
+    val content = doc.select("div.question-text div.description").html()
     val url = doc.select("link[rel=\"canonical\"]").attr("href")
     val sourceUrl = doc.select("div.question a.aa-link").attr("href")
     val id = doc.select("link[rel=\"canonical\"]").attr("href").split("/")(4).toLong
