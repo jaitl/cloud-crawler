@@ -18,8 +18,7 @@ class StackoverflowParser extends BaseParser[StackowerflowParsedData] {
   override def parse(crawlTask: CrawlTask, crawlResult: CrawlResult): ParseResult[StackowerflowParsedData] = {
     val doc = Jsoup.parse(crawlResult.data)
 
-    val date = dateFormat.parse(doc.select("div.user-action-time span")
-      .attr("title").replace("Z", "")).getTime
+    val date = 0
     val title = doc.select("title").text()
     val content = doc.select("div.question div.post-text").html()
     val url = doc.select("meta[property=\"og:url\"]").attr("content")

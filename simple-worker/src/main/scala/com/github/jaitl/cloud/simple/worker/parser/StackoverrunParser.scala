@@ -15,11 +15,7 @@ class StackoverrunParser extends BaseParser[StackowerflowParsedData] {
   override def parse(crawlTask: CrawlTask, crawlResult: CrawlResult): ParseResult[StackowerflowParsedData] = {
     val doc = Jsoup.parse(crawlResult.data)
 
-    val date = dateFormat.parse(
-      doc.select("div.row div.row div.col-lg-11.col-md-12 p.text-secondary.createDate.col-lg-6.col-md-6.col-sm-6.col-xs-12")
-        .get(0).select("small span.d-none")
-      .attr("datetime")
-    ).getTime
+    val date = 0
 
     val title = doc.select("h1").text()
 
