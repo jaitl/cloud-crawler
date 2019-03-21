@@ -5,7 +5,7 @@ import com.github.jaitl.cloud.simple.worker.parser.SODataMongoConverter
 import com.github.jaitl.cloud.simple.worker.parser.StackoverflowParser
 import com.github.jaitl.crawler.worker.WorkerApp
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
-import com.github.jaitl.crawler.worker.save.LocalFileSystemSaveRawProvider
+import com.github.jaitl.crawler.worker.save.DummySaveRawProvider
 import com.github.jaitl.crawler.worker.save.MongoSaveParsedProvider
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 import com.typesafe.config.ConfigFactory
@@ -29,7 +29,7 @@ object AppSOMongo extends StrictLogging {
           config.getString("simple-worker.mongo.url"),
           config.getString("simple-worker.mongo.db"),
           config.getString("simple-worker.mongo.collection")))
-      .withSaveRawProvider(new LocalFileSystemSaveRawProvider(config.getString("simple-worker.filepath")))
+      .withSaveRawProvider(new DummySaveRawProvider(""))
       .withTor(
         config.getString("simple-worker.tor.host"),
         config.getString("simple-worker.tor.port").toInt,

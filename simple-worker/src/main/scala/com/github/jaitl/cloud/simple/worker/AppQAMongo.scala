@@ -5,7 +5,7 @@ import com.github.jaitl.cloud.simple.worker.parser.QaRuParser
 import com.github.jaitl.cloud.simple.worker.parser.SODataMongoConverter
 import com.github.jaitl.crawler.worker.WorkerApp
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
-import com.github.jaitl.crawler.worker.save.LocalFileSystemSaveRawProvider
+import com.github.jaitl.crawler.worker.save.DummySaveRawProvider
 import com.github.jaitl.crawler.worker.save.MongoSaveParsedProvider
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 import com.typesafe.config.ConfigFactory
@@ -30,7 +30,7 @@ object AppQAMongo extends StrictLogging {
           config.getString("simple-worker.mongo.db"),
           config.getString("simple-worker.mongo.collection")))
       //.withSaveRawProvider(new LocalFileSystemSaveRawProvider("./"))
-      .withSaveRawProvider(new LocalFileSystemSaveRawProvider(config.getString("simple-worker.filepath")))
+      .withSaveRawProvider(new DummySaveRawProvider(""))
       .withProxy(
         config.getString("simple-worker.proxy.host"),
         config.getString("simple-worker.proxy.port").toInt,
