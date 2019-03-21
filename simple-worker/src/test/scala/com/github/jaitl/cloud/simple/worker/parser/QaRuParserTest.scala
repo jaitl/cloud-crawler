@@ -65,5 +65,16 @@ class QaRuParserTest extends FunSuite with Matchers {
     res.comments.head.accepted shouldBe true
     res.comments.head.voteCount shouldBe 17997
   }
+  test("QaRu 3") {
+    val content = Source.fromResource("html/qaru_3.html").mkString
+    val parser = new QaRuParser
+
+    val res = parser
+      .parse(CrawlTask("1000", "QaRuTasks"), CrawlResult(content))
+      .parsedData
+
+    res.tags.size shouldBe 3
+    res.url shouldBe "http://qaru.site/questions/5802709/recorded-files-lost-when-user-hangs-up-in-asterisk"
+  }
 
 }

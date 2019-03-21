@@ -1,0 +1,414 @@
+
+<!DOCTYPE HTML>
+<html lang="ru-RU">
+<head>
+    <title>php -  Записанные файлы потеряны, когда пользователь повесил трубку в Asterisk - Qaru</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width">
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="yandex-verification" content="68f8c2202f8948e2" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="csrf-param" content="csrf">
+    <meta name="csrf-token" content="30vhT-yxviMfnqLDVWPMUN_jRFxmH6wo5VLWsxirLS_0Nqyk27eNdOwOLzIwJR3QnWt8YrjV52sl7xkv0M4tgg==">
+    <meta name="description" content=" У меня есть одно голосовое приложение, в котором я хочу сохранить записанный звуковой файл. Мой код: $record_file= $dir_path . &quot;recordfile_&quot;.$file_count;
+$this-&amp;gt;obj_agi-&amp;gt;exec(&quot;Record&quot;,&quot;$record_file.wav,5,$maxsecs&quot;);
+  Всякий раз, когда я повес">
+    <link href="http://qaru.site/questions/5802709/recorded-files-lost-when-user-hangs-up-in-asterisk" rel="canonical">
+    <link href="/assets/all-9cf39ec290a25e1f0ade37806174f0b3.css" rel="stylesheet">
+    <link href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/styles/darcula.min.css" rel="stylesheet"> <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <script async src="https://yastatic.net/pcode/adfox/header-bidding.js"></script>
+    <script src="https://yastatic.net/pcode/adfox/loader.js" crossorigin="anonymous"></script>
+    <script async src="https://rotator.admediator.ru/js/rotator.js"></script>
+
+    <script>(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter44607970 = new Ya.Metrika2({ id:44607970, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://cdn.jsdelivr.net/npm/yandex-metrica-watch/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2");</script>
+
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-99598005-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        window.__gcse = {
+            callback: function() {
+                $('#___gcse_0 .gsc-clear-button').remove();
+                $('#___gcse_0 .gsc-search-button').remove();
+                $('#___gcse_0 .gsib_b').remove();
+                $('#___gcse_0 .gsc-input input').attr('placeholder', 'Поиск...');
+            }
+        };
+        (function() {
+            var cx = '011151660133384015389:9fypgkndwsa';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+        })();
+    </script>
+</head>
+<body>
+<noscript><div><img src="https://mc.yandex.ru/watch/44607970" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<nav id="w0" class="navbar-default navbar-fixed-top navbar"><div class="container"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w0-collapse"><span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span></button><a class="navbar-brand" href="/"><img class="dark" src="/img/logo-dark.svg" alt="qaru.site" /><div class="name">qa<span class="cl-orange">.ru</span></div></a></div><div id="w0-collapse" class="collapse navbar-collapse"><ul id="w1" class="navbar-nav navbar-right nav"><li class="active"><a href="/questions">Вопросы</a></li>
+    <li><a href="/tags">Теги</a></li>
+    <li class="blue hidden-xs hidden-sm" onclick="yaCounter44607970.reachGoal(&#039;register_menu_click&#039;); return true;"><a href="/want-register">Регистрация</a></li>
+    <li class="qase hidden-xs hidden-sm" rel="nofollow noindex" onclick="yaCounter44607970.reachGoal(&#039;qase_click&#039;); return true;"><a href="https://qase.io/?utm_source=qaru&amp;utm_medium=button"><img src="/files/qase.png"></a></li></ul><div class="search"><gcse:searchbox-only resultsUrl="/search" filter="0" sort_by=""></gcse:searchbox-only></div>
+</div></div></nav><div class="wrap">
+    <div class="container">
+        <div itemscope itemtype="http://schema.org/QAPage">
+            <div class="right-col">
+                <div class="hidden-xs hidden-sm sidebar">
+                    <style>
+                        .ca26432eb6c991cce4898895be668526c {
+                            max-width: 300px;
+                        }
+                    </style>
+                    <div class="ca26432eb6c991cce4898895be668526c">
+                        <ins class="adsbygoogle" style="width:300px;height:600px;" data-ad-client="ca-pub-9882502965778689" data-ad-slot="1447358630">
+                        </ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        <ins class="adsbygoogle" style="width:300px;height:600px;;margin-top: 20px;" data-ad-client="ca-pub-1191230850516122" data-ad-slot="8423199226">
+                        </ins>
+                        <script>
+                            (adsbygoogle=window.adsbygoogle || []).push({});
+                        </script>
+                        <div id="yandex_rtb_R-A-248011-22" style="margin-top: 20px;width: 300px;"></div>
+                        <script type="text/javascript">
+                            (function(w, d, n, s, t) {
+                                w[n] = w[n] || [];
+                                w[n].push(function() {
+                                    Ya.Context.AdvManager.render({
+                                        blockId: "R-A-248011-22",
+                                        renderTo: "yandex_rtb_R-A-248011-22",
+                                        async: true
+                                    });
+                                });
+                                t = d.getElementsByTagName("script")[0];
+                                s = d.createElement("script");
+                                s.type = "text/javascript";
+                                s.src = "//an.yandex.ru/system/context.js";
+                                s.async = true;
+                                t.parentNode.insertBefore(s, t);
+                            })(this, this.document, "yandexContextAsyncCallbacks");
+                        </script>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function(){
+                            window.navHeight = $('#w0').outerHeight();
+                            window.wh = $(window).height();
+                            setInterval(function () {
+                                window.navHeight = $('#w0').outerHeight();
+                                window.wh = $(window).height();
+                            });
+
+                            var awrap = $('.ca26432eb6c991cce4898895be668526c'),
+                                lastScrollTop = 0;
+
+                            $(window).on('scroll', function () {
+                                var st = $(this).scrollTop(),
+                                    ot = awrap.offset().top,
+                                    h = awrap.height(),
+                                    dh = $(document).height();
+
+                                if (st <= 0) {
+                                    awrap.css({position : 'initial'});
+                                } else {
+                                    if (h > window.wh) {
+                                        if (st > lastScrollTop
+                                            && (st + window.wh) >= h + ot + 20
+                                        ) {
+                                            if ((st + window.wh) <= dh - 152) {
+                                                awrap.css({position: 'fixed'});
+                                                awrap.css({bottom: 0});
+                                                awrap.css({top: 'initial'});
+                                            } else {
+                                                awrap.css({position : 'absolute'});
+                                                awrap.css({top : dh - h - 152 - 20});
+                                                awrap.css({bottom: 'initial'});
+                                            }
+                                        } else if (st < lastScrollTop && st <= ot-20-window.navHeight) {
+                                            awrap.css({position: 'fixed'});
+                                            awrap.css({top: 20+window.navHeight});
+                                            awrap.css({bottom: 'initial'});
+                                        } else if (awrap.css('position') !== 'absolute' && awrap.css('position') !== 'initial' && awrap.css('position') !== 'static') {
+                                            awrap.css({position : 'absolute'});
+                                            awrap.css({top : ot});
+                                            awrap.css({bottom: 'initial'});
+                                        }
+                                    } else {
+                                        awrap.css({position: 'fixed'});
+                                        awrap.css({top: 20+window.navHeight});
+                                        awrap.css({bottom: 'initial'});
+                                    }
+                                }
+                                lastScrollTop = st;
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="main-col" itemprop="mainEntity" itemscope itemtype="http://schema.org/Question">
+                <div class="question-header">
+                    <h1 itemprop="name"> Записанные файлы потеряны, когда пользователь повесил трубку в Asterisk</h1>
+                </div>
+                <div id="adfox_154697900567147088" style="margin-bottom: 10px"></div>
+                <script>
+                    var adfbm = {
+                        "betweenDigital": "895633",
+                        "myTarget": "895498"
+                    };
+                    var adu = [
+                        {
+                            "code": "adfox_154697900567147088",
+                            "bids": [
+                                {
+                                    "bidder": "myTarget",
+                                    "params": {
+                                        "placementId": "361716"
+                                    }
+                                },
+                                {
+                                    "bidder": "betweenDigital",
+                                    "sizes": [
+                                        [728,90],
+                                        [468,60],
+                                        [300,250],
+                                        [300,50],
+                                        [300,100]
+                                    ],
+                                    "params": {
+                                        "placementId": "2857187"
+                                    }
+                                }
+                            ],
+                            "sizes": [
+                                [728,90],
+                                [468,60],
+                                [300,250],
+                                [300,50],
+                                [300,100]
+                            ]
+                        }
+                        // {
+                        //     "code": "adfox_1547187797599103",
+                        //     "bids": [
+                        //         {
+                        //             "bidder": "myTarget",
+                        //             "params": {
+                        //                 "placementId": "362626"
+                        //             }
+                        //         },
+                        //         {
+                        //             "bidder": "betweenDigital",
+                        //             "sizes": [
+                        //                 [728,90],
+                        //                 [468,60],
+                        //                 [300,250],
+                        //                 [300,50],
+                        //                 [300,100]
+                        //             ],
+                        //             "params": {
+                        //                 "placementId": "2861465"
+                        //             }
+                        //         }
+                        //     ],
+                        //     "sizes": [
+                        //         [728,90],
+                        //         [468,60],
+                        //         [300,250],
+                        //         [300,50],
+                        //         [300,100]
+                        //     ]
+                        // }
+                    ];
+                    window.YaHeaderBiddingSettings = {
+                        biddersMap: adfbm,
+                        adUnits: adu,
+                        timeout: 500
+                    };
+                    window.Ya.adfoxCode.create({
+                        ownerId: 280150,
+                        containerId: 'adfox_154697900567147088',
+                        params: {
+                            pp: 'g',
+                            ps: 'dccp',
+                            p2: 'gfke'
+                        }
+                    });
+                </script>  <div class="question">
+                <div class="question-row">
+                    <div class="question-text">
+                        <div class="description" itemprop="text">
+                            <p> У меня есть одно голосовое приложение, в котором я хочу сохранить записанный звуковой файл. Мой код:</p> <pre><code>$record_file= $dir_path . "recordfile_".$file_count;
+$this-&gt;obj_agi-&gt;exec("Record","$record_file.wav,5,$maxsecs");
+</code></pre> <p> Всякий раз, когда я повесил трубку во время записи, приложение записи не может выполнить и повредить вызов.</p> <p> Кто-нибудь знает, как управлять этой функцией записи при вешании?</p> </div>
+                        <div class="votes-question">
+                            <div class="vote-count" itemprop="upvoteCount">0</div><i class="fa fa-thumbs-o-up fa-rotate-270"></i>
+                        </div>
+                        <div class="tags">
+                            <a href="/questions/tagged/php" class="tag" title="показать вопросы с меткой 'php'" rel="tag">php</a>
+                            <a href="/questions/tagged/asterisk" class="tag" title="показать вопросы с меткой 'asterisk'" rel="tag">asterisk</a>
+                            <a href="/questions/tagged/agi" class="tag" title="показать вопросы с меткой 'agi'" rel="tag">agi</a>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="action-time">
+                            задан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1078564/bhavik-patel" rel="noopener" target="_blank">Bhavik Patel</a></span></span> <span title="2012-11-12 08:09"> 12 нояб. &#39;12 в 8:09</span><span class="hidden" itemprop="dateCreated" datetime="2012-11-12 08:09">2012-11-12 08:09</span>
+                        </div>
+                        <a class="aa-link" href="https://stackoverflow.com/questions/13338657/recorded-files-lost-when-user-hangs-up-in-asterisk" target="_blank" rel="noopener">источник</a>
+                        <a class="s-link" href="/questions/5802709/recorded-files-lost-when-user-hangs-up-in-asterisk" title="поделиться">поделиться</a>
+                    </div>
+                </div>
+            </div>
+                <div class="answers" id="answers">
+                    <div class="answers-header">
+                        <span class="pull-left"><span itemprop="answerCount">1</span> ответ</span>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="answer-pager hidden">
+                    </div>
+                    <div class="answer last" id="12116290" itemscope itemtype="http://schema.org/Answer" itemprop="suggestedAnswer">
+                        <div class="answer-row">
+                            <div class="bafecdddddbc">
+                                <div class="desc" itemprop="text">
+                                    <p> Приложение записи обрабатывает запись обычно даже при зависании.</p> <p> Однако внутри AGI наилучшим способом захвата зависания является захват сигнала, отправленного из Asterisk в ваш AGI-процесс. Путем захвата вашего SIGHUP вы можете делать все, что хотите (биллинг, сенсорные файлы, вставка в БД и т.д.).</p> <p> По умолчанию будет отправлено сообщение SIGHUP.</p>
+                                    <ins class="adsbygoogle" style="display:block;margin-bottom:10px;" data-ad-client="ca-pub-1191230850516122" data-ad-format="auto" data-ad-slot="8423199226">
+                                    </ins>
+                                    <script>
+                                        (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script> <p> для получения дополнительной информации, здесь вывод из основного приложения приложения AGI (из CLI)</p> <pre><code>     A locally executed AGI script will receive SIGHUP
+     on hangup from the channel except when using DeadAGI. A fast AGI server will
+     correspondingly receive a HANGUP inline with the command dialog. Both of theses
+     signals may be disabled by setting the ${AGISIGHUP} channel variable to 'no'
+     before executing the AGI application. Alternatively, if you would like the
+     AGI application to exit immediately after a channel hangup is detected, set
+     the ${AGIEXITONHANGUP} variable to 'yes'.
+</code></pre> </div>
+                                <div class="votes-answer green">
+                                    <div class="vote-count" itemprop="upvoteCount">1</div><i class="fa fa-thumbs-o-up"></i>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="action-time">
+                                    ответ дан <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="https://stackoverflow.com/users/1172833/junky" rel="noopener" target="_blank">junky</a></span></span> <span title="2012-11-23 07:53"> 23 нояб. &#39;12 в 7:53</span><span class="hidden" itemprop="dateCreated" datetime="2012-11-23 07:53">2012-11-23 07:53</span>
+                                </div>
+                                <a class="aa-link" href="https://stackoverflow.com/questions/13338657/recorded-files-lost-when-user-hangs-up-in-asterisk/13523296#13523296" target="_blank" rel="noopener">источник</a>
+                                <a itemprop="url" class="s-link" href="/questions/5802709/recorded-files-lost-when-user-hangs-up-in-asterisk/12116290#12116290" title="поделиться">поделиться</a>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        .bfpg { width: 336px; height: 280px; }
+                        @media(min-width: 610px) { .bfpg { width: 728px; height: 90px; } }
+                    </style>
+                    <ins class="adsbygoogle bfpg" style="display:inline-block" data-ad-client="ca-pub-9882502965778689" data-full-width-responsive="true" data-ad-slot="4255068574"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script> <div class="answer-pager hidden">
+                </div>
+                    <style>
+                        .ufpg { width: 336px; height: 280px; }
+                        @media(min-width: 610px) { .ufpg { width: 580px; height: 400px; } }
+                    </style>
+                    <ins class="adsbygoogle ufpg" style="display:inline-block" data-ad-client="ca-pub-1191230850516122" data-full-width-responsive="true" data-ad-slot="8423199226"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                <div class="bottom-notice m-b-50">
+                    <p>Другие вопросы по меткам <a href="/questions/tagged/php" class="tag" title="показать вопросы с меткой 'php'" rel="tag">php</a>
+                        <a href="/questions/tagged/asterisk" class="tag" title="показать вопросы с меткой 'asterisk'" rel="tag">asterisk</a>
+                        <a href="/questions/tagged/agi" class="tag" title="показать вопросы с меткой 'agi'" rel="tag">agi</a>
+                        или
+                        <a class="btn btn-sm btn-block btn-primary m-t-5" href="/want-register" onclick="yaCounter44607970.reachGoal(&#039;register_qeustion_bottom_click&#039;); return true;">Задайте вопрос</a> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="pull-left">
+            <div class="license">
+                licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="nofollow license">cc by-sa 3.0</a>
+                with attribution.
+            </div>
+        </div>
+        <div class="pull-right logo">
+            <a class="hidden-xs mail" href="mailto:info@qaru.site">info@qaru.site</a>
+            <a href="#">
+                <img src="/img/logo-dark.svg" alt="qaru.site">
+                <div class="name">qa<span class="cl-orange">.ru</span></div>
+            </a>
+        </div>
+    </div>
+</footer>
+<script src="/assets/all-602ff289a5503d7da87e840acd4c7d95.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/highlight.min.js"></script></body>
+<script type="text/javascript">
+    (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script")
+    ;r.type="text/javascript";r.async=true
+    ;r.src="https://cdn.amplitude.com/libs/amplitude-4.4.0-min.gz.js"
+    ;r.onload=function(){if(e.amplitude.runQueuedFunctions){
+        e.amplitude.runQueuedFunctions()}else{
+        console.log("[Amplitude] Error: could not load SDK")}}
+    ;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)
+    ;function s(e,t){e.prototype[t]=function(){
+        this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+        var o=function(){this._q=[];return this}
+        ;var a=["add","append","clearAll","prepend","set","setOnce","unset"]
+        ;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[]
+            ;return this}
+        ;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"]
+        ;for(var p=0;p<l.length;p++){s(c,l[p])}n.Revenue=c
+        ;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","logEventWithTimestamp","logEventWithGroups","setSessionId","resetSessionId"]
+        ;function v(e){function t(t){e[t]=function(){
+            e._q.push([t].concat(Array.prototype.slice.call(arguments,0)))}}
+            for(var n=0;n<d.length;n++){t(d[n])}}v(n);n.getInstance=function(e){
+            e=(!e||e.length===0?"$default_instance":e).toLowerCase()
+            ;if(!n._iq.hasOwnProperty(e)){n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]}
+        ;e.amplitude=n})(window,document);
+
+    amplitude.getInstance().init("3a6ec943ecbcaf730a89b7132c26e5fc");
+    var tagNames = [],
+        tags = document.getElementsByClassName('tag');
+
+    for (var i = 0; i < tags.length; i++) {
+        if (!tagNames.includes(tags[i].text)) {
+            tagNames.push(tags[i].text);
+        }
+    }
+
+    var question_id = null;
+
+    if (matches = window.location.href.match(/\/([\d]+)\//i)) {
+        question_id = matches[1];
+    }
+
+    var d = document,
+        eventProperties = {
+            'user_agent': navigator.userAgent,
+            'referrer': document.referrer,
+            'href': window.location.href,
+            'question_id': question_id,
+            'is_question': d.getElementsByClassName('question-header').length,
+            'answer_count': d.getElementsByClassName('answer').length,
+            'have_accepted': d.getElementsByClassName('answer accepted').length,
+            'tags': tagNames
+        };
+
+    amplitude.getInstance().logEvent('PAGE_VIEW', eventProperties)
+</script>
+</html>

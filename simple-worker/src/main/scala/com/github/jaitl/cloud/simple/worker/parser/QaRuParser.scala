@@ -15,10 +15,7 @@ class QaRuParser extends BaseParser[StackowerflowParsedData] {
   override def parse(crawlTask: CrawlTask, crawlResult: CrawlResult): ParseResult[StackowerflowParsedData] = {
     val doc = Jsoup.parse(crawlResult.data)
 
-    val date = dateFormat.parse(
-      doc.select("div.question-text div.action-time span.hidden")
-      .attr("datetime")
-    ).getTime
+    val date = 0
 
     val title = doc.select("title").text()
 
