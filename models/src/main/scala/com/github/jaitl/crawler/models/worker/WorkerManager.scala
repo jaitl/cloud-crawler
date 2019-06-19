@@ -12,6 +12,8 @@ object WorkerManager {
     taskType: String,
     successIds: Seq[String],
     failureIds: Seq[String],
+    skippedIds: Seq[String],
+    bannedIds: Seq[String],
     newTasks: Map[String, Seq[String]]
   )
 

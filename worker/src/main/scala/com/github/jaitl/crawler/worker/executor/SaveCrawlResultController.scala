@@ -14,10 +14,12 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessRes
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.BannedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveCrawlResultControllerConfig
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SkippedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessAddedResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessCrawledTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessSavedResults
@@ -35,12 +37,18 @@ class SaveCrawlResultController[T](
   queueTaskBalancer: ActorRef,
   tasksBatchController: ActorRef,
   saveScheduler: Scheduler,
-  config: SaveCrawlResultControllerConfig
-) extends Actor with ActorLogging with Stash {
-  private implicit val executionContext: ExecutionContext = context.dispatcher
+  config: SaveCrawlResultControllerConfig)
+    extends Actor
+    with ActorLogging
+    with Stash {
+  implicit private val executionContext: ExecutionContext = context.dispatcher
 
-  var successTasks: mutable.Seq[SuccessCrawledTask] = mutable.ArraySeq.empty[SuccessCrawledTask]
+  var successTasks: mutable.Seq[SuccessCrawledTask] =
+    mutable.ArraySeq.empty[SuccessCrawledTask]
   var failedTasks: mutable.Seq[FailedTask] = mutable.ArraySeq.empty[FailedTask]
+  var skippedTasks: mutable.Seq[SkippedTask] =
+    mutable.ArraySeq.empty[SkippedTask]
+  var bannedTasks: mutable.Seq[BannedTask] = mutable.ArraySeq.empty[BannedTask]
 
   override def preStart(): Unit = {
     super.preStart()
@@ -48,7 +56,7 @@ class SaveCrawlResultController[T](
     saveScheduler.schedule(config.saveInterval, self, SaveResults)
   }
 
-  override def receive: Receive = addResultHandler orElse waitSave
+  override def receive: Receive = addResultHandler.orElse(waitSave)
 
   private def addResultHandler: Receive = {
     case AddResults(result) =>
@@ -60,17 +68,26 @@ class SaveCrawlResultController[T](
         case a @ FailedTask(_, _) =>
           failedTasks = failedTasks :+ a
           sender() ! SuccessAddedResults
+
+        case a @ SkippedTask(_, _) =>
+          skippedTasks = skippedTasks :+ a
+          sender() ! SuccessAddedResults
+
+        case a @ BannedTask(_, _) =>
+          bannedTasks = bannedTasks :+ a
+          sender() ! SuccessAddedResults
       }
   }
 
   private def waitSave: Receive = {
-    case SaveResults if successTasks.isEmpty && failedTasks.isEmpty =>
+    case SaveResults if successTasks.isEmpty && failedTasks.isEmpty && skippedTasks.isEmpty && bannedTasks.isEmpty =>
       tasksBatchController ! SuccessSavedResults
 
     case SaveResults =>
       context.become(saveResultHandler)
 
-      val parserResults = successTasks.flatMap(_.parseResult).map(_.parsedData.asInstanceOf[T])
+      val parserResults =
+        successTasks.flatMap(_.parseResult).map(_.parsedData.asInstanceOf[T])
       val rawResult = successTasks.map(r => (r.task, r.crawlResult))
 
       val saveFuture: Future[SaveResults] = for {
@@ -88,7 +105,7 @@ class SaveCrawlResultController[T](
         case ex: Exception => FailureSaveResults(ex)
       }
 
-      recoveredSaveFuture pipeTo self
+      recoveredSaveFuture.pipeTo(self)
   }
 
   private def saveResultHandler: Receive = {
@@ -98,8 +115,13 @@ class SaveCrawlResultController[T](
 
       val successIds = successTasks.map(_.task.id)
       val failureIds = failedTasks.map(_.task.id)
-      val newCrawlTasks = successTasks.flatMap(_.parseResult.map(_.newCrawlTasks).getOrElse(Seq.empty))
-      val newTasks = newCrawlTasks.groupBy(_.taskType)
+      val skippedIds = skippedTasks.map(_.task.id)
+      val bannedIds = bannedTasks.map(_.task.id)
+      val newCrawlTasks = successTasks.flatMap(
+        _.parseResult.map(_.newCrawlTasks).getOrElse(Seq.empty)
+      )
+      val newTasks = newCrawlTasks
+        .groupBy(_.taskType)
         .map {
           case (taskType, vals) =>
             val newTasks = vals.flatMap(_.tasks).distinct
@@ -111,11 +133,15 @@ class SaveCrawlResultController[T](
         taskType = pipeline.taskType,
         successIds = successIds,
         failureIds = failureIds,
+        skippedIds = skippedIds,
+        bannedIds = bannedIds,
         newTasks = newTasks
       )
 
       successTasks = mutable.ArraySeq.empty[SuccessCrawledTask]
       failedTasks = mutable.ArraySeq.empty[FailedTask]
+      skippedTasks = mutable.ArraySeq.empty[SkippedTask]
+      bannedTasks = mutable.ArraySeq.empty[BannedTask]
 
       tasksBatchController ! success
 
@@ -141,8 +167,14 @@ object SaveCrawlResultController {
   case object SuccessAddedResults
 
   trait CrawlTaskResult
-  case class SuccessCrawledTask(task: Task, crawlResult: CrawlResult, parseResult: Option[ParseResult[_]]) extends CrawlTaskResult
+  case class SuccessCrawledTask(
+    task: Task,
+    crawlResult: CrawlResult,
+    parseResult: Option[ParseResult[_]]
+  ) extends CrawlTaskResult
   case class FailedTask(task: Task, t: Throwable) extends CrawlTaskResult
+  case class SkippedTask(task: Task, t: Throwable) extends CrawlTaskResult
+  case class BannedTask(task: Task, t: Throwable) extends CrawlTaskResult
 
   case class SaveCrawlResultControllerConfig(saveInterval: FiniteDuration)
 
@@ -151,14 +183,16 @@ object SaveCrawlResultController {
     queueTaskBalancer: ActorRef,
     tasksBatchController: ActorRef,
     saveScheduler: Scheduler,
-    config: SaveCrawlResultControllerConfig
-  ): Props = Props(new SaveCrawlResultController(
-    pipeline = pipeline,
-    queueTaskBalancer = queueTaskBalancer,
-    tasksBatchController = tasksBatchController,
-    saveScheduler = saveScheduler,
-    config = config
-  ))
+    config: SaveCrawlResultControllerConfig): Props =
+    Props(
+      new SaveCrawlResultController(
+        pipeline = pipeline,
+        queueTaskBalancer = queueTaskBalancer,
+        tasksBatchController = tasksBatchController,
+        saveScheduler = saveScheduler,
+        config = config
+      )
+    )
 
   def name(): String = "saveCrawlResultController"
 }
@@ -168,16 +202,17 @@ private[worker] class SaveCrawlResultControllerCreator(
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
 ) extends TwoArgumentActorCreator[Pipeline[_], ActorRef] {
-  override def create(factory: ActorRefFactory, firstArg: Pipeline[_], secondArg: ActorRef): ActorRef = {
+  override def create(factory: ActorRefFactory, firstArg: Pipeline[_], secondArg: ActorRef): ActorRef =
     factory.actorOf(
-      props = SaveCrawlResultController.props(
-        pipeline = firstArg,
-        queueTaskBalancer = queueTaskBalancer,
-        tasksBatchController = secondArg,
-        saveScheduler = saveScheduler,
-        config = config
-      ).withDispatcher("worker.blocking-io-dispatcher"),
+      props = SaveCrawlResultController
+        .props(
+          pipeline = firstArg,
+          queueTaskBalancer = queueTaskBalancer,
+          tasksBatchController = secondArg,
+          saveScheduler = saveScheduler,
+          config = config
+        )
+        .withDispatcher("worker.blocking-io-dispatcher"),
       name = SaveCrawlResultController.name()
     )
-  }
 }
