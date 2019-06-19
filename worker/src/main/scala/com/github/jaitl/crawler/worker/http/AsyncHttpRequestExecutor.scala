@@ -4,11 +4,12 @@ import java.util.UUID
 
 import com.typesafe.scalalogging.StrictLogging
 import io.netty.handler.codec.http.HttpHeaderNames
-import org.asynchttpclient.AsyncHttpClient
-import org.asynchttpclient.BoundRequestBuilder
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient.Dsl.config
 import org.asynchttpclient.proxy.ProxyServer
+import org.asynchttpclient.AsyncHttpClient
+import org.asynchttpclient.BoundRequestBuilder
+import org.asynchttpclient.Realm
 
 import scala.compat.java8.FutureConverters.toScala
 import scala.concurrent.ExecutionContext
@@ -26,7 +27,16 @@ class AsyncHttpRequestExecutor(
       case ProxyType.Http => org.asynchttpclient.proxy.ProxyType.HTTP
     }
 
-    val proxyServer = new ProxyServer.Builder(executorConfig.host, executorConfig.port).setProxyType(proxyType).build()
+    val proxyServer = executorConfig.login match  {
+      case "" => new ProxyServer.Builder(executorConfig.host, executorConfig.port).setProxyType(proxyType).build()
+      case _ =>
+        new ProxyServer.Builder(executorConfig.host, executorConfig.port)
+          .setProxyType(proxyType)
+          .setRealm(new Realm.Builder(executorConfig.login, executorConfig.password)
+          .setScheme(Realm.AuthScheme.BASIC))
+          .build()
+    }
+
 
     asyncHttpClient(config().setProxyServer(proxyServer).setUserAgent(executorConfig.userAgent)
       .setFollowRedirect(true).setMaxRedirects(maxRedirectsCount))
