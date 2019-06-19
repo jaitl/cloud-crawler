@@ -8,11 +8,18 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ExecutorContext
 import com.github.jaitl.crawler.worker.executor.resource.ProxyResourceController.ProxyConfig
-import com.github.jaitl.crawler.worker.executor.resource.ResourceController.{NoFreeResource, NoResourcesAvailable, RequestResource, ReturnBannedResource, ReturnFailedResource, ReturnSkippedResource, ReturnSuccessResource, SuccessRequestResource}
-import com.github.jaitl.crawler.worker.http.agent.UserAgentGenerator
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoFreeResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoResourcesAvailable
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnBannedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutorConfig
 import com.github.jaitl.crawler.worker.http.ProxyType
+import com.github.jaitl.crawler.worker.http.agent.UserAgentGenerator
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
 import scala.collection.mutable

@@ -1,6 +1,8 @@
 package com.github.jaitl.crawler.worker.save
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
 
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
@@ -12,12 +14,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class S3SaveRawProvider(
-                         val accessKey: String,
-                         val secretKey: String,
-                         val bucketName: String,
-                         val path: String = "",
-                         val endpoint: String = "https://s3-us-west-1.amazonaws.com"
-                       ) extends SaveRawProvider with StrictLogging {
+  val accessKey: String,
+  val secretKey: String,
+  val bucketName: String,
+  val path: String = "",
+  val endpoint: String = "https://s3-us-west-1.amazonaws.com"
+) extends SaveRawProvider
+    with StrictLogging {
   val credentials = new BasicAWSCredentials(accessKey, secretKey)
   val client = new AmazonS3Client(credentials)
 
@@ -28,8 +31,7 @@ class S3SaveRawProvider(
       val bw = new BufferedWriter(new FileWriter(file))
       bw.write(r._2.data)
       bw.close()
-      client.putObject(bucketName,
-        r._1.taskType.concat("/").concat(r._1.id).concat("/").concat(r._1.taskData), file)
+      client.putObject(bucketName, r._1.taskType.concat("/").concat(r._1.id).concat("/").concat(r._1.taskData), file)
       logger.debug(s"Saving crawler result to: $fileName")
     })
   }
