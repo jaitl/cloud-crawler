@@ -4,10 +4,12 @@ import java.util.UUID
 
 import com.typesafe.scalalogging.StrictLogging
 import io.netty.handler.codec.http.HttpHeaderNames
-import org.asynchttpclient.{AsyncHttpClient, BoundRequestBuilder, Realm}
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient.Dsl.config
 import org.asynchttpclient.proxy.ProxyServer
+import org.asynchttpclient.AsyncHttpClient
+import org.asynchttpclient.BoundRequestBuilder
+import org.asynchttpclient.Realm
 
 import scala.compat.java8.FutureConverters.toScala
 import scala.concurrent.ExecutionContext
