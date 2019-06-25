@@ -29,6 +29,7 @@ A framework for building a distributed, highload system for crawling open data.
 ```
 
 ## Worker dependency
+
 [bintray.com](https://bintray.com/jaitl/cloud-crawler/)
 ### sbt
 ```
