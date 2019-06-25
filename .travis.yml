@@ -16,7 +16,7 @@ after_success:
     - sbt coveralls
 deploy:
     - provider: script
-      script: scripts/publish.sh
+      script: bash scripts/publish.sh
       skip_cleanup: true
       on:
           tags: true
