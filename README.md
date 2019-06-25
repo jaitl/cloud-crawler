@@ -6,13 +6,13 @@ A framework for building a distributed, highload system for crawling open data.
 ## Run
 1. Run two master node:
     ```
-    ./gradlew :master:run -DMASTER_PORT=2551
-    ./gradlew :master:run -DMASTER_PORT=2552
+    sbt -DMASTER_PORT=2551 master/run
+    sbt -DMASTER_PORT=2552 master/run
     ```
 2. Run worker nodes:
     ```
-    ./gradlew :simple-worker:run -DWORKER_PORT=2561
-    ./gradlew :simple-worker:run -DWORKER_PORT=2562
+    sbt -DWORKER_PORT=2561 simple-worker/run
+    sbt -DWORKER_PORT=2562 simple-worker/run
     ```
 
 ## Simple task

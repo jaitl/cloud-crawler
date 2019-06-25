@@ -4,12 +4,16 @@
 *.iws
 .idea/
 
-# Gradle
-.gradletasknamecache
-.gradle/
-build/
-bin/
-out/
-
-# MacOSg
+# MacOS
 .DS_Store
+
+# sbt
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
