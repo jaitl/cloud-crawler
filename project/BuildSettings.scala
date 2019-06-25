@@ -1,6 +1,7 @@
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageSbtPlugin.autoImport._
+import bintray.BintrayKeys._
 
 object BuildSettings {
   lazy val commonSettings: Seq[Setting[_]] = Seq(
@@ -8,6 +9,8 @@ object BuildSettings {
     organization := "com.github.jaitl",
     organizationName := "JaitlApp",
     resolvers += "jitpack" at "https://jitpack.io",
+    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+    bintrayRepository := "cloud-crawler",
     scalacOptions := Seq(
       "-encoding",
       "UTF-8", // source files are in UTF-8
