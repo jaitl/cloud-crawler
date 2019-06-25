@@ -1,14 +1,15 @@
 import Dependencies._
 import BuildSettings._
 
-val projectVersion = "1.1.0-SNAPSHOT"
+val projectVersion = sys.env.getOrElse("TRAVIS_TAG", "SNAPSHOT")
 
 lazy val root = (project in file("."))
   .aggregate(models, master, worker, `simple-worker`)
   .settings(commonSettings)
   .settings(
     name := "cloud-crawler",
-    version := projectVersion
+    version := projectVersion,
+    skip in publish := true
   )
 
 lazy val models = (project in file("models"))
@@ -16,7 +17,12 @@ lazy val models = (project in file("models"))
   .settings(commonSettings)
 
 lazy val master = (project in file("master"))
-  .settings(name := "master", version := projectVersion)
+  .settings(
+    name := "master",
+    version := projectVersion,
+    mainClass in run := Some("com.github.jaitl.crawler.master.MasterApp"),
+    skip in publish := true
+  )
   .settings(commonSettings)
   .dependsOn(models)
   .settings(
@@ -37,7 +43,8 @@ lazy val `simple-worker` = (project in file("simple-worker"))
   .settings(
     name := "simple-worker",
     version := projectVersion,
-    mainClass in run := Some("com.github.jaitl.cloud.simple.worker.App")
+    mainClass in run := Some("com.github.jaitl.cloud.simple.worker.App"),
+    skip in publish := true
   )
   .settings(commonSettings)
   .dependsOn(worker)
