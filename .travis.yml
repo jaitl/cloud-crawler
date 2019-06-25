@@ -5,8 +5,18 @@ jdk:
     - openjdk8
 sudo: false
 install: true
+env:
+    global:
+        - secure: "GDTxQPKGyafW6C6YfwdIbOOjXUm7Mb64MhTk/BRYeFFi1m2vj5j9Ds9QwJSLZQQ5JOwF72JmXxqXZKL66Wn4AjfP8LusTRj0OMycu4XK3ncZwqpnPHqMyA+8W7VhLqhySb85/1InI4mibwpbc7RLNm3N4a6P5zDb8JdzUr2Qx0TffOYCdIS3HgeLxjM2tT4OlmSCj7l1ZPCVYTAgbNpBefYGwmrg7N+NR+h7AdQYgxsVmVxyyKiBIFkUbAm64xlQQPq9EXU4BJIU61R3gJyEOEm4u2SasaBciipQut0VqJzCeHve46jAjesRZe25tfgJUb+goWudvPxcN3SyjrVlWkmByTo66N623NZOevzUzTO94wBzA62rqQPh+y6JW3R15oF6T6tLoOde9l4KD95z+Nu3Cm77+FrO7tG1h1/PTOKz5Ai02ob80TWt9AoQZejCS4Bj8Wp86YxBU0atYx5dLdq2AWESoVkh8L/RjvdHaPM+rcLwgosRZtSaO9q68Cqm7ri3CgtGxQhBh+MAdEGZ1vWj0OBJU76N/wn9ATyy6rKyOQ6qCwhugUX5xNDB34hOd6711EPxVS9JwyqiaLnYn7+1JbKna8BPckvb+1yAMu1EdA/CMhEdja0buX4vNvGcSKeqPIeoExEeM8czHEUbOinkVQjqgPLBOdUSOhWFb3Q="
+        - secure: "TV1VsQ7LBHzfnZlzELUmvhZA05chKNQn6hypMTjOITJNtJ6Ry0KLnx4U5a2qlPnxNLVFlXwVGUNwo2SgPUXfKMhBx5do2fX1Pdje2ZhHyfYpuFeS7lxU82CUYJ67jn3cHO49J7kXRArd4cDhTEHil1Ss/MVRrDCHiH24V16o9SQNJlxMA+7hBvelUysveT+Lj7LR0BzzIk0byNz4F1fDYGvy8pH95not/epoXlur+7OHUpadb+2smvailLyGLav1cGmPNFAAXyv2lgKQZ35YBkLFXuB7K0p19PtZrUz9tLTwQfZlh4Uu3C5goWk8xayezOU66Ew0JlwIbaIO3YduWYuVv0335F5m62gjvRWd34yKw178LEZzSbJ6+9N1k83MBU/ZFv2fnYJdKl/3I7U1NXInT+uXr5nqQorKzbVg84pXuxRWpOW3qE5ZvJJTfOAMOrgANFbgB65PCzkQn6YAEDRWQz1/GZm2ZjM3BzBZ6lxiaUDJPsZ5Wk94sB5cv68suKLNPeqde1GP0jQTriY1TenTHdx0Wu26/i0TyosOIYtyDd1XiHJyJm20TOlnblBPYZSE5aB0EcObrMNN0kUL2NxwjOpbsi+oG8Mw8OYOXqu7RG2ss46eFwb+7mdzxE/L9KmCIighupUHe+pG8hYnE6oCKdG1NSFG9OH1rOVzvVc="
 script:
     - sbt clean scalastyle coverage test coverageReport
     - sbt coverageAggregate
 after_success:
     - sbt coveralls
+deploy:
+    - provider: script
+      script: scripts/publish.sh
+      skip_cleanup: true
+      on:
+          tags: true
