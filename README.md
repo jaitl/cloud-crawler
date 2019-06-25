@@ -29,9 +29,7 @@ A framework for building a distributed, highload system for crawling open data.
 ```
 
 ## Worker dependency
-![GitHub release](https://img.shields.io/github/release/Jaitl/cloud-crawler.svg?label=version)
-
-[bintray.com](https://bintray.com/jaitl/cloud-crawler/)
+[![GitHub release](https://img.shields.io/github/release/Jaitl/cloud-crawler.svg?label=version)](https://bintray.com/jaitl/cloud-crawler)
 ### sbt
 ```
 resolvers += "Cloud Crawler Repository" at "https://dl.bintray.com/jaitl/cloud-crawler",
