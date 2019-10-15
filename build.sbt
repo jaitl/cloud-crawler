@@ -1,5 +1,8 @@
 import Dependencies._
 import BuildSettings._
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerBaseImage
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerExposedPorts
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerRepository
 
 val projectVersion = sys.env.getOrElse("TRAVIS_TAG", "SNAPSHOT")
 
@@ -17,6 +20,7 @@ lazy val models = (project in file("models"))
   .settings(commonSettings)
 
 lazy val master = (project in file("master"))
+  .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(
     name := "master",
     version := projectVersion,
@@ -29,6 +33,10 @@ lazy val master = (project in file("master"))
     libraryDependencies ++= Seq(mongoScalaDriver, ficus) ++ Akka.list ++ Logging.list,
     libraryDependencies ++= Seq(scalaTest, scalamock)
   )
+  .settings(
+    version in Docker := "latest",
+    dockerBaseImage := "java"
+  )
 
 lazy val worker = (project in file("worker"))
   .settings(name := "worker", version := projectVersion)
@@ -40,6 +48,7 @@ lazy val worker = (project in file("worker"))
   )
 
 lazy val `simple-worker` = (project in file("simple-worker"))
+  .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(
     name := "simple-worker",
     version := projectVersion,
@@ -51,4 +60,8 @@ lazy val `simple-worker` = (project in file("simple-worker"))
   .settings(
     libraryDependencies += jsoup,
     libraryDependencies += scalaTest
+  )
+  .settings(
+    version in Docker := "latest",
+    dockerBaseImage := "java"
   )

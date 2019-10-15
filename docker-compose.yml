@@ -1,0 +1,19 @@
+version: '2'
+services:
+  node:
+    container_name: cc_worker
+    image: simple-worker
+    environment:
+      CLUSTER_PORT: 1606
+      CLUSTER_IP: node
+      SEED_PORT_1600_TCP_ADDR: master
+      SEED_PORT_1600_TCP_PORT: 1600
+  master:
+    container_name: cc_master
+    image: master:latest
+    environment:
+      CLUSTER_PORT: 1600
+      CLUSTER_IP: master
+      SEED_PORT_1600_TCP_ADDR: master
+      MONGO_PROVIDER_CONNECTION_STRING: mongodb://host.docker.internal:27017
+

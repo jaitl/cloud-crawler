@@ -34,7 +34,7 @@ object MasterApp extends StrictLogging {
       config.getConfig("akka.remote.netty.tcp").getString("port")
     )
 
-    val system = ActorSystem("cloudCrawlerSystem", config)
+    val system = ActorSystem(config.getConfig("clustering.cluster").getString("name"), config)
 
     val queueTaskConfig = config.as[QueueTaskConfig]("master.queue-task")
     val recoveryConfig = config.as[RecoveryConfig]("master.queue-task-recovery")
