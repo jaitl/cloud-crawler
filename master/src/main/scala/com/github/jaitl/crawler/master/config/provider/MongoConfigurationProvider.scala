@@ -26,19 +26,23 @@ class MongoConfigurationProvider(
   private val database: MongoDatabase = mongoClient.getDatabase(dbName)
   private val crawlerProjectConfiguration: MongoCollection[ProjectConfiguration] =
     database.getCollection(configurationCollectionName)
-  private val crawlerProxies: MongoCollection[ProjectConfiguration] =
+  private val crawlerProxies: MongoCollection[CrawlerProxy] =
     database.getCollection(proxyCollectionName)
-  private val crawlerTors: MongoCollection[ProjectConfiguration] =
+  private val crawlerTors: MongoCollection[CrawlerTor] =
     database.getCollection(torCollectionName)
 
-  override def getCrawlerProjectConfiguration(taskType: String)(
-    implicit ec: ExecutionContext): Future[Option[ProjectConfiguration]] =
+  override def getCrawlerProjectConfiguration(taskType: String): Future[Seq[ProjectConfiguration]] =
     crawlerProjectConfiguration
       .find(equal("workerTaskType", taskType))
       .toFuture()
-      .map(_.headOption)
 
-  override def getCrawlerProxyConfiguration(taskType: String): Future[Option[CrawlerProxy]] = ???
+  override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[CrawlerProxy]] =
+    crawlerProxies
+      .find(equal("workerTaskType", taskType))
+      .toFuture()
 
-  override def getCrawlerTOrConfiguration(taskType: String): Future[Option[CrawlerTor]] = ???
+  override def getCrawlerTorConfiguration(taskType: String): Future[Seq[CrawlerTor]] =
+    crawlerTors
+      .find(equal("workerTaskType", taskType))
+      .toFuture()
 }
