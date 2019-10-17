@@ -1,15 +1,16 @@
 package com.github.jaitl.crawler.master.config.provider
 
-import com.github.jaitl.crawler.models.worker.{ProjectConfiguration, CrawlerProxy, CrawlerTor}
+import com.github.jaitl.crawler.models.worker.ProjectConfiguration
+import com.github.jaitl.crawler.models.worker.CrawlerProxy
+import com.github.jaitl.crawler.models.worker.CrawlerTor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait CrawlerConfigurationProvider {
 
-  def getCrawlerProxyConfiguration(taskType: String): Future[Option[CrawlerProxy]]
+  def getCrawlerProxyConfiguration(taskType: String): Future[Seq[CrawlerProxy]]
 
-  def getCrawlerTOrConfiguration(taskType: String): Future[Option[CrawlerTor]]
+  def getCrawlerTorConfiguration(taskType: String): Future[Seq[CrawlerTor]]
 
-  def getCrawlerProjectConfiguration(taskType: String)(
-    implicit ec: ExecutionContext): Future[Option[ProjectConfiguration]]
+  def getCrawlerProjectConfiguration(taskType: String): Future[Seq[ProjectConfiguration]]
 }
