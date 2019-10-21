@@ -79,7 +79,7 @@ class QueueTaskRequestController(
 
 object QueueTaskRequestController {
 
-  case class RequestTask(requestId: UUID, taskType: String, batchSize: Int,requester: ActorRef)
+  case class RequestTask(requestId: UUID, taskType: String, batchSize: Int, requester: ActorRef)
 
   case class QueueBatchSuccess(requestId: UUID, taskType: String, requester: ActorRef, tasks: Seq[Task])
 

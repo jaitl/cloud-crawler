@@ -39,5 +39,23 @@ object WorkerManager {
 
   case class NoTasks(requestId: UUID, taskType: String)
 
+  case class SuccessTasksConfigRequest(requestId: UUID, taskType: String, head: ProjectConfiguration)
+
+  case class FailureConfigRequest(requestId: UUID, taskType: String, throwable: Throwable)
+
+  case class NoConfigs(requestId: UUID, taskType: String)
+
+  case class SuccessProxyRequest(requestId: UUID, taskType: String, head: CrawlerProxy)
+
+  case class FailureProxyRequest(requestId: UUID, taskType: String, throwable: Throwable)
+
+  case class NoProxies(requestId: UUID, taskType: String)
+
+  case class SuccessTorRequest(requestId: UUID, taskType: String, head: CrawlerTor)
+
+  case class FailureTorRequest(requestId: UUID, taskType: String, throwable: Throwable)
+
+  case class NoTors(requestId: UUID, taskType: String)
+
   case object EmptyTaskTypeList
 }
