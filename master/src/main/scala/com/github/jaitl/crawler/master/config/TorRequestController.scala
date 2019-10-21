@@ -7,8 +7,10 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Stash
+import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
+import com.github.jaitl.crawler.master.config.ProxyRequestController.RequestProxy
 import com.github.jaitl.crawler.master.config.TorRequestController.RequestTor
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestFailure
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestSuccess
@@ -88,4 +90,12 @@ object TorRequestController {
     Props(new TorRequestController(configurationProvider))
 
   def name(): String = "torRequestController"
+
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case msg @ RequestTor(_, taskType, _) => (taskType, msg)
+  }
+
+  val extractShardId: ShardRegion.ExtractShardId = {
+    case RequestTor(_, taskType, _) => taskType
+  }
 }

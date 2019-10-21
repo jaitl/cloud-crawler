@@ -7,11 +7,13 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Stash
+import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.ConfigurationRequestFailure
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.ConfigurationRequestSuccess
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
+import com.github.jaitl.crawler.master.queue.QueueTaskRequestController.RequestTask
 import com.github.jaitl.crawler.models.worker.ProjectConfiguration
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureConfigRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
@@ -90,4 +92,12 @@ object ConfigurationRequestController {
     Props(new ConfigurationRequestController(configurationProvider))
 
   def name(): String = "configurationRequestController"
+
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case msg @ RequestConfiguration(_, taskType, _) => (taskType, msg)
+  }
+
+  val extractShardId: ShardRegion.ExtractShardId = {
+    case RequestConfiguration(_, taskType, _) => taskType
+  }
 }

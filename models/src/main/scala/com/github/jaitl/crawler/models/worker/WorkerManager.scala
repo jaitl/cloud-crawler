@@ -9,6 +9,10 @@ object WorkerManager {
 
   case class RequestConfiguration(requestId: UUID, taskType: String)
 
+  case class RequestProxy(requestId: UUID, taskType: String)
+
+  case class RequestTor(requestId: UUID, taskType: String)
+
   case class  TasksBatchProcessResult(
     requestId: UUID,
     taskType: String,
