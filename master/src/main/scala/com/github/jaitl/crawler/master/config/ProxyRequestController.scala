@@ -7,7 +7,9 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Stash
+import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
+import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
 import com.github.jaitl.crawler.master.config.ProxyRequestController.ProxyRequestFailure
 import com.github.jaitl.crawler.master.config.ProxyRequestController.ProxyRequestSuccess
 import com.github.jaitl.crawler.master.config.ProxyRequestController.RequestProxy
@@ -86,4 +88,12 @@ object ProxyRequestController {
     Props(new ProxyRequestController(configurationProvider))
 
   def name(): String = "proxyRequestController"
+
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case msg @ RequestProxy(_, taskType, _) => (taskType, msg)
+  }
+
+  val extractShardId: ShardRegion.ExtractShardId = {
+    case RequestProxy(_, taskType, _) => taskType
+  }
 }
