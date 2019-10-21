@@ -7,13 +7,15 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Stash
-import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.ConfigurationRequestFailure
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.ConfigurationRequestSuccess
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
 import com.github.jaitl.crawler.models.worker.ProjectConfiguration
+import com.github.jaitl.crawler.models.worker.WorkerManager.FailureConfigRequest
+import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
+import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksConfigRequest
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContextExecutor
@@ -38,12 +40,38 @@ class ConfigurationRequestController(
         } else {
           Future.failed(NoConfigurationFound(s"No configuration for $taskType"))
         }
-      } yield ConfigurationRequestSuccess(requestId, taskType, requester, configs.head)
+      } yield ConfigurationRequestSuccess(requestId, taskType, requester, configs)
 
       configResult
         .recover { case t: Throwable => ConfigurationRequestFailure(requestId, taskType, requester, t) }
         .pipeTo(self)
   }
+
+  private def processingRequest: Receive = {
+    case ConfigurationRequestSuccess(requestId, taskType, requester, tasks) =>
+      log.info(s"ConfigurationRequestSuccess: $requestId, $taskType, self: $self, tasks: $tasks")
+
+      if (tasks.nonEmpty) {
+        requester ! SuccessTasksConfigRequest(requestId, taskType, tasks.head)
+      } else {
+        requester ! NoConfigs(requestId, taskType)
+      }
+
+      context.unbecome()
+      unstashAll()
+
+    case ConfigurationRequestFailure(requestId, taskType, requester, throwable) =>
+      requester ! FailureConfigRequest(requestId, taskType, throwable)
+
+      context.unbecome()
+      unstashAll()
+
+    case req @ RequestConfiguration(_, _, _) =>
+      log.debug(s"stash req: $req")
+      stash()
+  }
+  final case class NoConfigurationFound(private val message: String = "", private val cause: Throwable = None.orNull)
+      extends Exception(message, cause)
 }
 
 object ConfigurationRequestController {
@@ -54,7 +82,7 @@ object ConfigurationRequestController {
     requestId: UUID,
     taskType: String,
     requester: ActorRef,
-    config: ProjectConfiguration)
+    config: Seq[ProjectConfiguration])
 
   case class ConfigurationRequestFailure(requestId: UUID, taskType: String, requester: ActorRef, throwable: Throwable)
 
@@ -63,5 +91,3 @@ object ConfigurationRequestController {
 
   def name(): String = "configurationRequestController"
 }
-final case class NoConfigurationFound(private val message: String = "", private val cause: Throwable = None.orNull)
-    extends Exception(message, cause)
