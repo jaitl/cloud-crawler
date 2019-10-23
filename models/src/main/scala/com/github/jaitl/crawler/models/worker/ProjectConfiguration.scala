@@ -9,5 +9,8 @@ case class ProjectConfiguration(
   workerTaskType: String,
   workerMongodbUrl: String,
   workerMongodbDB: String,
-  workerMongodbCollection: String
+  workerMongodbCollection: String,
+  workerCrawler: String,
+  workerParser: String,
+  workerParallelBatches: Int
 )

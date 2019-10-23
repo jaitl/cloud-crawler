@@ -35,9 +35,12 @@ class ProxyRequestController(
   private def waitRequest: Receive = {
     case RequestProxy(requestId, taskType, requester) =>
       log.debug(s"RequestProxy: $requestId, $taskType, self: $self")
+
+      context.become(processingRequest)
+
       val proxyResult = for {
         proxies <- proxyProvider.getCrawlerProxyConfiguration(taskType)
-        _ <- if (proxies.isEmpty) {
+        _ <- if (proxies.nonEmpty) {
           Future.successful(Unit)
         } else {
           Future.failed(NoProxyFound(s"No proxies for $taskType"))

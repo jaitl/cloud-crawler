@@ -10,16 +10,13 @@ import akka.actor.Stash
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
-import com.github.jaitl.crawler.master.config.ProxyRequestController.RequestProxy
 import com.github.jaitl.crawler.master.config.TorRequestController.RequestTor
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestFailure
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestSuccess
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
 import com.github.jaitl.crawler.models.worker.CrawlerTor
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureTorRequest
-import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoTors
-import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksConfigRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTorRequest
 
 import scala.concurrent.ExecutionContext
@@ -38,9 +35,12 @@ class TorRequestController(
   private def waitRequest: Receive = {
     case RequestTor(requestId, taskType, requester) =>
       log.debug(s"RequestConfiguration: $requestId, $taskType, self: $self")
+
+      context.become(processingRequest)
+
       val torsResult = for {
         tors <- configurationProvider.getCrawlerTorConfiguration(taskType)
-        _ <- if (tors.isEmpty) {
+        _ <- if (tors.nonEmpty) {
           Future.successful(Unit)
         } else {
           Future.failed(NoTorsFound(s"No tors for $taskType"))

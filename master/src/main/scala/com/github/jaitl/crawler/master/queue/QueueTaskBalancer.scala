@@ -4,7 +4,6 @@ import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
-import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyTaskTypeList
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
@@ -82,4 +81,3 @@ object QueueTaskBalancer {
   case object Stop
 
 }
-
