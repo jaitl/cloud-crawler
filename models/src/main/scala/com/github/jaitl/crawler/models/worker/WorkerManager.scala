@@ -62,4 +62,6 @@ object WorkerManager {
   case class NoTors(requestId: UUID, taskType: String)
 
   case object EmptyTaskTypeList
+
+  case object EmptyList
 }

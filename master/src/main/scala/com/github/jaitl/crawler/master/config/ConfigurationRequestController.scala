@@ -13,7 +13,6 @@ import com.github.jaitl.crawler.master.config.ConfigurationRequestController.Con
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.ConfigurationRequestSuccess
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
-import com.github.jaitl.crawler.master.queue.QueueTaskRequestController.RequestTask
 import com.github.jaitl.crawler.models.worker.ProjectConfiguration
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureConfigRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
@@ -35,9 +34,12 @@ class ConfigurationRequestController(
   private def waitRequest: Receive = {
     case RequestConfiguration(requestId, taskType, requester) =>
       log.debug(s"RequestConfiguration: $requestId, $taskType, self: $self")
+
+      context.become(processingRequest)
+
       val configResult = for {
         configs <- configurationProvider.getCrawlerProjectConfiguration(taskType)
-        _ <- if (configs.isEmpty) {
+        _ <- if (configs.nonEmpty) {
           Future.successful(Unit)
         } else {
           Future.failed(NoConfigurationFound(s"No configuration for $taskType"))
