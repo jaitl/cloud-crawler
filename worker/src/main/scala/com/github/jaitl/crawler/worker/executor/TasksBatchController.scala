@@ -12,6 +12,7 @@ import com.github.jaitl.crawler.models.task.TasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
+import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
@@ -37,6 +38,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Retu
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
@@ -47,9 +49,10 @@ import scala.concurrent.duration.FiniteDuration
 private[worker] class TasksBatchController(
   batch: TasksBatch,
   pipeline: Pipeline[_],
+  configPipeline: ConfigurablePipeline[_],
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
+  saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]],
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
@@ -68,8 +71,8 @@ private[worker] class TasksBatchController(
     super.preStart()
     log.info(s"Start new TasksBatchController, batch id: ${batch.id} with ")
 
-    resourceController = resourceControllerCreator.create(this.context, pipeline.resourceType)
-    saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self)
+    resourceController = resourceControllerCreator.create(this.context, configPipeline.resourceType)
+    saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self, configPipeline)
     crawlExecutor = crawlExecutorCreator.create(this.context)
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
   }
@@ -175,9 +178,10 @@ private[worker] object TasksBatchController {
   def props(
     batch: TasksBatch,
     pipeline: Pipeline[_],
+    configPipeline: ConfigurablePipeline[_],
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
-    saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
+    saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]],
     queueTaskBalancer: ActorRef,
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
@@ -186,6 +190,7 @@ private[worker] object TasksBatchController {
       new TasksBatchController(
         batch = batch,
         pipeline = pipeline,
+        configPipeline = configPipeline,
         resourceControllerCreator = resourceControllerCreator,
         crawlExecutorCreator = crawlExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,
@@ -205,20 +210,22 @@ private[worker] object TasksBatchController {
 class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: TwoArgumentActorCreator[Pipeline[_], ActorRef],
+  saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]],
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
-) extends TwoArgumentActorCreator[TasksBatch, Pipeline[_]] {
+) extends ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline[_]] {
   override def create(
     factory: ActorRefFactory,
     firstArg: TasksBatch,
-    secondArg: Pipeline[_]
+    secondArg: Pipeline[_],
+    thirdArg: ConfigurablePipeline[_]
   ): ActorRef =
     factory.actorOf(
       props = TasksBatchController.props(
         batch = firstArg,
         pipeline = secondArg,
+        configPipeline = thirdArg,
         resourceControllerCreator = resourceControllerCreator,
         crawlExecutorCreator = crawlExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,

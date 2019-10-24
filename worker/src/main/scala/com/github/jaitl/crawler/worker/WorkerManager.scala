@@ -19,8 +19,10 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.TaskTypeWithBatchSiz
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.WorkerManager.TaskBatchContext
 import com.github.jaitl.crawler.worker.config.WorkerConfig
-import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
+import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchController
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 
@@ -29,8 +31,9 @@ import scala.collection.mutable
 private[worker] class WorkerManager(
   queueTaskBalancer: ActorRef,
   pipelines: Map[String, Pipeline[_]],
+  configPipeline: ConfigurablePipeline[_],
   config: WorkerConfig,
-  tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]],
+  tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline[_]],
   batchRequestScheduler: Scheduler,
   batchExecutionTimeoutScheduler: Scheduler
 ) extends Actor
@@ -52,12 +55,14 @@ private[worker] class WorkerManager(
       }
 
     case SuccessTasksBatchRequest(requestId, taskType, tasksBatch) =>
-      val tasksBatchController = tasksBatchControllerCreator.create(this.context, tasksBatch, pipelines(taskType))
+      val tasksBatchController =
+        tasksBatchControllerCreator.create(this.context, tasksBatch, pipelines(taskType), configPipeline)
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
       context.watch(tasksBatchController)
       tasksBatchController ! TasksBatchController.ExecuteTask
-      log.info(s"SuccessTasksBatchRequest size: ${context.children.size} " +
-        s"batchControllers: ${batchControllers.size}, id: $requestId")
+      log.info(
+        s"SuccessTasksBatchRequest size: ${context.children.size} " +
+          s"batchControllers: ${batchControllers.size}, id: $requestId")
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
     case NoTasks(requestId, taskType) =>
     case EmptyTaskTypeList =>
@@ -89,8 +94,9 @@ private[worker] object WorkerManager {
   def props(
     queueTaskBalancer: ActorRef,
     pipelines: Map[String, Pipeline[_]],
+    configPipeline: ConfigurablePipeline[_],
     config: WorkerConfig,
-    tasksBatchControllerCreator: TwoArgumentActorCreator[TasksBatch, Pipeline[_]],
+    tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline[_]],
     batchRequestScheduler: Scheduler,
     batchExecutionTimeoutScheduler: Scheduler
   ): Props =
@@ -98,6 +104,7 @@ private[worker] object WorkerManager {
       new WorkerManager(
         queueTaskBalancer,
         pipelines,
+        configPipeline,
         config,
         tasksBatchControllerCreator,
         batchRequestScheduler,
