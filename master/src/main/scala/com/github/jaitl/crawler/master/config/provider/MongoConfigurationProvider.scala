@@ -52,12 +52,8 @@ class MongoConfigurationProvider(
           entity.workerBatchSize,
           entity.workerBaseUrl,
           entity.workerTaskType,
-          entity.workerMongodbUrl,
-          entity.workerMongodbDB,
-          entity.workerMongodbCollection,
-          entity.workerCrawler,
-          entity.workerParser,
-          entity.workerBatchSize
+          entity.workerBatchSize,
+          entity.workerResource
       ))
       .toFuture()
 
@@ -78,10 +74,6 @@ case class MongoProjectConfiguration(
   workerBatchSize: Int,
   workerBaseUrl: String,
   workerTaskType: String,
-  workerMongodbUrl: String,
-  workerMongodbDB: String,
-  workerMongodbCollection: String,
-  workerCrawler: String,
-  workerParser: String,
-  workerParallelBatches: Int
+  workerParallelBatches: Int,
+  workerResource: String
 )

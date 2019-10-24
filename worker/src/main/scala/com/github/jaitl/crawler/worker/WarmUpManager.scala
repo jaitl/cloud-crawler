@@ -1,6 +1,5 @@
 package com.github.jaitl.crawler.worker
 
-import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
@@ -20,9 +19,7 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.RequestConfiguration
 import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksConfigRequest
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
-import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
-import com.github.jaitl.crawler.worker.exception.NoPipelinesException
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultControllerCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchControllerCreator
@@ -30,46 +27,32 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveCr
 import com.github.jaitl.crawler.worker.executor.TasksBatchController.TasksBatchControllerConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceControllerConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceControllerCreator
-import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
-import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
-import com.github.jaitl.crawler.worker.pipeline.WarmUpPipeline
 import com.github.jaitl.crawler.worker.scheduler.AkkaScheduler
 import com.typesafe.config.Config
 
-import scala.reflect.runtime.universe._
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+
 import scala.concurrent.duration.FiniteDuration
 // scalastyle:off
 private[worker] class WarmUpManager(
-  pipelines: Seq[WarmUpPipeline[_]],
+  pipeline: Pipeline[_],
   system: ActorSystem,
   configurationBalancer: ActorRef,
   config: Config
 ) extends Actor
     with ActorLogging {
-  private var pp: Option[Map[String, Pipeline[_]]] = None
 
   override def receive: Receive = monitors.orElse(balancerActions)
 
   private def balancerActions: Receive = {
     case RequestConfiguration => {
-      configurationBalancer ! RequestConfiguration(UUID.randomUUID(), pipelines.head.taskType)
+      configurationBalancer ! RequestConfiguration(UUID.randomUUID(), pipeline.taskType)
     }
     case SuccessTasksConfigRequest(requestId, taskType, configuration) => {
       log.info(s"Config received: $configuration")
-
-
-      val pipe = PipelineBuilder()
-        .withTaskType(taskType)
-        .withBatchSize(configuration.workerBatchSize)
-        .withCrawler(mirror.staticModule(configuration.workerCrawler).asInstanceOf[BaseCrawler])
-        .withParser(mirror.staticModule(configuration.workerParser).asInstanceOf[BaseParser[Any]])
-        .build()
-      val listOfPipeLines = pipe :: Nil
-      pp = Some(listOfPipeLines.map(pipe => pipe.taskType -> pipe).toMap)
-
+      
       val workerConfig = WorkerConfig(
         configuration.workerParallelBatches,
         config.as[FiniteDuration]("worker.manager.executeInterval"),
@@ -109,14 +92,10 @@ private[worker] class WarmUpManager(
         config = tasksBatchControllerConfig
       )
 
-      pp match {
-        case Some(pip) if pip.nonEmpty => log.info(s"count pipelines: ${pip.size}")
-        case _ => throw new NoPipelinesException
-      }
       val workerManager = system.actorOf(
         WorkerManager.props(
           queueTaskBalancer = queueTaskBalancer,
-          pipelines = pp.get,
+          pipelines = Map(pipe.taskType -> pipe),
           config = workerConfig,
           tasksBatchControllerCreator = tasksBatchControllerCreator,
           batchRequestScheduler = new AkkaScheduler(system),
@@ -148,14 +127,14 @@ private[worker] object WarmUpManager {
   case object CheckTimeout
 
   def props(
-    pipelines: Seq[WarmUpPipeline[_]],
+    pipeline: Pipeline[_],
     system: ActorSystem,
     configurationBalancer: ActorRef,
     config: Config
   ): Props =
     Props(
       new WarmUpManager(
-        pipelines,
+        pipeline,
         system,
         configurationBalancer,
         config
