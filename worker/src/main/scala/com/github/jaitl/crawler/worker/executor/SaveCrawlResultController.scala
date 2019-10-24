@@ -12,7 +12,7 @@ import akka.pattern.pipe
 import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
-import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
+import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.BannedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
@@ -24,6 +24,7 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.Succes
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessCrawledTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessSavedResults
 import com.github.jaitl.crawler.worker.parser.ParseResult
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 
@@ -34,6 +35,7 @@ import scala.concurrent.duration.FiniteDuration
 
 class SaveCrawlResultController[T](
   pipeline: Pipeline[T],
+  configPipeline: ConfigurablePipeline[T],
   queueTaskBalancer: ActorRef,
   tasksBatchController: ActorRef,
   saveScheduler: Scheduler,
@@ -180,6 +182,7 @@ object SaveCrawlResultController {
 
   def props(
     pipeline: Pipeline[_],
+    configPipeline: ConfigurablePipeline[_],
     queueTaskBalancer: ActorRef,
     tasksBatchController: ActorRef,
     saveScheduler: Scheduler,
@@ -187,6 +190,7 @@ object SaveCrawlResultController {
     Props(
       new SaveCrawlResultController(
         pipeline = pipeline,
+        configPipeline = configPipeline,
         queueTaskBalancer = queueTaskBalancer,
         tasksBatchController = tasksBatchController,
         saveScheduler = saveScheduler,
@@ -201,12 +205,17 @@ private[worker] class SaveCrawlResultControllerCreator(
   queueTaskBalancer: ActorRef,
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
-) extends TwoArgumentActorCreator[Pipeline[_], ActorRef] {
-  override def create(factory: ActorRefFactory, firstArg: Pipeline[_], secondArg: ActorRef): ActorRef =
+) extends ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]] {
+  override def create(
+    factory: ActorRefFactory,
+    firstArg: Pipeline[_],
+    secondArg: ActorRef,
+    thirdArg: ConfigurablePipeline[_]): ActorRef =
     factory.actorOf(
       props = SaveCrawlResultController
         .props(
           pipeline = firstArg,
+          configPipeline = thirdArg,
           queueTaskBalancer = queueTaskBalancer,
           tasksBatchController = secondArg,
           saveScheduler = saveScheduler,

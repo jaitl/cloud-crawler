@@ -27,10 +27,10 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveCr
 import com.github.jaitl.crawler.worker.executor.TasksBatchController.TasksBatchControllerConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceControllerConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceControllerCreator
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.AkkaScheduler
 import com.typesafe.config.Config
-
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 
@@ -52,7 +52,7 @@ private[worker] class WarmUpManager(
     }
     case SuccessTasksConfigRequest(requestId, taskType, configuration) => {
       log.info(s"Config received: $configuration")
-      
+
       val workerConfig = WorkerConfig(
         configuration.workerParallelBatches,
         config.as[FiniteDuration]("worker.manager.executeInterval"),
@@ -95,7 +95,8 @@ private[worker] class WarmUpManager(
       val workerManager = system.actorOf(
         WorkerManager.props(
           queueTaskBalancer = queueTaskBalancer,
-          pipelines = Map(pipe.taskType -> pipe),
+          pipelines = Map(),
+          configPipeline = ConfigurablePipelineBuilder().build(),
           config = workerConfig,
           tasksBatchControllerCreator = tasksBatchControllerCreator,
           batchRequestScheduler = new AkkaScheduler(system),
