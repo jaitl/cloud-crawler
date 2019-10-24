@@ -5,16 +5,16 @@ import akka.actor.ActorSystem
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonProxySettings
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestConfiguration
-import com.github.jaitl.crawler.worker.pipeline.WarmUpPipeline
+import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 
 // scalastyle:off
 object WorkerApp extends StrictLogging {
 
-  private var warmUpPipelines: Seq[WarmUpPipeline[_]] = Seq.empty
+  private var warmUpPipelines: Pipeline[_] = null
 
-  def addWarmUpPipeline(pipelines: Seq[WarmUpPipeline[_]]): this.type = {
+  def addWarmUpPipeline(pipelines: Pipeline[_]): this.type = {
     this.warmUpPipelines = pipelines
     this
   }

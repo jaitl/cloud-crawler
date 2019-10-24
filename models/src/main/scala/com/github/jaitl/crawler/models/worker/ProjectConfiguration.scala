@@ -7,10 +7,6 @@ case class ProjectConfiguration(
   workerBatchSize: Int,
   workerBaseUrl: String,
   workerTaskType: String,
-  workerMongodbUrl: String,
-  workerMongodbDB: String,
-  workerMongodbCollection: String,
-  workerCrawler: String,
-  workerParser: String,
-  workerParallelBatches: Int
+  workerParallelBatches: Int,
+  workerResource: String
 )

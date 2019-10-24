@@ -10,9 +10,14 @@ import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class LocalFileSystemSaveRawProvider(val path: String)
-    extends SaveRawProvider
-    with StrictLogging {
+class LocalFileSystemSaveRawProvider() extends SaveRawProvider with StrictLogging {
+
+  private var path: String = ""
+  def withPath(path: String): this.type = {
+    this.path = path
+    this
+  }
+
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
     raw.toList.par.foreach(r => {
       val folder = path
