@@ -49,10 +49,10 @@ import scala.concurrent.duration.FiniteDuration
 private[worker] class TasksBatchController(
   batch: TasksBatch,
   pipeline: Pipeline[_],
-  configPipeline: ConfigurablePipeline[_],
+  configPipeline: ConfigurablePipeline,
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]],
+  saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
@@ -178,10 +178,10 @@ private[worker] object TasksBatchController {
   def props(
     batch: TasksBatch,
     pipeline: Pipeline[_],
-    configPipeline: ConfigurablePipeline[_],
+    configPipeline: ConfigurablePipeline,
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
-    saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]],
+    saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
     queueTaskBalancer: ActorRef,
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
@@ -210,16 +210,16 @@ private[worker] object TasksBatchController {
 class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
-  saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]],
+  saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
-) extends ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline[_]] {
+) extends ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline] {
   override def create(
     factory: ActorRefFactory,
     firstArg: TasksBatch,
     secondArg: Pipeline[_],
-    thirdArg: ConfigurablePipeline[_]
+    thirdArg: ConfigurablePipeline
   ): ActorRef =
     factory.actorOf(
       props = TasksBatchController.props(

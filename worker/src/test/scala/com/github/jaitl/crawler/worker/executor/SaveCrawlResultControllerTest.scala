@@ -18,7 +18,7 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.Succes
 import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NewCrawlTasks
 import com.github.jaitl.crawler.worker.parser.ParseResult
-import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.{ConfigurablePipelineBuilder, PipelineBuilder}
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
@@ -37,10 +37,8 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val pipeline = PipelineBuilder
       .noParserPipeline()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveRawProvider(saveRawProvider)
       .withCrawler(baseCrawler)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -54,6 +52,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
+        ConfigurablePipelineBuilder().build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
@@ -68,11 +67,9 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val pipeline = PipelineBuilder[TestDataRes]()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveResultProvider(saveParsedProvider)
       .withCrawler(baseCrawler)
       .withParser(parser)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -86,6 +83,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
+        ConfigurablePipelineBuilder().build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
@@ -101,12 +99,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val pipeline = PipelineBuilder[TestDataRes]()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveResultProvider(saveParsedProvider)
       .withCrawler(baseCrawler)
       .withParser(parser)
       .withSaveRawProvider(saveRawProvider)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -120,6 +116,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
+        ConfigurablePipelineBuilder().build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,

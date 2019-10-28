@@ -31,14 +31,14 @@ import scala.collection.mutable
 private[worker] class WorkerManager(
   queueTaskBalancer: ActorRef,
   pipelines: Map[String, Pipeline[_]],
-  configPipeline: ConfigurablePipeline[_],
+  configPipeline: ConfigurablePipeline,
   config: WorkerConfig,
-  tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline[_]],
+  tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline],
   batchRequestScheduler: Scheduler,
   batchExecutionTimeoutScheduler: Scheduler
 ) extends Actor
     with ActorLogging {
-  val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, pipe.batchSize)).toSeq
+  val taskTypes = pipelines.values.map(pipe => TaskTypeWithBatchSize(pipe.taskType, configPipeline.batchSize)).toSeq
   val batchControllers: mutable.Map[ActorRef, TaskBatchContext] = mutable.Map.empty
 
   batchRequestScheduler.schedule(config.executeInterval, self, RequestBatch)
@@ -94,9 +94,9 @@ private[worker] object WorkerManager {
   def props(
     queueTaskBalancer: ActorRef,
     pipelines: Map[String, Pipeline[_]],
-    configPipeline: ConfigurablePipeline[_],
+    configPipeline: ConfigurablePipeline,
     config: WorkerConfig,
-    tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline[_]],
+    tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline],
     batchRequestScheduler: Scheduler,
     batchExecutionTimeoutScheduler: Scheduler
   ): Props =
