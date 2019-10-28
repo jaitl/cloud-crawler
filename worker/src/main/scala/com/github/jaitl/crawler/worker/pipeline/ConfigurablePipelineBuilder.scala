@@ -1,9 +1,8 @@
 package com.github.jaitl.crawler.worker.pipeline
 
-import com.github.jaitl.crawler.worker.parser.NoParser
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
-private[pipeline] class ConfigurablePipelineBuilder[T] {
+private[pipeline] class ConfigurablePipelineBuilder {
   private var batchSize: Option[Int] = None
   private var resourceType: Option[ResourceType] = None
 
@@ -39,7 +38,7 @@ private[pipeline] class ConfigurablePipelineBuilder[T] {
     this
   }
 
-  def build(): ConfigurablePipeline[T] = {
+  def build(): ConfigurablePipeline = {
 
     if (batchSize.isEmpty) {
       throw new PipelineBuilderException("batch size is not defined")
@@ -56,8 +55,8 @@ private[pipeline] class ConfigurablePipelineBuilder[T] {
 }
 
 object ConfigurablePipelineBuilder {
-  def apply[T](): ConfigurablePipelineBuilder[T] = new ConfigurablePipelineBuilder[T]()
-  def noParserPipeline(): ConfigurablePipelineBuilder[NoParser] = new ConfigurablePipelineBuilder[NoParser]()
+  def apply(): ConfigurablePipelineBuilder = new ConfigurablePipelineBuilder()
+  def noParserPipeline(): ConfigurablePipelineBuilder = new ConfigurablePipelineBuilder()
 }
 
 class PipelineBuilderException(message: String) extends Exception(message)

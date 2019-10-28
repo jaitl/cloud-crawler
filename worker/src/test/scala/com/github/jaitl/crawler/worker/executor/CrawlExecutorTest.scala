@@ -32,11 +32,9 @@ class CrawlExecutorTest extends ActorTestSuite {
 
     val pipeline = PipelineBuilder[TestDataRes]()
       .withTaskType("test")
-      .withBatchSize(10)
       .withCrawler(baseCrawler)
       .withParser(parser)
       .withSaveResultProvider(saveParsedProvider)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
   }
 

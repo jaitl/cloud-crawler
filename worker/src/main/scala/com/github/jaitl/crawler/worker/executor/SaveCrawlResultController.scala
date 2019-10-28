@@ -35,7 +35,7 @@ import scala.concurrent.duration.FiniteDuration
 
 class SaveCrawlResultController[T](
   pipeline: Pipeline[T],
-  configPipeline: ConfigurablePipeline[T],
+  configPipeline: ConfigurablePipeline,
   queueTaskBalancer: ActorRef,
   tasksBatchController: ActorRef,
   saveScheduler: Scheduler,
@@ -182,7 +182,7 @@ object SaveCrawlResultController {
 
   def props(
     pipeline: Pipeline[_],
-    configPipeline: ConfigurablePipeline[_],
+    configPipeline: ConfigurablePipeline,
     queueTaskBalancer: ActorRef,
     tasksBatchController: ActorRef,
     saveScheduler: Scheduler,
@@ -205,12 +205,12 @@ private[worker] class SaveCrawlResultControllerCreator(
   queueTaskBalancer: ActorRef,
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig
-) extends ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline[_]] {
+) extends ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline] {
   override def create(
     factory: ActorRefFactory,
     firstArg: Pipeline[_],
     secondArg: ActorRef,
-    thirdArg: ConfigurablePipeline[_]): ActorRef =
+    thirdArg: ConfigurablePipeline): ActorRef =
     factory.actorOf(
       props = SaveCrawlResultController
         .props(
