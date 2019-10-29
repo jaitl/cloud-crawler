@@ -11,12 +11,8 @@ import akka.actor.Props
 import akka.actor.Terminated
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonProxySettings
-import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyList
-import com.github.jaitl.crawler.models.worker.WorkerManager.FailureConfigRequest
-import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
-import com.github.jaitl.crawler.models.worker.WorkerManager.RequestBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.RequestConfiguration
-import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksConfigRequest
+import com.github.jaitl.crawler.models.worker.CrawlerTor
+import com.github.jaitl.crawler.models.worker.WorkerManager.{EmptyList, FailureConfigRequest, NoConfigs, RequestBatch, RequestConfiguration, SuccessProxyRequest, SuccessTasksConfigRequest, SuccessTorRequest}
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
@@ -50,8 +46,22 @@ private[worker] class WarmUpManager(
     case RequestConfiguration => {
       configurationBalancer ! RequestConfiguration(UUID.randomUUID(), pipeline.taskType)
     }
+    case SuccessTorRequest(requestId, taskType, tor) => {
+
+    }
+    case SuccessProxyRequest(requestId, taskType, proxy) => {
+
+    }
     case SuccessTasksConfigRequest(requestId, taskType, configuration) => {
       log.info(s"Config received: $configuration")
+
+      val configurationBuilder = ConfigurablePipelineBuilder().withBatchSize(configuration.workerBatchSize)
+
+      if(configuration.workerResource.equals("Tor")) {
+
+      } else {
+
+      })
 
       val workerConfig = WorkerConfig(
         configuration.workerParallelBatches,
