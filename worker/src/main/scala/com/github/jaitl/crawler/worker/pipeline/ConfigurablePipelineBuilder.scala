@@ -58,5 +58,3 @@ object ConfigurablePipelineBuilder {
   def apply(): ConfigurablePipelineBuilder = new ConfigurablePipelineBuilder()
   def noParserPipeline(): ConfigurablePipelineBuilder = new ConfigurablePipelineBuilder()
 }
-
-class PipelineBuilderException(message: String) extends Exception(message)
