@@ -52,7 +52,7 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
       WorkerManager.props(
         queueTaskBalancer.ref,
         pipelines,
-        ConfigurablePipelineBuilder().build(),
+        null,
         config,
         tasksBatchControllerCreator,
         batchRequestScheduler,

@@ -31,12 +31,12 @@ class MongoConfigurationProvider(
 
   private val mongoClient: MongoClient = MongoClient(connectionString)
   private val codecRegistry = fromRegistries(
-    fromProviders(classOf[MongoProjectConfiguration], classOf[CrawlerProxy], classOf[CrawlerTor]),
+    fromProviders(classOf[MongoProjectConfiguration], classOf[MongoCrawlerProxy], classOf[CrawlerTor]),
     DEFAULT_CODEC_REGISTRY)
   private val database: MongoDatabase = mongoClient.getDatabase(dbName).withCodecRegistry(codecRegistry)
   private val crawlerProjectConfiguration: MongoCollection[MongoProjectConfiguration] =
     database.getCollection(configurationCollectionName)
-  private val crawlerProxies: MongoCollection[CrawlerProxy] =
+  private val crawlerProxies: MongoCollection[MongoCrawlerProxy] =
     database.getCollection(proxyCollectionName)
   private val crawlerTors: MongoCollection[CrawlerTor] =
     database.getCollection(torCollectionName)
@@ -60,6 +60,18 @@ class MongoConfigurationProvider(
   override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[CrawlerProxy]] =
     crawlerProxies
       .find(equal("workerTaskType", taskType))
+      .map(entity =>
+        CrawlerProxy(
+          entity._id.toString,
+          entity.workerProxyHost,
+          entity.workerProxyPort,
+          entity.workerProxyTimeoutUp,
+          entity.workerProxyTimeoutDown,
+          entity.workerParallel,
+          entity.workerProxyLogin,
+          entity.workerProxyPassword,
+          entity.workerTaskType
+      ))
       .toFuture()
 
   override def getCrawlerTorConfiguration(taskType: String): Future[Seq[CrawlerTor]] =
@@ -76,4 +88,16 @@ case class MongoProjectConfiguration(
   workerTaskType: String,
   workerParallelBatches: Int,
   workerResource: String
+)
+
+case class MongoCrawlerProxy(
+  _id: ObjectId,
+  workerProxyHost: String,
+  workerProxyPort: Int,
+  workerProxyTimeoutUp: String,
+  workerProxyTimeoutDown: String,
+  workerParallel: Int,
+  workerProxyLogin: String,
+  workerProxyPassword: String,
+  workerTaskType: String
 )

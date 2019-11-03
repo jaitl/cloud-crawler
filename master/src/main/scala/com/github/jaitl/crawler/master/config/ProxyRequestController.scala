@@ -9,12 +9,12 @@ import akka.actor.Props
 import akka.actor.Stash
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
 import com.github.jaitl.crawler.master.config.ProxyRequestController.ProxyRequestFailure
 import com.github.jaitl.crawler.master.config.ProxyRequestController.ProxyRequestSuccess
 import com.github.jaitl.crawler.master.config.ProxyRequestController.RequestProxy
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
 import com.github.jaitl.crawler.models.worker.CrawlerProxy
+import com.github.jaitl.crawler.models.worker.ProjectConfiguration
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureProxyRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoProxies
 import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessProxyRequest
@@ -34,16 +34,16 @@ class ProxyRequestController(
 
   private def waitRequest: Receive = {
     case RequestProxy(requestId, taskType, requester) =>
-      log.debug(s"RequestProxy: $requestId, $taskType, self: $self")
+      log.debug(s"RequestProxy: $requestId, ${taskType.workerTaskType}, self: $self")
 
       context.become(processingRequest)
 
       val proxyResult = for {
-        proxies <- proxyProvider.getCrawlerProxyConfiguration(taskType)
+        proxies <- proxyProvider.getCrawlerProxyConfiguration(taskType.workerTaskType)
         _ <- if (proxies.nonEmpty) {
           Future.successful(Unit)
         } else {
-          Future.failed(NoProxyFound(s"No proxies for $taskType"))
+          Future.failed(NoProxyFound(s"No proxies for ${taskType.workerTaskType}"))
         }
       } yield ProxyRequestSuccess(requestId, taskType, requester, proxies)
 
@@ -81,11 +81,19 @@ class ProxyRequestController(
 }
 object ProxyRequestController {
 
-  case class RequestProxy(requestId: UUID, taskType: String, requester: ActorRef)
+  case class RequestProxy(requestId: UUID, taskType: ProjectConfiguration, requester: ActorRef)
 
-  case class ProxyRequestSuccess(requestId: UUID, taskType: String, requester: ActorRef, config: Seq[CrawlerProxy])
+  case class ProxyRequestSuccess(
+    requestId: UUID,
+    taskType: ProjectConfiguration,
+    requester: ActorRef,
+    config: Seq[CrawlerProxy])
 
-  case class ProxyRequestFailure(requestId: UUID, taskType: String, requester: ActorRef, throwable: Throwable)
+  case class ProxyRequestFailure(
+    requestId: UUID,
+    taskType: ProjectConfiguration,
+    requester: ActorRef,
+    throwable: Throwable)
 
   def props(configurationProvider: CrawlerConfigurationProvider): Props =
     Props(new ProxyRequestController(configurationProvider))
@@ -93,10 +101,10 @@ object ProxyRequestController {
   def name(): String = "proxyRequestController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg @ RequestProxy(_, taskType, _) => (taskType, msg)
+    case msg @ RequestProxy(_, taskType, _) => (taskType._id, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
-    case RequestProxy(_, taskType, _) => taskType
+    case RequestProxy(_, taskType, _) => taskType._id
   }
 }
