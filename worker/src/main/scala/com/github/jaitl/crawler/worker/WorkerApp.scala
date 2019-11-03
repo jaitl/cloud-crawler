@@ -38,14 +38,23 @@ object WorkerApp extends StrictLogging {
       name = "configurationBalancerProxy"
     )
 
+    val resourceBalancer: ActorRef = system.actorOf(
+      ClusterSingletonProxy.props(
+        singletonManagerPath = "/user/resourceBalancer",
+        settings = ClusterSingletonProxySettings(system).withRole("master")
+      ),
+      name = "resourceBalancer"
+    )
+
     val warmUpManager = system.actorOf(
       WarmUpManager.props(
         warmUpPipelines,
         system,
         configurationBalancer,
+        resourceBalancer,
         config
       ),
-      WorkerManager.name()
+      WarmUpManager.name()
     )
     logger.info("Aktor call")
     warmUpManager ! RequestConfiguration

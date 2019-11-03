@@ -13,7 +13,9 @@ object WorkerManager {
 
   case class RequestTor(requestId: UUID, taskType: String)
 
-  case class  TasksBatchProcessResult(
+  case class RequestResource(requestId: UUID, configuration: ProjectConfiguration)
+
+  case class TasksBatchProcessResult(
     requestId: UUID,
     taskType: String,
     successIds: Seq[String],
@@ -47,19 +49,19 @@ object WorkerManager {
 
   case class FailureConfigRequest(requestId: UUID, taskType: String, throwable: Throwable)
 
+  case class FailureProxyRequest(requestId: UUID, taskType: ProjectConfiguration, throwable: Throwable)
+
   case class NoConfigs(requestId: UUID, taskType: String)
 
-  case class SuccessProxyRequest(requestId: UUID, taskType: String, head: CrawlerProxy)
+  case class SuccessProxyRequest(requestId: UUID, taskType: ProjectConfiguration, head: CrawlerProxy)
 
-  case class FailureProxyRequest(requestId: UUID, taskType: String, throwable: Throwable)
+  case class NoProxies(requestId: UUID, taskType: ProjectConfiguration)
 
-  case class NoProxies(requestId: UUID, taskType: String)
+  case class SuccessTorRequest(requestId: UUID, taskType: ProjectConfiguration, head: CrawlerTor)
 
-  case class SuccessTorRequest(requestId: UUID, taskType: String, head: CrawlerTor)
+  case class FailureTorRequest(requestId: UUID, taskType: ProjectConfiguration, throwable: Throwable)
 
-  case class FailureTorRequest(requestId: UUID, taskType: String, throwable: Throwable)
-
-  case class NoTors(requestId: UUID, taskType: String)
+  case class NoTors(requestId: UUID, taskType: ProjectConfiguration)
 
   case object EmptyTaskTypeList
 

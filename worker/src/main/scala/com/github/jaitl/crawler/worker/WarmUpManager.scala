@@ -11,8 +11,19 @@ import akka.actor.Props
 import akka.actor.Terminated
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonProxySettings
-import com.github.jaitl.crawler.models.worker.CrawlerTor
-import com.github.jaitl.crawler.models.worker.WorkerManager.{EmptyList, FailureConfigRequest, NoConfigs, RequestBatch, RequestConfiguration, SuccessProxyRequest, SuccessTasksConfigRequest, SuccessTorRequest}
+import com.github.jaitl.crawler.models.worker.CrawlerProxy
+import com.github.jaitl.crawler.models.worker.ProjectConfiguration
+import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyList
+import com.github.jaitl.crawler.models.worker.WorkerManager.FailureConfigRequest
+import com.github.jaitl.crawler.models.worker.WorkerManager.FailureProxyRequest
+import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
+import com.github.jaitl.crawler.models.worker.WorkerManager.NoProxies
+import com.github.jaitl.crawler.models.worker.WorkerManager.RequestBatch
+import com.github.jaitl.crawler.models.worker.WorkerManager.RequestConfiguration
+import com.github.jaitl.crawler.models.worker.WorkerManager.RequestResource
+import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessProxyRequest
+import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksConfigRequest
+import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTorRequest
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
@@ -23,19 +34,23 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveCr
 import com.github.jaitl.crawler.worker.executor.TasksBatchController.TasksBatchControllerConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceControllerConfig
 import com.github.jaitl.crawler.worker.executor.resource.ResourceControllerCreator
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.AkkaScheduler
+import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 import com.typesafe.config.Config
+
+import scala.concurrent.duration.{Duration, FiniteDuration}
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 
-import scala.concurrent.duration.FiniteDuration
 // scalastyle:off
 private[worker] class WarmUpManager(
   pipeline: Pipeline[_],
   system: ActorSystem,
   configurationBalancer: ActorRef,
+  resourceBalancer: ActorRef,
   config: Config
 ) extends Actor
     with ActorLogging {
@@ -46,75 +61,10 @@ private[worker] class WarmUpManager(
     case RequestConfiguration => {
       configurationBalancer ! RequestConfiguration(UUID.randomUUID(), pipeline.taskType)
     }
-    case SuccessTorRequest(requestId, taskType, tor) => {
-
-    }
-    case SuccessProxyRequest(requestId, taskType, proxy) => {
-
-    }
+    case SuccessTorRequest(requestId, taskType, tor) => {}
     case SuccessTasksConfigRequest(requestId, taskType, configuration) => {
       log.info(s"Config received: $configuration")
-
-      val configurationBuilder = ConfigurablePipelineBuilder().withBatchSize(configuration.workerBatchSize)
-
-      if(configuration.workerResource.equals("Tor")) {
-
-      } else {
-
-      })
-
-      val workerConfig = WorkerConfig(
-        configuration.workerParallelBatches,
-        config.as[FiniteDuration]("worker.manager.executeInterval"),
-        config.as[FiniteDuration]("worker.manager.runExecutionTimeoutCheckInterval"),
-        config.as[FiniteDuration]("worker.manager.batchExecutionTimeout")
-      )
-      val queueTaskBalancer: ActorRef = system.actorOf(
-        ClusterSingletonProxy.props(
-          singletonManagerPath = "/user/queueTaskBalancer",
-          settings = ClusterSingletonProxySettings(system).withRole("master")
-        ),
-        name = "queueTaskBalancerProxy"
-      )
-      val crawlExecutorCreator = new PropsActorCreator(
-        actorName = CrawlExecutor.name(),
-        props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
-      )
-      val saveCrawlResultControllerConfig = config.as[SaveCrawlResultControllerConfig]("worker.save-controller")
-
-      val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
-        queueTaskBalancer = queueTaskBalancer,
-        saveScheduler = new AkkaScheduler(system),
-        config = saveCrawlResultControllerConfig
-      )
-
-      val resourceControllerConfig = config.as[ResourceControllerConfig]("worker.resource-controller")
-      val tasksBatchControllerConfig = config.as[TasksBatchControllerConfig]("worker.task-batch-controller")
-
-      val resourceControllerCreator = new ResourceControllerCreator(resourceControllerConfig)
-
-      val tasksBatchControllerCreator = new TasksBatchControllerCreator(
-        resourceControllerCreator = resourceControllerCreator,
-        crawlExecutorCreator = crawlExecutorCreator,
-        saveCrawlResultCreator = saveCrawlResultControllerCreator,
-        queueTaskBalancer = queueTaskBalancer,
-        executeScheduler = new AkkaScheduler(system),
-        config = tasksBatchControllerConfig
-      )
-
-      val workerManager = system.actorOf(
-        WorkerManager.props(
-          queueTaskBalancer = queueTaskBalancer,
-          pipelines = Map(),
-          configPipeline = ConfigurablePipelineBuilder().build(),
-          config = workerConfig,
-          tasksBatchControllerCreator = tasksBatchControllerCreator,
-          batchRequestScheduler = new AkkaScheduler(system),
-          batchExecutionTimeoutScheduler = new AkkaScheduler(system)
-        ),
-        WorkerManager.name()
-      )
-      workerManager ! RequestBatch
+      resourceBalancer ! RequestResource(UUID.randomUUID(), configuration)
     }
     case FailureConfigRequest(requestId, taskType, throwable) => {
       log.info(s"Exception for $taskType received! $throwable")
@@ -122,7 +72,28 @@ private[worker] class WarmUpManager(
     case NoConfigs(requestId, taskType) => {
       log.info(s"No config for $taskType received!")
     }
-    case EmptyList =>
+    case SuccessProxyRequest(requestId, configuration, proxy) => {
+      log.info(s"Proxy for ${configuration.workerTaskType} received! $proxy")
+      requestBatch(
+        config,
+        configuration,
+        ConfigurablePipelineBuilder()
+          .withBatchSize(configuration.workerBatchSize)
+          .withProxy(
+            proxy.workerProxyHost,
+            proxy.workerProxyPort,
+            proxy.workerParallel,
+            RandomTimeout(Duration(proxy.workerProxyTimeoutUp), Duration(proxy.workerProxyTimeoutDown)),
+            proxy.workerProxyLogin,
+            proxy.workerProxyPassword).build()
+      )
+    }
+    case NoProxies(requestId, taskType) => {
+      log.info(s"No proxy for ${taskType.workerTaskType} received!")
+    }
+    case FailureProxyRequest(requestId, taskType, throwable) => {
+      log.info(s"Exception for $taskType received! $throwable")
+    }
   }
 
   private def monitors: Receive = {
@@ -131,6 +102,65 @@ private[worker] class WarmUpManager(
 
     case CheckTimeout =>
       val now = Instant.now()
+  }
+
+  def requestBatch(
+    config: Config,
+    configuration: ProjectConfiguration,
+    configurablePipeline: ConfigurablePipeline): Unit = {
+
+    val workerConfig = WorkerConfig(
+      configuration.workerParallelBatches,
+      config.as[FiniteDuration]("worker.manager.executeInterval"),
+      config.as[FiniteDuration]("worker.manager.runExecutionTimeoutCheckInterval"),
+      config.as[FiniteDuration]("worker.manager.batchExecutionTimeout")
+    )
+    val queueTaskBalancer: ActorRef = system.actorOf(
+      ClusterSingletonProxy.props(
+        singletonManagerPath = "/user/queueTaskBalancer",
+        settings = ClusterSingletonProxySettings(system).withRole("master")
+      ),
+      name = "queueTaskBalancerProxy"
+    )
+    val crawlExecutorCreator = new PropsActorCreator(
+      actorName = CrawlExecutor.name(),
+      props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
+    )
+    val saveCrawlResultControllerConfig = config.as[SaveCrawlResultControllerConfig]("worker.save-controller")
+
+    val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
+      queueTaskBalancer = queueTaskBalancer,
+      saveScheduler = new AkkaScheduler(system),
+      config = saveCrawlResultControllerConfig
+    )
+
+    val resourceControllerConfig = config.as[ResourceControllerConfig]("worker.resource-controller")
+    val tasksBatchControllerConfig = config.as[TasksBatchControllerConfig]("worker.task-batch-controller")
+
+    val resourceControllerCreator = new ResourceControllerCreator(resourceControllerConfig)
+
+    val tasksBatchControllerCreator = new TasksBatchControllerCreator(
+      resourceControllerCreator = resourceControllerCreator,
+      crawlExecutorCreator = crawlExecutorCreator,
+      saveCrawlResultCreator = saveCrawlResultControllerCreator,
+      queueTaskBalancer = queueTaskBalancer,
+      executeScheduler = new AkkaScheduler(system),
+      config = tasksBatchControllerConfig
+    )
+
+    val workerManager = system.actorOf(
+      WorkerManager.props(
+        queueTaskBalancer = queueTaskBalancer,
+        pipelines = Map(pipeline.taskType -> pipeline),
+        configurablePipeline = configurablePipeline,
+        config = workerConfig,
+        tasksBatchControllerCreator = tasksBatchControllerCreator,
+        batchRequestScheduler = new AkkaScheduler(system),
+        batchExecutionTimeoutScheduler = new AkkaScheduler(system)
+      ),
+      WorkerManager.name()
+    )
+    workerManager ! RequestBatch
   }
 }
 
@@ -141,6 +171,7 @@ private[worker] object WarmUpManager {
     pipeline: Pipeline[_],
     system: ActorSystem,
     configurationBalancer: ActorRef,
+    resourceBalancer: ActorRef,
     config: Config
   ): Props =
     Props(
@@ -148,6 +179,7 @@ private[worker] object WarmUpManager {
         pipeline,
         system,
         configurationBalancer,
+        resourceBalancer,
         config
       ))
 

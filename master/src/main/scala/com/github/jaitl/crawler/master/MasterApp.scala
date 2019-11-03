@@ -8,10 +8,9 @@ import akka.cluster.singleton.ClusterSingletonManager
 import akka.cluster.singleton.ClusterSingletonManagerSettings
 import com.github.jaitl.crawler.master.config.ConfigurationBalancer
 import com.github.jaitl.crawler.master.config.ConfigurationRequestController
-import com.github.jaitl.crawler.master.config.ProxiesBalancer
 import com.github.jaitl.crawler.master.config.ProxyRequestController
+import com.github.jaitl.crawler.master.config.ResourceBalancer
 import com.github.jaitl.crawler.master.config.TorRequestController
-import com.github.jaitl.crawler.master.config.TorsBalancer
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProviderFactory
 import com.github.jaitl.crawler.master.queue.QueueTaskBalancer
@@ -93,6 +92,15 @@ object MasterApp extends StrictLogging {
 
     system.actorOf(
       ClusterSingletonManager.props(
+        singletonProps = ResourceBalancer.props(proxyRequestController, torRequestController),
+        terminationMessage = QueueTaskBalancer.Stop,
+        settings = ClusterSingletonManagerSettings(system).withRole("master")
+      ),
+      name = ResourceBalancer.name()
+    )
+
+    system.actorOf(
+      ClusterSingletonManager.props(
         singletonProps = QueueTaskBalancer.props(queueTaskQueueReqCtrl, queueTaskQueueResCtrl),
         terminationMessage = QueueTaskBalancer.Stop,
         settings = ClusterSingletonManagerSettings(system).withRole("master")
@@ -116,24 +124,6 @@ object MasterApp extends StrictLogging {
         settings = ClusterSingletonManagerSettings(system).withRole("master")
       ),
       name = ConfigurationBalancer.name()
-    )
-
-    system.actorOf(
-      ClusterSingletonManager.props(
-        singletonProps = ProxiesBalancer.props(proxyRequestController),
-        terminationMessage = ProxiesBalancer.Stop,
-        settings = ClusterSingletonManagerSettings(system).withRole("master")
-      ),
-      name = ProxiesBalancer.name()
-    )
-
-    system.actorOf(
-      ClusterSingletonManager.props(
-        singletonProps = TorsBalancer.props(proxyRequestController),
-        terminationMessage = TorsBalancer.Stop,
-        settings = ClusterSingletonManagerSettings(system).withRole("master")
-      ),
-      name = TorsBalancer.name()
     )
   }
 }

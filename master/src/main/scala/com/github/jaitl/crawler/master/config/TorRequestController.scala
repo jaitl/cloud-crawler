@@ -15,6 +15,7 @@ import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestFai
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestSuccess
 import com.github.jaitl.crawler.master.config.provider.CrawlerConfigurationProvider
 import com.github.jaitl.crawler.models.worker.CrawlerTor
+import com.github.jaitl.crawler.models.worker.ProjectConfiguration
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureTorRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoTors
 import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTorRequest
@@ -39,7 +40,7 @@ class TorRequestController(
       context.become(processingRequest)
 
       val torsResult = for {
-        tors <- configurationProvider.getCrawlerTorConfiguration(taskType)
+        tors <- configurationProvider.getCrawlerTorConfiguration(taskType.workerTaskType)
         _ <- if (tors.nonEmpty) {
           Future.successful(Unit)
         } else {
@@ -80,11 +81,19 @@ class TorRequestController(
 }
 object TorRequestController {
 
-  case class RequestTor(requestId: UUID, taskType: String, requester: ActorRef)
+  case class RequestTor(requestId: UUID, taskConfig: ProjectConfiguration, requester: ActorRef)
 
-  case class TorRequestSuccess(requestId: UUID, taskType: String, requester: ActorRef, config: Seq[CrawlerTor])
+  case class TorRequestSuccess(
+    requestId: UUID,
+    taskConfig: ProjectConfiguration,
+    requester: ActorRef,
+    config: Seq[CrawlerTor])
 
-  case class TorRequestFailure(requestId: UUID, taskType: String, requester: ActorRef, throwable: Throwable)
+  case class TorRequestFailure(
+    requestId: UUID,
+    taskConfig: ProjectConfiguration,
+    requester: ActorRef,
+    throwable: Throwable)
 
   def props(configurationProvider: CrawlerConfigurationProvider): Props =
     Props(new TorRequestController(configurationProvider))
@@ -92,10 +101,10 @@ object TorRequestController {
   def name(): String = "torRequestController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg @ RequestTor(_, taskType, _) => (taskType, msg)
+    case msg @ RequestTor(_, taskType, _) => (taskType._id, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
-    case RequestTor(_, taskType, _) => taskType
+    case RequestTor(_, taskType, _) => taskType._id
   }
 }
