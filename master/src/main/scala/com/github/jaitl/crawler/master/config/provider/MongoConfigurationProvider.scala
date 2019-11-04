@@ -22,7 +22,7 @@ class MongoConfigurationProvider(
   dbName: String,
   configurationCollectionName: String,
   proxyCollectionName: String,
-  torCollectionName: String,
+  torCollectionName: String
 ) extends CrawlerConfigurationProvider {
 
   import org.mongodb.scala.bson.codecs.Macros._ // scalastyle:ignore
