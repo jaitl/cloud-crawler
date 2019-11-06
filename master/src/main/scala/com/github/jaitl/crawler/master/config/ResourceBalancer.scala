@@ -16,10 +16,10 @@ class ResourceBalancer(
 
   override def receive: Receive = {
     case RequestResource(requestId, projectConfiguration) if projectConfiguration.workerResource.nonEmpty =>
-      log.debug(s"RequestConfiguration, requestId: $requestId, config: $projectConfiguration")
+      log.debug(s"RequestResource, requestId: $requestId, config: $projectConfiguration")
       projectConfiguration.workerResource match {
-        case "Tor" => proxiesBalancer ! RequestProxy(requestId, projectConfiguration, sender())
-        case "Proxy" => torsBalancer ! RequestTor(requestId, projectConfiguration, sender())
+        case "Proxy" => proxiesBalancer ! RequestProxy(requestId, projectConfiguration, sender())
+        case "Tor" => torsBalancer ! RequestTor(requestId, projectConfiguration, sender())
       }
   }
 }

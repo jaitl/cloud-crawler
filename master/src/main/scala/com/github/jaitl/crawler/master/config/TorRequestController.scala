@@ -9,7 +9,6 @@ import akka.actor.Props
 import akka.actor.Stash
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import com.github.jaitl.crawler.master.config.ConfigurationRequestController.RequestConfiguration
 import com.github.jaitl.crawler.master.config.TorRequestController.RequestTor
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestFailure
 import com.github.jaitl.crawler.master.config.TorRequestController.TorRequestSuccess
@@ -55,7 +54,7 @@ class TorRequestController(
 
   private def processingRequest: Receive = {
     case TorRequestSuccess(requestId, taskType, requester, tors) =>
-      log.info(s"ConfigurationRequestSuccess: $requestId, $taskType, self: $self, tors: $tors")
+      log.info(s"TorSuccess: $requestId, $taskType, self: $self, tors: $tors")
 
       if (tors.nonEmpty) {
         requester ! SuccessTorRequest(requestId, taskType, tors.head)
@@ -72,7 +71,7 @@ class TorRequestController(
       context.unbecome()
       unstashAll()
 
-    case req @ RequestConfiguration(_, _, _) =>
+    case req @ RequestTor(_, _, _) =>
       log.debug(s"stash req: $req")
       stash()
   }
