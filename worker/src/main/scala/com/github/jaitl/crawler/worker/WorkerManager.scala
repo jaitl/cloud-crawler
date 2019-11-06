@@ -49,7 +49,6 @@ private[worker] class WorkerManager(
   override def receive: Receive = monitors.orElse(balancerActions)
 
   private def balancerActions: Receive = {
-    case RequestResource => {}
 
     case RequestBatch =>
       if (context.children.size < config.parallelBatches) {
