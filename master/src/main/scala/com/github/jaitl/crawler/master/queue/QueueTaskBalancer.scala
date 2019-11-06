@@ -4,7 +4,6 @@ import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
-import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyTaskTypeList
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
@@ -22,9 +21,7 @@ class QueueTaskBalancer(
     case RequestTasksBatch(requestId, taskTypes) if taskTypes.nonEmpty =>
       log.debug(s"RequestTasksBatch, requestId: $requestId, types: $taskTypes")
 
-      if (taskTypes.isEmpty) {
-        sender() ! EmptyTaskTypeList
-      } else if (taskTypes.lengthCompare(1) == 0) {
+      if (taskTypes.lengthCompare(1) == 0) {
         val task = taskTypes.head
         queueTaskQueueReqCtrl ! QueueTaskRequestController.RequestTask(
           requestId,

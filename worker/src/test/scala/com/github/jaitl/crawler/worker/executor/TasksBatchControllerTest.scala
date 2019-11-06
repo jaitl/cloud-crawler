@@ -14,6 +14,7 @@ import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
+import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
@@ -33,6 +34,8 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Retu
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.worker.parser.ParseResult
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
@@ -45,6 +48,7 @@ import scala.concurrent.duration._
 class TasksBatchControllerTest extends ActorTestSuite {
   class TestSuite(taskCount: Int) {
     val tasks = (1 to taskCount).map(i => Task(i.toString, "test", i.toString))
+    val tasksBatchSize = 10
     val batch = TasksBatch(
       id = UUID.randomUUID(),
       taskType = "test",
@@ -53,10 +57,8 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
     val pipeline = PipelineBuilder[TestDataRes]()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveRawProvider(mock[SaveRawProvider])
       .withCrawler(mock[BaseCrawler])
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val resourceController = TestProbe()
@@ -64,19 +66,30 @@ class TasksBatchControllerTest extends ActorTestSuite {
     val crawlExecutor = TestProbe()
     val crawlExecutorCreator = mock[ActorCreator]
     val saveCrawlResultController = TestProbe()
-    val saveCrawlResultCreator = mock[TwoArgumentActorCreator[Pipeline[_], ActorRef]]
+    val saveCrawlResultCreator = mock[ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline]]
     val queueTaskBalancer = TestProbe()
     val executeScheduler = mock[Scheduler]
     val config = TasksBatchControllerConfig(maxAttempts = 2, 1.minute)
 
     (resourceControllerCreator.create _).expects(*, *).returning(resourceController.ref)
     (crawlExecutorCreator.create _).expects(*).returning(crawlExecutor.ref)
-    (saveCrawlResultCreator.create _).expects(*, *, *).returning(saveCrawlResultController.ref)
+    (saveCrawlResultCreator.create _).expects(*, *, *, *).returning(saveCrawlResultController.ref)
     (executeScheduler.schedule _).expects(*, *, *).returning(Unit)
 
     val tasksBatchController = TestActorRef[TasksBatchController](
-      TasksBatchController.props(batch, pipeline, resourceControllerCreator, crawlExecutorCreator,
-        saveCrawlResultCreator, queueTaskBalancer.ref, executeScheduler, config)
+      TasksBatchController.props(
+        batch,
+        pipeline,
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize).build(),
+        resourceControllerCreator,
+        crawlExecutorCreator,
+        saveCrawlResultCreator,
+        queueTaskBalancer.ref,
+        executeScheduler,
+        config
+      )
     )
 
     val requestExecutor = mock[HttpRequestExecutor]
@@ -87,7 +100,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
       val watcher = TestProbe()
       watcher.watch(tasksBatchController)
 
-      tasksBatchController.underlyingActor.taskQueue should have size 1
+      (tasksBatchController.underlyingActor.taskQueue should have).size(1)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       tasksBatchController ! ExecuteTask
@@ -97,25 +110,30 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
       var crawlRequest = crawlExecutor.expectMsgType[Crawl]
 
-      tasksBatchController.underlyingActor.taskQueue should have size 0
+      (tasksBatchController.underlyingActor.taskQueue should have).size(0)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 1
 
-      crawlExecutor.reply(CrawlSuccessResult(
-        crawlRequest.requestId,
-        crawlRequest.task,
-        crawlRequest.requestExecutor,
-        CrawlResult("1"),
-        Some(ParseResult(TestDataRes("1")))
-      ))
+      crawlExecutor.reply(
+        CrawlSuccessResult(
+          crawlRequest.requestId,
+          crawlRequest.task,
+          crawlRequest.requestExecutor,
+          CrawlResult("1"),
+          Some(ParseResult(TestDataRes("1")))
+        ))
 
       resourceController.expectMsg(ReturnSuccessResource(resRequest.requestId, requestExecutor))
-      saveCrawlResultController.expectMsg(AddResults(SuccessCrawledTask(
-        crawlRequest.task.task, CrawlResult("1"), Some(ParseResult(TestDataRes("1")))
-      )))
+      saveCrawlResultController.expectMsg(
+        AddResults(
+          SuccessCrawledTask(
+            crawlRequest.task.task,
+            CrawlResult("1"),
+            Some(ParseResult(TestDataRes("1")))
+          )))
 
       saveCrawlResultController.reply(SuccessAddedResults)
 
-      tasksBatchController.underlyingActor.taskQueue should have size 0
+      (tasksBatchController.underlyingActor.taskQueue should have).size(0)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       tasksBatchController ! ExecuteTask
@@ -131,7 +149,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
       watcher.watch(tasksBatchController)
 
       tasksBatchController.underlyingActor.forcedStop shouldBe false
-      tasksBatchController.underlyingActor.taskQueue should have size 2
+      (tasksBatchController.underlyingActor.taskQueue should have).size(2)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       tasksBatchController ! ExecuteTask
@@ -142,7 +160,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
       saveCrawlResultController.expectMsg(SaveResults)
 
       tasksBatchController.underlyingActor.forcedStop shouldBe true
-      tasksBatchController.underlyingActor.taskQueue should have size 2
+      (tasksBatchController.underlyingActor.taskQueue should have).size(2)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       saveCrawlResultController.reply(SuccessSavedResults)
@@ -156,7 +174,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
     }
 
     "resource fail during crawl" in new TestSuite(2) {
-      tasksBatchController.underlyingActor.taskQueue should have size 2
+      (tasksBatchController.underlyingActor.taskQueue should have).size(2)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       tasksBatchController ! ExecuteTask
@@ -166,21 +184,25 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
       var crawlRequest = crawlExecutor.expectMsgType[Crawl]
 
-      tasksBatchController.underlyingActor.taskQueue should have size 1
+      (tasksBatchController.underlyingActor.taskQueue should have).size(1)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 1
 
-      crawlExecutor.reply(CrawlFailureResult(
-        crawlRequest.requestId, crawlRequest.task, crawlRequest.requestExecutor, new IOException("")
-      ))
+      crawlExecutor.reply(
+        CrawlFailureResult(
+          crawlRequest.requestId,
+          crawlRequest.task,
+          crawlRequest.requestExecutor,
+          new IOException("")
+        ))
 
       resourceController.expectMsgType[ReturnFailedResource]
 
-      tasksBatchController.underlyingActor.taskQueue should have size 2
+      (tasksBatchController.underlyingActor.taskQueue should have).size(2)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
     }
 
     "exception during crawl" in new TestSuite(1) {
-      tasksBatchController.underlyingActor.taskQueue should have size 1
+      (tasksBatchController.underlyingActor.taskQueue should have).size(1)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       tasksBatchController ! ExecuteTask
@@ -190,21 +212,25 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
       var crawlRequest = crawlExecutor.expectMsgType[Crawl]
 
-      tasksBatchController.underlyingActor.taskQueue should have size 0
+      (tasksBatchController.underlyingActor.taskQueue should have).size(0)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 1
 
       var ex = new Exception("")
-      crawlExecutor.reply(CrawlFailureResult(
-        crawlRequest.requestId, crawlRequest.task, crawlRequest.requestExecutor, ex
-      ))
+      crawlExecutor.reply(
+        CrawlFailureResult(
+          crawlRequest.requestId,
+          crawlRequest.task,
+          crawlRequest.requestExecutor,
+          ex
+        ))
 
       resourceController.expectMsgType[ReturnSuccessResource]
 
-      tasksBatchController.underlyingActor.taskQueue should have size 1
+      (tasksBatchController.underlyingActor.taskQueue should have).size(1)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
       tasksBatchController.underlyingActor.taskQueue.head.attempt shouldBe 1
-      tasksBatchController.underlyingActor.taskQueue.head.t should contain only (ex)
+      (tasksBatchController.underlyingActor.taskQueue.head.t should contain).only(ex)
 
       tasksBatchController ! ExecuteTask
 
@@ -213,14 +239,18 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
       crawlRequest = crawlExecutor.expectMsgType[Crawl]
 
-      tasksBatchController.underlyingActor.taskQueue should have size 0
+      (tasksBatchController.underlyingActor.taskQueue should have).size(0)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 1
 
       ex = new Exception("")
 
-      crawlExecutor.reply(CrawlFailureResult(
-        crawlRequest.requestId, crawlRequest.task, crawlRequest.requestExecutor, ex
-      ))
+      crawlExecutor.reply(
+        CrawlFailureResult(
+          crawlRequest.requestId,
+          crawlRequest.task,
+          crawlRequest.requestExecutor,
+          ex
+        ))
 
       resourceController.expectMsgType[ReturnSuccessResource]
 
