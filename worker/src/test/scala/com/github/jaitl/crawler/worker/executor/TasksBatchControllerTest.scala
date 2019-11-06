@@ -12,7 +12,10 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.ActorTestSuite
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
-import com.github.jaitl.crawler.worker.creator.{ActorCreator, OneArgumentActorCreator, ThreeArgumentActorCreator, TwoArgumentActorCreator}
+import com.github.jaitl.crawler.worker.creator.ActorCreator
+import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
+import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
+import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
@@ -31,7 +34,11 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Retu
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.http.HttpRequestExecutor
 import com.github.jaitl.crawler.worker.parser.ParseResult
-import com.github.jaitl.crawler.worker.pipeline.{ConfigurablePipeline, ConfigurablePipelineBuilder, Pipeline, PipelineBuilder, ResourceType}
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.Pipeline
+import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
@@ -41,6 +48,7 @@ import scala.concurrent.duration._
 class TasksBatchControllerTest extends ActorTestSuite {
   class TestSuite(taskCount: Int) {
     val tasks = (1 to taskCount).map(i => Task(i.toString, "test", i.toString))
+    val tasksBatchSize = 10
     val batch = TasksBatch(
       id = UUID.randomUUID(),
       taskType = "test",
@@ -72,7 +80,9 @@ class TasksBatchControllerTest extends ActorTestSuite {
       TasksBatchController.props(
         batch,
         pipeline,
-        ConfigurablePipelineBuilder().build(),
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize).build(),
         resourceControllerCreator,
         crawlExecutorCreator,
         saveCrawlResultCreator,

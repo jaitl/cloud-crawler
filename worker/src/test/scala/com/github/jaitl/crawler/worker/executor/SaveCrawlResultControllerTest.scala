@@ -18,7 +18,9 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.Succes
 import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NewCrawlTasks
 import com.github.jaitl.crawler.worker.parser.ParseResult
-import com.github.jaitl.crawler.worker.pipeline.{ConfigurablePipelineBuilder, PipelineBuilder}
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
@@ -31,6 +33,8 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
   import scala.concurrent.duration._
 
   class OnlyRawResultSaverSuite {
+    val tasksBatchSize = 10
+
     val baseCrawler = mock[BaseCrawler]
     val saveRawProvider = mock[SaveRawProvider]
 
@@ -52,7 +56,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
-        ConfigurablePipelineBuilder().build(),
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
@@ -61,6 +68,8 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
   }
 
   class OnlyParsedResultSaverSuite {
+    val tasksBatchSize = 10
+
     val baseCrawler = mock[BaseCrawler]
     val saveParsedProvider = mock[SaveParsedProvider[TestDataRes]]
     val parser = mock[BaseParser[TestDataRes]]
@@ -83,7 +92,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
-        ConfigurablePipelineBuilder().build(),
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
@@ -92,6 +104,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
   }
 
   class RawAndParsedResultSaverSuite {
+    val tasksBatchSize = 10
     val baseCrawler = mock[BaseCrawler]
     val saveParsedProvider = mock[SaveParsedProvider[TestDataRes]]
     val parser = mock[BaseParser[TestDataRes]]
@@ -116,7 +129,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
-        ConfigurablePipelineBuilder().build(),
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,

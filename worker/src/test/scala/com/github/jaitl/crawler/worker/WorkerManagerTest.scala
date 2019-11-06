@@ -20,6 +20,7 @@ import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
@@ -29,6 +30,8 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
   import scala.concurrent.duration._
 
   class WorkerTestSuite {
+    val tasksBatchSize = 10
+
     val pipeline = PipelineBuilder
       .noParserPipeline()
       .withTaskType("test")
@@ -52,7 +55,10 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
       WorkerManager.props(
         queueTaskBalancer.ref,
         pipelines,
-        null,
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         config,
         tasksBatchControllerCreator,
         batchRequestScheduler,

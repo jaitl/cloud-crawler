@@ -27,6 +27,11 @@ private[pipeline] class ConfigurablePipelineBuilder {
     this
   }
 
+  def withProxy(res: ResourceType): this.type = {
+    resourceType = Some(res)
+    this
+  }
+
   def withTor(
     host: String,
     post: Int,
