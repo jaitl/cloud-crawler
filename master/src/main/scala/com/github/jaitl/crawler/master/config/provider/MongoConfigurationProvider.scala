@@ -1,11 +1,9 @@
 package com.github.jaitl.crawler.master.config.provider
 
-import java.time.Instant
-
-import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.worker.ProjectConfiguration
 import com.github.jaitl.crawler.models.worker.CrawlerProxy
 import com.github.jaitl.crawler.models.worker.CrawlerTor
+import com.mongodb.client.model.FindOneAndUpdateOptions
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.types.ObjectId
@@ -13,8 +11,8 @@ import org.mongodb.scala.MongoClient
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.MongoDatabase
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
+import org.mongodb.scala.model.Sorts
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class MongoConfigurationProvider(
@@ -59,7 +57,11 @@ class MongoConfigurationProvider(
 
   override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[CrawlerProxy]] =
     crawlerProxies
-      .find(equal("workerTaskType", taskType))
+      .findOneAndUpdate(
+        equal("workerTaskType", taskType),
+        inc("usedCount", 1),
+        new FindOneAndUpdateOptions().sort(Sorts.ascending("usedCount"))
+      )
       .map(entity =>
         CrawlerProxy(
           entity._id.toString,
