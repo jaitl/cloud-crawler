@@ -18,7 +18,9 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.Succes
 import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NewCrawlTasks
 import com.github.jaitl.crawler.worker.parser.ParseResult
+import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
+import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
@@ -31,16 +33,16 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
   import scala.concurrent.duration._
 
   class OnlyRawResultSaverSuite {
+    val tasksBatchSize = 10
+
     val baseCrawler = mock[BaseCrawler]
     val saveRawProvider = mock[SaveRawProvider]
 
     val pipeline = PipelineBuilder
       .noParserPipeline()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveRawProvider(saveRawProvider)
       .withCrawler(baseCrawler)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -54,6 +56,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
@@ -62,17 +68,17 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
   }
 
   class OnlyParsedResultSaverSuite {
+    val tasksBatchSize = 10
+
     val baseCrawler = mock[BaseCrawler]
     val saveParsedProvider = mock[SaveParsedProvider[TestDataRes]]
     val parser = mock[BaseParser[TestDataRes]]
 
     val pipeline = PipelineBuilder[TestDataRes]()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveResultProvider(saveParsedProvider)
       .withCrawler(baseCrawler)
       .withParser(parser)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -86,6 +92,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
@@ -94,6 +104,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
   }
 
   class RawAndParsedResultSaverSuite {
+    val tasksBatchSize = 10
     val baseCrawler = mock[BaseCrawler]
     val saveParsedProvider = mock[SaveParsedProvider[TestDataRes]]
     val parser = mock[BaseParser[TestDataRes]]
@@ -101,12 +112,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val pipeline = PipelineBuilder[TestDataRes]()
       .withTaskType("test")
-      .withBatchSize(10)
       .withSaveResultProvider(saveParsedProvider)
       .withCrawler(baseCrawler)
       .withParser(parser)
       .withSaveRawProvider(saveRawProvider)
-      .withTor("0", 0, 1, RandomTimeout(1.millis, 1.millis), 0, "")
       .build()
 
     val queueTaskBalancer = TestProbe()
@@ -120,6 +129,10 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
         pipeline,
+        ConfigurablePipelineBuilder()
+          .withProxy(mock[ResourceType])
+          .withBatchSize(tasksBatchSize)
+          .build(),
         queueTaskBalancer.ref,
         tasksBatchController.ref,
         saveScheduler,
