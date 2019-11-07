@@ -10,7 +10,7 @@ import com.github.jaitl.crawler.worker.save.SaveRawProvider
 private[pipeline] class PipelineBuilder[T] {
   private var taskType: Option[String] = None
   private var crawler: Option[BaseCrawler] = None
-  private var emailNotifier: Option[BaseNotification] = None
+  private var notifier: Option[BaseNotification] = None
   private var saveRawProvider: Option[SaveRawProvider] = None
   private var parser: Option[BaseParser[T]] = None
   private var saveParsedProvider: Option[SaveParsedProvider[T]] = None
@@ -25,8 +25,8 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
-  def withEmailNotifier(emailImpl: BaseNotification): this.type = {
-    this.emailNotifier = Some(emailImpl)
+  def withNotifier(notifierImpl: BaseNotification): this.type = {
+    this.notifier = Some(notifierImpl)
     this
   }
 
@@ -65,7 +65,7 @@ private[pipeline] class PipelineBuilder[T] {
       saveRawProvider = saveRawProvider,
       parser = parser,
       saveParsedProvider = saveParsedProvider,
-      notifier = emailNotifier
+      notifier = notifier
     )
   }
 }
