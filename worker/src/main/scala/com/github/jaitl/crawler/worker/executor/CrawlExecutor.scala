@@ -22,11 +22,10 @@ import scala.util.Success
 import scala.util.Try
 
 private class CrawlExecutor extends Actor {
-  private implicit val executionContext: ExecutionContext = context.dispatcher
+  implicit private val executionContext: ExecutionContext = context.dispatcher
 
   override def receive: Receive = {
     case Crawl(requestId, task, requestExecutor, pipeline) =>
-
       val crawlTask = CrawlTask(task.task.taskData, task.task.taskType)
       val crawlResult = for {
         crawlResult <- Try(pipeline.crawler.crawl(crawlTask, requestExecutor)) match {
@@ -40,7 +39,7 @@ private class CrawlExecutor extends Actor {
         case t: Throwable => CrawlFailureResult(requestId, task, requestExecutor, t)
       }
 
-      recoveredResult pipeTo sender()
+      recoveredResult.pipeTo(sender())
   }
 }
 
