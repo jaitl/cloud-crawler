@@ -5,7 +5,12 @@ import java.util.UUID
 import akka.testkit.TestProbe
 import com.github.jaitl.crawler.master.ActorTestSuite
 import com.github.jaitl.crawler.master.queue.QueueTaskRequestController.RequestTask
-import com.github.jaitl.crawler.master.queue.QueueTaskResultController.{AddNewTasks, MarkAsFailed, MarkAsParsingFailed, MarkAsProcessed, MarkAsSkipped, ReturnToQueue}
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsParsingFailed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsSkipped
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ReturnToQueue
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.TaskTypeWithBatchSize
