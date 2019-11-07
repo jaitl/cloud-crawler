@@ -51,7 +51,8 @@ class MongoConfigurationProvider(
           entity.workerBaseUrl,
           entity.workerTaskType,
           entity.workerBatchSize,
-          entity.workerResource
+          entity.workerResource,
+          entity.workerNotification
       ))
       .toFuture()
 
@@ -89,7 +90,8 @@ case class MongoProjectConfiguration(
   workerBaseUrl: String,
   workerTaskType: String,
   workerParallelBatches: Int,
-  workerResource: String
+  workerResource: String,
+  workerNotification: Boolean
 )
 
 case class MongoCrawlerProxy(

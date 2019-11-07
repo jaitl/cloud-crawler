@@ -9,12 +9,10 @@ import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Terminated
 import com.github.jaitl.crawler.models.task.TasksBatch
-import com.github.jaitl.crawler.models.worker.ProjectConfiguration
 import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyTaskTypeList
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureTasksBatchRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.RequestResource
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksBatchRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.TaskTypeWithBatchSize

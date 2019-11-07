@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.testkit.TestProbe
 import com.github.jaitl.crawler.master.ActorTestSuite
 import com.github.jaitl.crawler.master.queue.QueueTaskRequestController.RequestTask
-import com.github.jaitl.crawler.master.queue.QueueTaskResultController.{AddNewTasks, MarkAsFailed, MarkAsProcessed, MarkAsSkipped, ReturnToQueue}
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.{AddNewTasks, MarkAsFailed, MarkAsParsingFailed, MarkAsProcessed, MarkAsSkipped, ReturnToQueue}
 import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.models.worker.WorkerManager.TaskTypeWithBatchSize
@@ -43,6 +43,7 @@ class QueueTaskBalancerTest extends ActorTestSuite {
         failureIds = Seq("3", "4"),
         skippedIds = Seq("5", "6"),
         bannedIds = Seq("7", "8"),
+        parsingFailedTaskIds = Seq("9", "10"),
         newTasks = Map("type2" -> Seq("tt1", "tt2"))
       )
 
@@ -52,6 +53,7 @@ class QueueTaskBalancerTest extends ActorTestSuite {
       queueTaskQueueResCtrl.expectMsg(MarkAsFailed(requestId, taskType, Seq("3", "4"), self))
       queueTaskQueueResCtrl.expectMsg(MarkAsSkipped(requestId, taskType, Seq("5", "6"), self))
       queueTaskQueueResCtrl.expectMsg(MarkAsProcessed(requestId, taskType, Seq("7", "8"), self))
+      queueTaskQueueResCtrl.expectMsg(MarkAsParsingFailed(requestId, taskType, Seq("9", "10"), self))
       queueTaskQueueResCtrl.expectMsg(AddNewTasks(requestId, "type2", Seq("tt1", "tt2"), self))
     }
 

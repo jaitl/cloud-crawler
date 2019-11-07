@@ -8,5 +8,6 @@ case class ProjectConfiguration(
   workerBaseUrl: String,
   workerTaskType: String,
   workerParallelBatches: Int,
-  workerResource: String
+  workerResource: String,
+  notification: Boolean
 )

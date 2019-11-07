@@ -1,10 +1,13 @@
 package com.github.jaitl.crawler.worker.pipeline
 
+import com.github.jaitl.crawler.worker.email.BaseNotification
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
 private[pipeline] class ConfigurablePipelineBuilder {
   private var batchSize: Option[Int] = None
   private var resourceType: Option[ResourceType] = None
+  private var emailer: Option[BaseNotification] = Option.empty
+  private var emailNotification: Boolean = false
 
   def withBatchSize(batchSize: Int): this.type = {
     this.batchSize = Some(batchSize)
@@ -13,6 +16,11 @@ private[pipeline] class ConfigurablePipelineBuilder {
 
   def withProxy(host: String, post: Int, limit: Int, timeout: RandomTimeout): this.type = {
     resourceType = Some(Proxy(host, post, limit, timeout))
+    this
+  }
+
+  def withEmailNotification(emailNotify: Boolean): this.type = {
+    emailNotification = emailNotify
     this
   }
 
@@ -43,6 +51,11 @@ private[pipeline] class ConfigurablePipelineBuilder {
     this
   }
 
+  def withEmailer(emailImpl: BaseNotification): this.type = {
+    emailer = Some(emailImpl)
+    this
+  }
+
   def build(): ConfigurablePipeline = {
 
     if (batchSize.isEmpty) {
@@ -51,10 +64,15 @@ private[pipeline] class ConfigurablePipelineBuilder {
     if (resourceType.isEmpty) {
       throw new PipelineBuilderException("proxy or tor is not defined")
     }
+    if (emailNotification && emailer.isEmpty) {
+      throw new PipelineBuilderException("Emailer or tor is not defined")
+    }
 
     ConfigurablePipeline(
       batchSize = batchSize.get,
-      resourceType = resourceType.get
+      resourceType = resourceType.get,
+      emailNotification = emailNotification,
+      emailer = emailer.orNull
     )
   }
 }

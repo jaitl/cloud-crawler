@@ -1,15 +1,16 @@
 package com.github.jaitl.crawler.worker.pipeline
 
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
+import com.github.jaitl.crawler.worker.email.BaseNotification
 import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NoParser
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
-import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
 private[pipeline] class PipelineBuilder[T] {
   private var taskType: Option[String] = None
   private var crawler: Option[BaseCrawler] = None
+  private var emailNotifier: Option[BaseNotification] = None
   private var saveRawProvider: Option[SaveRawProvider] = None
   private var parser: Option[BaseParser[T]] = None
   private var saveParsedProvider: Option[SaveParsedProvider[T]] = None
@@ -21,6 +22,11 @@ private[pipeline] class PipelineBuilder[T] {
 
   def withCrawler(crawler: BaseCrawler): this.type = {
     this.crawler = Some(crawler)
+    this
+  }
+
+  def withEmailNotifier(emailImpl: BaseNotification): this.type = {
+    this.emailNotifier = Some(emailImpl)
     this
   }
 
@@ -58,7 +64,8 @@ private[pipeline] class PipelineBuilder[T] {
       crawler = crawler.get,
       saveRawProvider = saveRawProvider,
       parser = parser,
-      saveParsedProvider = saveParsedProvider
+      saveParsedProvider = saveParsedProvider,
+      emailNotifier = emailNotifier
     )
   }
 }
