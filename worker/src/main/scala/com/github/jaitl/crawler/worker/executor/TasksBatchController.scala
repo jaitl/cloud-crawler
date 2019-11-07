@@ -13,7 +13,7 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
-import com.github.jaitl.crawler.worker.email.NotificationExecutor.SendNotification
+import com.github.jaitl.crawler.worker.notification.NotificationExecutor.SendNotification
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
@@ -131,7 +131,7 @@ private[worker] class TasksBatchController(
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
       log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
       if (ResourceHelper.isParsingFailed(t)) {
-        if (configPipeline.emailNotification) {
+        if (configPipeline.enableNotification) {
           emailNotifier ! SendNotification(
             t.asInstanceOf[ParsingException].message,
             t.asInstanceOf[ParsingException].data,

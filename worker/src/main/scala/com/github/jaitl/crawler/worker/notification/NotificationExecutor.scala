@@ -1,9 +1,9 @@
-package com.github.jaitl.crawler.worker.email
+package com.github.jaitl.crawler.worker.notification
 
 import akka.actor.Actor
 import akka.actor.Props
 
-import com.github.jaitl.crawler.worker.email.NotificationExecutor.SendNotification
+import com.github.jaitl.crawler.worker.notification.NotificationExecutor.SendNotification
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 
 import scala.concurrent.ExecutionContext
@@ -14,7 +14,7 @@ private class NotificationExecutor extends Actor {
 
   override def receive: Receive = {
     case SendNotification(message, data, pipeline) =>
-      Future(pipeline.emailNotifier.map(notifier => notifier.sendNotification(message, data)))
+      Future(pipeline.notifier.map(notifier => notifier.sendNotification(message, data)))
   }
 }
 private[worker] object NotificationExecutor {

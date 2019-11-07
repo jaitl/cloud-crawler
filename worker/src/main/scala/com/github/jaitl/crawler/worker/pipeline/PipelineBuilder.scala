@@ -1,7 +1,7 @@
 package com.github.jaitl.crawler.worker.pipeline
 
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
-import com.github.jaitl.crawler.worker.email.BaseNotification
+import com.github.jaitl.crawler.worker.notification.BaseNotification
 import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NoParser
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
@@ -65,7 +65,7 @@ private[pipeline] class PipelineBuilder[T] {
       saveRawProvider = saveRawProvider,
       parser = parser,
       saveParsedProvider = saveParsedProvider,
-      emailNotifier = emailNotifier
+      notifier = emailNotifier
     )
   }
 }

@@ -1,10 +1,10 @@
 package com.github.jaitl.crawler.worker.pipeline
 
-import com.github.jaitl.crawler.worker.email.BaseNotification
+import com.github.jaitl.crawler.worker.notification.BaseNotification
 
 private[worker] case class ConfigurablePipeline(
   batchSize: Int,
   resourceType: ResourceType,
-  emailNotification: Boolean,
-  emailer: BaseNotification
+  enableNotification: Boolean,
+  notifier: BaseNotification
 )
