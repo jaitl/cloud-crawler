@@ -1,5 +1,7 @@
 import Dependencies._
 import BuildSettings._
+import com.typesafe.sbt.packager.docker.DockerPermissionStrategy
+import com.typesafe.sbt.packager.docker.DockerVersion
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerBaseImage
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerExposedPorts
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerRepository
@@ -34,6 +36,8 @@ lazy val master = (project in file("master"))
     libraryDependencies ++= Seq(scalaTest, scalamock)
   )
   .settings(
+    dockerPermissionStrategy := DockerPermissionStrategy.Run,
+    dockerVersion := Some(DockerVersion(18, 9, 0, Some("ce"))),
     version in Docker := "latest",
     dockerBaseImage := "java"
   )
