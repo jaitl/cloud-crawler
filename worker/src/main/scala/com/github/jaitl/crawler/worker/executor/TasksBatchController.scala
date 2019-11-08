@@ -68,7 +68,7 @@ private[worker] class TasksBatchController(
   val taskQueue: mutable.Queue[QueuedTask] = mutable.Queue.apply(batch.tasks.map(QueuedTask(_, 0)): _*)
 
   private var resourceController: ActorRef = _
-  private var emailNotifier: ActorRef = _
+  private var notifier: ActorRef = _
   private var saveCrawlResultController: ActorRef = _
   private var crawlExecutor: ActorRef = _
 
@@ -79,7 +79,7 @@ private[worker] class TasksBatchController(
     resourceController = resourceControllerCreator.create(this.context, configPipeline.resourceType)
     saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self, configPipeline)
     crawlExecutor = crawlExecutorCreator.create(this.context)
-    emailNotifier = notifierExecutorCreator.create(this.context)
+    notifier = notifierExecutorCreator.create(this.context)
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
   }
 
@@ -132,7 +132,7 @@ private[worker] class TasksBatchController(
       log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
       if (ResourceHelper.isParsingFailed(t)) {
         if (configPipeline.enableNotification) {
-          emailNotifier ! SendNotification(
+          notifier ! SendNotification(
             t.asInstanceOf[ParsingException].message,
             t.asInstanceOf[ParsingException].data,
             pipeline)
