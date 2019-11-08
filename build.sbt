@@ -66,6 +66,8 @@ lazy val `simple-worker` = (project in file("simple-worker"))
     libraryDependencies += scalaTest
   )
   .settings(
+    dockerPermissionStrategy := DockerPermissionStrategy.Run,
+    dockerVersion := Some(DockerVersion(18, 9, 0, Some("ce"))),
     version in Docker := "latest",
     dockerBaseImage := "java"
   )
