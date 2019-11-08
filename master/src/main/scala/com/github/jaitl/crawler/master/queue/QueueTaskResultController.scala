@@ -10,6 +10,7 @@ import akka.pattern.pipe
 import akka.cluster.sharding.ShardRegion
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.AddNewTasks
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsFailed
+import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsParsingFailed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsProcessed
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.MarkAsSkipped
 import com.github.jaitl.crawler.master.queue.QueueTaskResultController.ReturnToQueue
@@ -25,16 +26,17 @@ import scala.util.Failure
 class QueueTaskResultController(
   queueProvider: QueueTaskProvider,
   config: QueueTaskConfig
-) extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
   implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
-  override def receive: Receive = markTasks orElse addTasks orElse returnTasks
+  override def receive: Receive = markTasks.orElse(addTasks).orElse(returnTasks)
 
   private val markTasks: Receive = {
     case MarkAsProcessed(requestId, taskType, ids, requester) =>
       val dropFuture = queueProvider.dropTasks(ids).map(_ => ActionSuccess(requestId, taskType))
 
-      dropFuture pipeTo requester
+      dropFuture.pipeTo(requester)
 
       dropFuture.onComplete {
         case Failure(ex) => log.error(ex, s"Error during MarkAsProcessed, requestId: $requestId")
@@ -58,7 +60,7 @@ class QueueTaskResultController(
         }
       } yield ActionSuccess(requestId, taskType)
 
-      updateFuture pipeTo requester
+      updateFuture.pipeTo(requester)
 
       updateFuture.onComplete {
         case Failure(ex) => log.error(ex, s"Error during MarkAsFailed, requestId: $requestId")
@@ -75,7 +77,23 @@ class QueueTaskResultController(
         }
       } yield ActionSuccess(requestId, taskType)
 
-      updateFuture pipeTo requester
+      updateFuture.pipeTo(requester)
+
+      updateFuture.onComplete {
+        case Failure(ex) => log.error(ex, s"Error during MarkAsSkipped, requestId: $requestId")
+        case _ =>
+      }
+    case MarkAsParsingFailed(requestId, taskType, ids, requester) =>
+      val updateFuture = for {
+        tasks <- queueProvider.getByIds(ids)
+        _ <- if (tasks.nonEmpty) {
+          queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskParsingFailed)
+        } else {
+          Future.successful(Unit)
+        }
+      } yield ActionSuccess(requestId, taskType)
+
+      updateFuture.pipeTo(requester)
 
       updateFuture.onComplete {
         case Failure(ex) => log.error(ex, s"Error during MarkAsSkipped, requestId: $requestId")
@@ -87,7 +105,7 @@ class QueueTaskResultController(
     case AddNewTasks(requestId, taskType, tasksData, requester) =>
       val pushFuture = queueProvider.pushTasks(taskType, tasksData).map(_ => ActionSuccess(requestId, taskType))
 
-      pushFuture pipeTo requester
+      pushFuture.pipeTo(requester)
 
       pushFuture.onComplete {
         case Failure(ex) => log.error(ex, s"Error during AddNewTasks, requestId: $requestId")
@@ -101,12 +119,14 @@ class QueueTaskResultController(
         .updateTasksStatus(ids, TaskStatus.taskWait)
         .map(_ => ActionSuccess(requestId, taskType))
 
-      returnFuture pipeTo requester
+      returnFuture.pipeTo(requester)
   }
 }
 
 object QueueTaskResultController {
   case class MarkAsProcessed(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
+
+  case class MarkAsParsingFailed(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
 
   case class MarkAsFailed(requestId: UUID, taskType: String, ids: Seq[String], requester: ActorRef)
 
@@ -122,16 +142,18 @@ object QueueTaskResultController {
   def name(): String = "queueTaskResultController"
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case msg @ MarkAsProcessed(_ , taskType, _, _) => (taskType, msg)
-    case msg @ MarkAsFailed(_ , taskType, _, _) => (taskType, msg)
-    case msg @ MarkAsSkipped(_ , taskType, _, _) => (taskType, msg)
-    case msg @ AddNewTasks(_ , taskType, _, _) => (taskType, msg)
+    case msg @ MarkAsProcessed(_, taskType, _, _) => (taskType, msg)
+    case msg @ MarkAsFailed(_, taskType, _, _) => (taskType, msg)
+    case msg @ MarkAsParsingFailed(_, taskType, _, _) => (taskType, msg)
+    case msg @ MarkAsSkipped(_, taskType, _, _) => (taskType, msg)
+    case msg @ AddNewTasks(_, taskType, _, _) => (taskType, msg)
     case msg @ ReturnToQueue(_, taskType, _, _) => (taskType, msg)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
     case MarkAsProcessed(_, taskType, _, _) => taskType
     case MarkAsFailed(_, taskType, _, _) => taskType
+    case MarkAsParsingFailed(_, taskType, _, _) => taskType
     case MarkAsSkipped(_, taskType, _, _) => taskType
     case AddNewTasks(_, taskType, _, _) => taskType
     case ReturnToQueue(_, taskType, _, _) => taskType

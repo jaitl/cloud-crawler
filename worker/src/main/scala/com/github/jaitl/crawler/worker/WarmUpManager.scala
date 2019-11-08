@@ -27,6 +27,7 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTorRequest
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
+import com.github.jaitl.crawler.worker.notification.NotificationExecutor
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultControllerCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchControllerCreator
@@ -41,7 +42,8 @@ import com.github.jaitl.crawler.worker.scheduler.AkkaScheduler
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 import com.typesafe.config.Config
 
-import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 
@@ -85,7 +87,11 @@ private[worker] class WarmUpManager(
             proxy.workerParallel,
             RandomTimeout(Duration(proxy.workerProxyTimeoutUp), Duration(proxy.workerProxyTimeoutDown)),
             proxy.workerProxyLogin,
-            proxy.workerProxyPassword).build()
+            proxy.workerProxyPassword
+          )
+          .withNotifier(pipeline.notifier.get)
+          .withEnableNotification(configuration.notification)
+          .build()
       )
     }
     case NoProxies(requestId, taskType) => {
@@ -126,6 +132,11 @@ private[worker] class WarmUpManager(
       actorName = CrawlExecutor.name(),
       props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
     )
+
+    val notifierExecutorCreator = new PropsActorCreator(
+      actorName = NotificationExecutor.name(),
+      props = NotificationExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
+    )
     val saveCrawlResultControllerConfig = config.as[SaveCrawlResultControllerConfig]("worker.save-controller")
 
     val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
@@ -142,6 +153,7 @@ private[worker] class WarmUpManager(
     val tasksBatchControllerCreator = new TasksBatchControllerCreator(
       resourceControllerCreator = resourceControllerCreator,
       crawlExecutorCreator = crawlExecutorCreator,
+      notifierExecutorCreator = notifierExecutorCreator,
       saveCrawlResultCreator = saveCrawlResultControllerCreator,
       queueTaskBalancer = queueTaskBalancer,
       executeScheduler = new AkkaScheduler(system),

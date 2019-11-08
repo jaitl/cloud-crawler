@@ -64,7 +64,9 @@ class TasksBatchControllerTest extends ActorTestSuite {
     val resourceController = TestProbe()
     val resourceControllerCreator = mock[OneArgumentActorCreator[ResourceType]]
     val crawlExecutor = TestProbe()
+    val notificationExecutor = TestProbe()
     val crawlExecutorCreator = mock[ActorCreator]
+    val notificationExecutorCreator = mock[ActorCreator]
     val saveCrawlResultController = TestProbe()
     val saveCrawlResultCreator = mock[ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline]]
     val queueTaskBalancer = TestProbe()
@@ -73,6 +75,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
     (resourceControllerCreator.create _).expects(*, *).returning(resourceController.ref)
     (crawlExecutorCreator.create _).expects(*).returning(crawlExecutor.ref)
+    (notificationExecutorCreator.create _).expects(*).returning(notificationExecutor.ref)
     (saveCrawlResultCreator.create _).expects(*, *, *, *).returning(saveCrawlResultController.ref)
     (executeScheduler.schedule _).expects(*, *, *).returning(Unit)
 
@@ -85,6 +88,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
           .withBatchSize(tasksBatchSize).build(),
         resourceControllerCreator,
         crawlExecutorCreator,
+        notificationExecutorCreator,
         saveCrawlResultCreator,
         queueTaskBalancer.ref,
         executeScheduler,
