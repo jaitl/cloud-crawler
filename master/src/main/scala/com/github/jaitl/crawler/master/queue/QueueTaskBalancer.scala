@@ -37,7 +37,15 @@ class QueueTaskBalancer(
           sender())
       }
 
-    case TasksBatchProcessResult(requestId, taskType, successIds, failureIds, skippedIds, bannedIds, newTasks) =>
+    case TasksBatchProcessResult(
+        requestId,
+        taskType,
+        successIds,
+        failureIds,
+        skippedIds,
+        parsingFailedTaskIds,
+        bannedIds,
+        newTasks) =>
       log.debug(s"TasksBatchProcessResult, requestId: $requestId, types: $taskType")
 
       if (successIds.nonEmpty) {
@@ -51,6 +59,13 @@ class QueueTaskBalancer(
       }
       if (bannedIds.nonEmpty) {
         queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsProcessed(requestId, taskType, bannedIds, sender())
+      }
+      if (parsingFailedTaskIds.nonEmpty) {
+        queueTaskQueueResCtrl ! QueueTaskResultController.MarkAsParsingFailed(
+          requestId,
+          taskType,
+          parsingFailedTaskIds,
+          sender())
       }
       if (newTasks.nonEmpty) {
         newTasks.foreach {

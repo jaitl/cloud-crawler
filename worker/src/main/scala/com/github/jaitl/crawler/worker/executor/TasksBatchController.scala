@@ -13,7 +13,7 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
-import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
+import com.github.jaitl.crawler.worker.notification.NotificationExecutor.SendNotification
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
@@ -21,6 +21,7 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddRes
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.BannedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.FailureSaveResults
+import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.ParsingFailedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SaveResults
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SkippedTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessAddedResults
@@ -34,10 +35,12 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.NoRe
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.RequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnBannedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnParsingFailedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
+import com.github.jaitl.crawler.worker.parser.ParsingException
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
@@ -52,6 +55,7 @@ private[worker] class TasksBatchController(
   configPipeline: ConfigurablePipeline,
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
+  notifierExecutorCreator: ActorCreator,
   saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
@@ -64,6 +68,7 @@ private[worker] class TasksBatchController(
   val taskQueue: mutable.Queue[QueuedTask] = mutable.Queue.apply(batch.tasks.map(QueuedTask(_, 0)): _*)
 
   private var resourceController: ActorRef = _
+  private var notifier: ActorRef = _
   private var saveCrawlResultController: ActorRef = _
   private var crawlExecutor: ActorRef = _
 
@@ -74,6 +79,7 @@ private[worker] class TasksBatchController(
     resourceController = resourceControllerCreator.create(this.context, configPipeline.resourceType)
     saveCrawlResultController = saveCrawlResultCreator.create(this.context, pipeline, self, configPipeline)
     crawlExecutor = crawlExecutorCreator.create(this.context)
+    notifier = notifierExecutorCreator.create(this.context)
     executeScheduler.schedule(config.executeInterval, self, ExecuteTask)
   }
 
@@ -118,12 +124,22 @@ private[worker] class TasksBatchController(
   private def crawlResultHandler: Receive = {
     case CrawlSuccessResult(requestId, task, requestExecutor, crawlResult, parseResult) =>
       log.info(s"success crawl completed: ${task.task.taskData}")
+
       resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       saveCrawlResultController ! AddResults(SuccessCrawledTask(task.task, crawlResult, parseResult))
 
     case CrawlFailureResult(requestId, task, requestExecutor, t) =>
       log.error(t, s"failure crawl completed: ${task.task.taskData}, attempt: ${task.attempt}")
-      if (ResourceHelper.isResourceSkipped(t)) {
+      if (ResourceHelper.isParsingFailed(t)) {
+        if (configPipeline.enableNotification) {
+          notifier ! SendNotification(
+            t.asInstanceOf[ParsingException].message,
+            t.asInstanceOf[ParsingException].data,
+            pipeline)
+        }
+        resourceController ! ReturnParsingFailedResource(requestId, requestExecutor, t)
+        saveCrawlResultController ! AddResults(ParsingFailedTask(task.task, t))
+      } else if (ResourceHelper.isResourceSkipped(t)) {
         resourceController ! ReturnSkippedResource(requestId, requestExecutor, t)
         saveCrawlResultController ! AddResults(SkippedTask(task.task, t))
       } else if (ResourceHelper.isBotBanned(t)) {
@@ -181,6 +197,7 @@ private[worker] object TasksBatchController {
     configPipeline: ConfigurablePipeline,
     resourceControllerCreator: OneArgumentActorCreator[ResourceType],
     crawlExecutorCreator: ActorCreator,
+    notifierExecutorCreator: ActorCreator,
     saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
     queueTaskBalancer: ActorRef,
     executeScheduler: Scheduler,
@@ -193,6 +210,7 @@ private[worker] object TasksBatchController {
         configPipeline = configPipeline,
         resourceControllerCreator = resourceControllerCreator,
         crawlExecutorCreator = crawlExecutorCreator,
+        notifierExecutorCreator = notifierExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,
         queueTaskBalancer = queueTaskBalancer,
         executeScheduler = executeScheduler,
@@ -210,6 +228,7 @@ private[worker] object TasksBatchController {
 class TasksBatchControllerCreator(
   resourceControllerCreator: OneArgumentActorCreator[ResourceType],
   crawlExecutorCreator: ActorCreator,
+  notifierExecutorCreator: ActorCreator,
   saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
   queueTaskBalancer: ActorRef,
   executeScheduler: Scheduler,
@@ -228,6 +247,7 @@ class TasksBatchControllerCreator(
         configPipeline = thirdArg,
         resourceControllerCreator = resourceControllerCreator,
         crawlExecutorCreator = crawlExecutorCreator,
+        notifierExecutorCreator = notifierExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,
         queueTaskBalancer = queueTaskBalancer,
         executeScheduler = executeScheduler,
