@@ -89,7 +89,7 @@ private[worker] class WarmUpManager(
             proxy.workerProxyLogin,
             proxy.workerProxyPassword
           )
-          .withNotifier(pipeline.notifier.get)
+          .withNotifier(pipeline.notifier.getOrElse(None))
           .withEnableNotification(configuration.notification)
           .build()
       )
