@@ -27,7 +27,7 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTorRequest
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
-import com.github.jaitl.crawler.worker.notification.NotificationExecutor
+import com.github.jaitl.crawler.worker.notification.{DummyNotification, NotificationExecutor}
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultControllerCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchControllerCreator
@@ -89,7 +89,7 @@ private[worker] class WarmUpManager(
             proxy.workerProxyLogin,
             proxy.workerProxyPassword
           )
-          .withNotifier(pipeline.notifier.getOrElse(None))
+          .withNotifier(pipeline.notifier.getOrElse(new DummyNotification()))
           .withEnableNotification(configuration.notification)
           .build()
       )
