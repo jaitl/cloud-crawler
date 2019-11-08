@@ -11,9 +11,7 @@ import akka.actor.Props
 import akka.actor.Terminated
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonProxySettings
-import com.github.jaitl.crawler.models.worker.CrawlerProxy
 import com.github.jaitl.crawler.models.worker.ProjectConfiguration
-import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyList
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureConfigRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureProxyRequest
 import com.github.jaitl.crawler.models.worker.WorkerManager.NoConfigs
@@ -27,7 +25,8 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTorRequest
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
-import com.github.jaitl.crawler.worker.notification.{DummyNotification, NotificationExecutor}
+import com.github.jaitl.crawler.worker.notification.DummyNotification
+import com.github.jaitl.crawler.worker.notification.NotificationExecutor
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultControllerCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchControllerCreator
