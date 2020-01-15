@@ -58,6 +58,9 @@ private[worker] class WorkerManager(
       }
 
     case SuccessTasksBatchRequest(requestId, taskType, tasksBatch) =>
+      log.info(
+        s"SuccessTasksBatchRequest queue size: ${context.children.size} " +
+          s"batchControllers: ${batchControllers.size}, id: $requestId, items: ${tasksBatch.tasks.size}")
       val newBatch = TasksBatch(
         tasksBatch.id,
         tasksBatch.taskType,
@@ -67,9 +70,7 @@ private[worker] class WorkerManager(
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
       context.watch(tasksBatchController)
       tasksBatchController ! TasksBatchController.ExecuteTask
-      log.info(
-        s"SuccessTasksBatchRequest size: ${context.children.size} " +
-          s"batchControllers: ${batchControllers.size}, id: $requestId")
+      log.info(s"After filtering" + s"items: ${newBatch.tasks.size}")
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
     case NoTasks(requestId, taskType) =>
     case EmptyTaskTypeList =>
