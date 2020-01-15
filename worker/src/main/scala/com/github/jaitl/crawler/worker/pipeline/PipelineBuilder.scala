@@ -6,6 +6,8 @@ import com.github.jaitl.crawler.worker.parser.BaseParser
 import com.github.jaitl.crawler.worker.parser.NoParser
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
+import com.github.jaitl.crawler.worker.validators.BatchTasksValidator
+import com.github.jaitl.crawler.worker.validators.DummyTasksValidator
 
 private[pipeline] class PipelineBuilder[T] {
   private var taskType: Option[String] = None
@@ -14,6 +16,7 @@ private[pipeline] class PipelineBuilder[T] {
   private var saveRawProvider: Option[SaveRawProvider] = None
   private var parser: Option[BaseParser[T]] = None
   private var saveParsedProvider: Option[SaveParsedProvider[T]] = None
+  private var batchTasksValidator: BatchTasksValidator = new DummyTasksValidator
 
   def withTaskType(taskType: String): this.type = {
     this.taskType = Some(taskType)
@@ -45,6 +48,11 @@ private[pipeline] class PipelineBuilder[T] {
     this
   }
 
+  def withBatchTasksValidator(batchTasksValidator: BatchTasksValidator): this.type = {
+    this.batchTasksValidator = batchTasksValidator
+    this
+  }
+
   def build(): Pipeline[T] = {
     if (taskType.isEmpty) {
       throw new PipelineBuilderException("task type is not defined")
@@ -65,7 +73,8 @@ private[pipeline] class PipelineBuilder[T] {
       saveRawProvider = saveRawProvider,
       parser = parser,
       saveParsedProvider = saveParsedProvider,
-      notifier = notifier
+      notifier = notifier,
+      batchTasksValidator = batchTasksValidator
     )
   }
 }
