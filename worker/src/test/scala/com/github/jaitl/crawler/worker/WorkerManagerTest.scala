@@ -14,7 +14,6 @@ import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
-import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.TasksBatchController
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
@@ -23,7 +22,7 @@ import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
-import com.github.jaitl.crawler.worker.timeout.RandomTimeout
+import com.github.jaitl.crawler.worker.validators.DummyTasksValidator
 import org.scalatest.concurrent.Eventually
 
 class WorkerManagerTest extends ActorTestSuite with Eventually {
@@ -46,6 +45,7 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
     val tasksBatchControllerCreator = mock[ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline]]
     val batchRequestScheduler = mock[Scheduler]
     val batchExecutionTimeoutScheduler = mock[Scheduler]
+    val batchTasksValidator = new DummyTasksValidator
 
     (batchRequestScheduler.schedule _).expects(*, *, *).returning(Unit)
     (batchExecutionTimeoutScheduler.schedule _).expects(*, *, *).returning(Unit)
@@ -62,7 +62,8 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
         config,
         tasksBatchControllerCreator,
         batchRequestScheduler,
-        batchExecutionTimeoutScheduler
+        batchExecutionTimeoutScheduler,
+        batchTasksValidator
       ))
   }
 

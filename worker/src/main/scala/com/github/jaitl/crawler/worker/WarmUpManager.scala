@@ -167,7 +167,8 @@ private[worker] class WarmUpManager(
         config = workerConfig,
         tasksBatchControllerCreator = tasksBatchControllerCreator,
         batchRequestScheduler = new AkkaScheduler(system),
-        batchExecutionTimeoutScheduler = new AkkaScheduler(system)
+        batchExecutionTimeoutScheduler = new AkkaScheduler(system),
+        batchTasksValidator = pipeline.batchTasksValidator
       ),
       WorkerManager.name()
     )

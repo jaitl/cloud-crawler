@@ -24,6 +24,7 @@ import com.github.jaitl.crawler.worker.executor.TasksBatchController
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
+import com.github.jaitl.crawler.worker.validators.BatchTasksValidator
 
 import scala.collection.mutable
 
@@ -34,7 +35,8 @@ private[worker] class WorkerManager(
   config: WorkerConfig,
   tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline],
   batchRequestScheduler: Scheduler,
-  batchExecutionTimeoutScheduler: Scheduler
+  batchExecutionTimeoutScheduler: Scheduler,
+  batchTasksValidator: BatchTasksValidator
 ) extends Actor
     with ActorLogging {
   val batchControllers: mutable.Map[ActorRef, TaskBatchContext] = mutable.Map.empty
@@ -56,8 +58,12 @@ private[worker] class WorkerManager(
       }
 
     case SuccessTasksBatchRequest(requestId, taskType, tasksBatch) =>
+      val newBatch = TasksBatch(
+        tasksBatch.id,
+        tasksBatch.taskType,
+        tasksBatch.tasks.filter(pipelines(taskType).batchTasksValidator.validateBatchItem))
       val tasksBatchController =
-        tasksBatchControllerCreator.create(this.context, tasksBatch, pipelines(taskType), configurablePipeline)
+        tasksBatchControllerCreator.create(this.context, newBatch, pipelines(taskType), configurablePipeline)
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
       context.watch(tasksBatchController)
       tasksBatchController ! TasksBatchController.ExecuteTask
@@ -99,7 +105,8 @@ private[worker] object WorkerManager {
     config: WorkerConfig,
     tasksBatchControllerCreator: ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline],
     batchRequestScheduler: Scheduler,
-    batchExecutionTimeoutScheduler: Scheduler
+    batchExecutionTimeoutScheduler: Scheduler,
+    batchTasksValidator: BatchTasksValidator
   ): Props =
     Props(
       new WorkerManager(
@@ -109,7 +116,8 @@ private[worker] object WorkerManager {
         config,
         tasksBatchControllerCreator,
         batchRequestScheduler,
-        batchExecutionTimeoutScheduler
+        batchExecutionTimeoutScheduler,
+        batchTasksValidator
       ))
 
   def name(): String = "workerManager"
