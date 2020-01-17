@@ -107,7 +107,10 @@ private[worker] class TasksBatchController(
       if (taskQueue.nonEmpty) {
         val task = taskQueue.dequeue()
         if (task.task.skipped) {
+          currentActiveCrawlTask = currentActiveCrawlTask + 1
           saveCrawlResultController ! AddResults(SkippedTask(task.task, new PageNotFoundException("")))
+          log.info(s"crawl task: ${task.task.id} skipped, activeTasks: $currentActiveCrawlTask")
+          resourceController ! ReturnSuccessResource(requestId, requestExecutor)
         } else {
           crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
           currentActiveCrawlTask = currentActiveCrawlTask + 1
