@@ -14,6 +14,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Requ
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnBannedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResourceNoWait
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.TorResourceController.ExecutorContext
@@ -98,6 +99,14 @@ private class TorResourceController(
       val context = executors(requestExecutor.getExecutorId()).copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
       log.info(s"Waiting in ReturnSkippedResource $requestId for $awaitTo")
+
+    case ReturnSkippedResourceNoWait(requestId, requestExecutor, t) =>
+      val now = Instant.now()
+      val awaitTo = now.plusSeconds(1)
+      val context = executors(requestExecutor.getExecutorId())
+        .copy(isUsed = false, awaitTo = Some(awaitTo))
+      executors += context.id -> context
+      log.info(s"Waiting in ReturnSkippedResourceNoWait $requestId for $awaitTo")
 
     case ReturnBannedResource(requestId, requestExecutor, t) =>
       val now = Instant.now()
