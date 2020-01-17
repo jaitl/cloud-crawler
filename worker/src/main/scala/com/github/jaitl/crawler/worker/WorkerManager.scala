@@ -65,15 +65,13 @@ private[worker] class WorkerManager(
       val newBatch = TasksBatch(
         tasksBatch.id,
         tasksBatch.taskType,
-        tasksBatch.tasks.map(t =>
-          Task(t.id, t.taskType, t.taskData, t.attempt, t.lastUpdate, batchTasksValidator.validateBatchItem(t)))
+        tasksBatch.tasks.map(t => t.copy(skipped = batchTasksValidator.validateBatchItem(t)))
       )
       val tasksBatchController =
         tasksBatchControllerCreator.create(this.context, newBatch, pipelines(taskType), configurablePipeline)
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
       context.watch(tasksBatchController)
       tasksBatchController ! TasksBatchController.ExecuteTask
-      log.info(s"After filtering" + s"items: ${newBatch.tasks.size}")
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
     case NoTasks(requestId, taskType) =>
     case EmptyTaskTypeList =>
