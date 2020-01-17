@@ -33,15 +33,19 @@ class MongoQueueTaskProvider(
   private val collection: MongoCollection[MongoQueueTaskEntity] = database.getCollection(collectionName)
 
   override def pullBatch(taskType: String, size: Int): Future[Seq[Task]] =
-    collection.find(and(equal("taskType", taskType), equal("taskStatus", TaskStatus.taskWait)))
+    collection
+      .find(and(equal("taskType", taskType), equal("taskStatus", TaskStatus.taskWait)))
       .limit(size)
-      .map(entity => Task(
-        entity._id.toString,
-        entity.taskType,
-        entity.taskData,
-        entity.attempt,
-        entity.lastUpdate.map(Instant.ofEpochMilli)
-      ))
+      .map(
+        entity =>
+          Task(
+            entity._id.toString,
+            entity.taskType,
+            entity.taskData,
+            entity.attempt,
+            entity.lastUpdate.map(Instant.ofEpochMilli),
+            false
+        ))
       .toFuture()
 
   override def pushTasks(taskType: String, taskData: Seq[String]): Future[Unit] = {
@@ -61,13 +65,14 @@ class MongoQueueTaskProvider(
     collection.bulkWrite(updates).toFuture().map(_ => Unit)
   }
 
-  override def updateTasksStatusFromTo(time: Instant, fromStatus: String, toStatus: String): Future[Long] = {
-    collection.updateMany(
-      and(equal("taskStatus", fromStatus), lte("lastUpdate", time.toEpochMilli)),
-      set("taskStatus", toStatus)
-    ).toFuture()
+  override def updateTasksStatusFromTo(time: Instant, fromStatus: String, toStatus: String): Future[Long] =
+    collection
+      .updateMany(
+        and(equal("taskStatus", fromStatus), lte("lastUpdate", time.toEpochMilli)),
+        set("taskStatus", toStatus)
+      )
+      .toFuture()
       .map(_.getModifiedCount)
-  }
 
   override def updateTasksStatusAndIncAttempt(ids: Seq[String], taskStatus: String): Future[Unit] = {
     val updates = ids.map { id =>
@@ -92,14 +97,18 @@ class MongoQueueTaskProvider(
 
   override def getByIds(ids: Seq[String]): Future[Seq[Task]] = {
     val objIds = ids.map(id => new ObjectId(id))
-    collection.find(in("_id", objIds: _*))
-      .map(entity => Task(
-        entity._id.toString,
-        entity.taskType,
-        entity.taskData,
-        entity.attempt,
-        entity.lastUpdate.map(Instant.ofEpochMilli)
-      ))
+    collection
+      .find(in("_id", objIds: _*))
+      .map(
+        entity =>
+          Task(
+            entity._id.toString,
+            entity.taskType,
+            entity.taskData,
+            entity.attempt,
+            entity.lastUpdate.map(Instant.ofEpochMilli),
+            false
+        ))
       .toFuture()
   }
 
