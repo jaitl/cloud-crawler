@@ -92,7 +92,7 @@ private class ProxyResourceController(
       executors += context.id -> context
       log.info(s"Waiting in ReturnSkippedResource $requestId for $awaitTo")
 
-    case ReturnSkippedResourceNoWait(requestId, requestExecutor, t) =>
+    case ReturnSkippedResourceNoWait(requestId, requestExecutor) =>
       val now = Instant.now()
       val awaitTo = now.plusSeconds(1)
       val context = executors(requestExecutor.getExecutorId())
