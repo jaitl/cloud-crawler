@@ -13,6 +13,7 @@ import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
+import com.github.jaitl.crawler.worker.exception.PageNotFoundException
 import com.github.jaitl.crawler.worker.notification.NotificationExecutor.SendNotification
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
@@ -45,7 +46,6 @@ import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
-import org.lmdbjava.LmdbNativeException.PageNotFoundException
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
