@@ -8,5 +8,5 @@ case class Task(
   taskData: String,
   attempt: Int = 0,
   lastUpdate: Option[Instant] = None,
-  skipped: Boolean
+  skipped: Boolean = false
 )
