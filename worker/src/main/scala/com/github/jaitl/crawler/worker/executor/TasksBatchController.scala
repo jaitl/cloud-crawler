@@ -107,7 +107,7 @@ private[worker] class TasksBatchController(
       if (taskQueue.nonEmpty) {
         val task = taskQueue.dequeue()
         if (task.task.skipped) {
-          saveCrawlResultController ! AddResults(SkippedTask(task.task, PageNotFoundException))
+          saveCrawlResultController ! AddResults(SkippedTask(task.task, new PageNotFoundException("")))
         } else {
           crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
           currentActiveCrawlTask = currentActiveCrawlTask + 1
