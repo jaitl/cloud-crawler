@@ -38,6 +38,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Retu
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnFailedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnParsingFailedResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResource
+import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSkippedResourceNoWait
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
@@ -109,8 +110,8 @@ private[worker] class TasksBatchController(
         if (task.task.skipped) {
           currentActiveCrawlTask = currentActiveCrawlTask + 1
           saveCrawlResultController ! AddResults(SkippedTask(task.task, new PageNotFoundException("")))
-          log.info(s"crawl task: ${task.task.id} skipped, activeTasks: $currentActiveCrawlTask")
-          resourceController ! ReturnSuccessResource(requestId, requestExecutor)
+          log.info(s"crawl task: ${task.task.taskData} skipped, activeTasks: $currentActiveCrawlTask")
+          resourceController ! ReturnSkippedResourceNoWait(requestId, requestExecutor)
         } else {
           crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
           currentActiveCrawlTask = currentActiveCrawlTask + 1

@@ -23,6 +23,7 @@ private[worker] object ResourceController {
   case class ReturnSuccessResource(requestId: UUID, requestExecutor: HttpRequestExecutor)
   case class ReturnFailedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
   case class ReturnSkippedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
+  case class ReturnSkippedResourceNoWait(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
   case class ReturnParsingFailedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
   case class ReturnBannedResource(requestId: UUID, requestExecutor: HttpRequestExecutor, t: Throwable)
 }
