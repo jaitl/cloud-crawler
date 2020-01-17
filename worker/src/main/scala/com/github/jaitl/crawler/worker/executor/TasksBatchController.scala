@@ -45,6 +45,7 @@ import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
+import org.lmdbjava.LmdbNativeException.PageNotFoundException
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
@@ -105,9 +106,13 @@ private[worker] class TasksBatchController(
     case SuccessRequestResource(requestId, requestExecutor) =>
       if (taskQueue.nonEmpty) {
         val task = taskQueue.dequeue()
-        crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
-        currentActiveCrawlTask = currentActiveCrawlTask + 1
-        log.info(s"crawl task: ${task.task.id}, activeTasks: $currentActiveCrawlTask")
+        if (task.task.skipped) {
+          saveCrawlResultController ! AddResults(SkippedTask(task.task, PageNotFoundException))
+        } else {
+          crawlExecutor ! Crawl(requestId, task, requestExecutor, pipeline)
+          currentActiveCrawlTask = currentActiveCrawlTask + 1
+          log.info(s"crawl task: ${task.task.id}, activeTasks: $currentActiveCrawlTask")
+        }
       } else {
         resourceController ! ReturnSuccessResource(requestId, requestExecutor)
       }

@@ -8,6 +8,7 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Terminated
+import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.task.TasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyTaskTypeList
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureTasksBatchRequest
@@ -64,7 +65,9 @@ private[worker] class WorkerManager(
       val newBatch = TasksBatch(
         tasksBatch.id,
         tasksBatch.taskType,
-        tasksBatch.tasks.filter(pipelines(taskType).batchTasksValidator.validateBatchItem))
+        tasksBatch.tasks.map(t =>
+          Task(t.id, t.taskType, t.taskData, t.attempt, t.lastUpdate, batchTasksValidator.validateBatchItem(t)))
+      )
       val tasksBatchController =
         tasksBatchControllerCreator.create(this.context, newBatch, pipelines(taskType), configurablePipeline)
       batchControllers += tasksBatchController -> TaskBatchContext(tasksBatchController, Instant.now(), taskType)
