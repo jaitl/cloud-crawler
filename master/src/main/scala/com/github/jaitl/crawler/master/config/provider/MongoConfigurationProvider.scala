@@ -103,5 +103,5 @@ case class MongoCrawlerProxy(
   workerParallel: Int,
   workerProxyLogin: String,
   workerProxyPassword: String,
-  workerTaskType: String
+  workerTaskType: List[String]
 )
