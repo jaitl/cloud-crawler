@@ -9,5 +9,5 @@ case class CrawlerProxy(
   workerParallel: Int,
   workerProxyLogin: String,
   workerProxyPassword: String,
-  workerTaskType: String
+  workerTaskType: List[String]
 )
