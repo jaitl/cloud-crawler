@@ -9,5 +9,5 @@ case class CrawlerTor(
   workerTorPassword: String,
   workerTorTimeoutUp: String,
   workerTorTimeoutDown: String,
-  workerTaskType: String
+  workerTaskType: List[String]
 )
