@@ -130,5 +130,5 @@ case class MongoCrawlerTor(
   workerTorPassword: String,
   workerTorTimeoutUp: String,
   workerTorTimeoutDown: String,
-  workerTaskType: String
+  workerTaskType: List[String]
 )
