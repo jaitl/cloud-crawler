@@ -8,7 +8,6 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.actor.Terminated
-import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.models.task.TasksBatch
 import com.github.jaitl.crawler.models.worker.WorkerManager.EmptyTaskTypeList
 import com.github.jaitl.crawler.models.worker.WorkerManager.FailureTasksBatchRequest
