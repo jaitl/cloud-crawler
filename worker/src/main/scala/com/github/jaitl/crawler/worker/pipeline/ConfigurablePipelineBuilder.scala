@@ -42,12 +42,12 @@ private[pipeline] class ConfigurablePipelineBuilder {
 
   def withTor(
     host: String,
-    post: Int,
+    port: Int,
     limit: Int,
     timeout: RandomTimeout,
     controlPort: Int,
     password: String): this.type = {
-    resourceType = Some(Tor(host, post, limit, timeout, controlPort, password))
+    resourceType = Some(Tor(host, port, limit, timeout, controlPort, password))
     this
   }
 

@@ -8,6 +8,8 @@ services:
       CLUSTER_IP: node
       SEED_PORT_1600_TCP_ADDR: master
       SEED_PORT_1600_TCP_PORT: 1600
+      WORKER_MONGODB_URL: mongodb://root:example@host.docker.internal:27017
+      WORKER_EXECUTE_INTERVAL: 30.seconds
   master:
     container_name: cc_master
     image: master:latest
@@ -15,5 +17,12 @@ services:
       CLUSTER_PORT: 1600
       CLUSTER_IP: master
       SEED_PORT_1600_TCP_ADDR: master
-      MONGO_PROVIDER_CONNECTION_STRING: mongodb://host.docker.internal:27017
-
+      MONGO_PROVIDER_CONNECTION_STRING: mongodb://root:example@host.docker.internal:27017
+  tor:
+    image: arulrajnet/torprivoxy
+    ports:
+      - 9050:9050
+      - 9051:9051
+      - 8118:8118
+    volumes:
+      - ./torrc:/opt/tor/torrc
