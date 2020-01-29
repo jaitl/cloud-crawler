@@ -29,14 +29,14 @@ class MongoConfigurationProvider(
 
   private val mongoClient: MongoClient = MongoClient(connectionString)
   private val codecRegistry = fromRegistries(
-    fromProviders(classOf[MongoProjectConfiguration], classOf[MongoCrawlerProxy], classOf[CrawlerTor]),
+    fromProviders(classOf[MongoProjectConfiguration], classOf[MongoCrawlerProxy], classOf[MongoCrawlerTor]),
     DEFAULT_CODEC_REGISTRY)
   private val database: MongoDatabase = mongoClient.getDatabase(dbName).withCodecRegistry(codecRegistry)
   private val crawlerProjectConfiguration: MongoCollection[MongoProjectConfiguration] =
     database.getCollection(configurationCollectionName)
   private val crawlerProxies: MongoCollection[MongoCrawlerProxy] =
     database.getCollection(proxyCollectionName)
-  private val crawlerTors: MongoCollection[CrawlerTor] =
+  private val crawlerTors: MongoCollection[MongoCrawlerTor] =
     database.getCollection(torCollectionName)
 
   override def getCrawlerProjectConfiguration(taskType: String): Future[Seq[ProjectConfiguration]] =
@@ -79,7 +79,23 @@ class MongoConfigurationProvider(
 
   override def getCrawlerTorConfiguration(taskType: String): Future[Seq[CrawlerTor]] =
     crawlerTors
-      .find(equal("workerTaskType", taskType))
+      .findOneAndUpdate(
+        equal("workerTaskType", taskType),
+        inc("usedCount", 1),
+        new FindOneAndUpdateOptions().sort(Sorts.ascending("usedCount"))
+      )
+      .map(entity =>
+        CrawlerTor(
+          entity._id.toString,
+          entity.workerTorHost,
+          entity.workerTorLimit,
+          entity.workerTorPort,
+          entity.workerTorControlPort,
+          entity.workerTorPassword,
+          entity.workerTorTimeoutUp,
+          entity.workerTorTimeoutDown,
+          entity.workerTaskType
+        ))
       .toFuture()
 }
 case class MongoProjectConfiguration(
@@ -104,4 +120,15 @@ case class MongoCrawlerProxy(
   workerProxyLogin: String,
   workerProxyPassword: String,
   workerTaskType: List[String]
+)
+case class MongoCrawlerTor(
+  _id: ObjectId,
+  workerTorHost: String,
+  workerTorLimit: Int,
+  workerTorPort: Int,
+  workerTorControlPort: Int,
+  workerTorPassword: String,
+  workerTorTimeoutUp: String,
+  workerTorTimeoutDown: String,
+  workerTaskType: String
 )

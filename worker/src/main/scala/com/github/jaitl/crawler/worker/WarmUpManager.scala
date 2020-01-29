@@ -62,7 +62,26 @@ private[worker] class WarmUpManager(
     case RequestConfiguration => {
       configurationBalancer ! RequestConfiguration(UUID.randomUUID(), pipeline.taskType)
     }
-    case SuccessTorRequest(requestId, taskType, tor) => {}
+    case SuccessTorRequest(requestId, configuration, tor) => {
+      log.info(s"Tor for ${configuration.workerTaskType} received! $tor")
+      requestBatch(
+        config,
+        configuration,
+        ConfigurablePipelineBuilder()
+          .withBatchSize(configuration.workerBatchSize)
+          .withTor(
+            tor.workerTorHost,
+            tor.workerTorPort,
+            tor.workerTorLimit,
+            RandomTimeout(Duration(tor.workerTorTimeoutUp), Duration(tor.workerTorTimeoutDown)),
+            tor.workerTorControlPort,
+            tor.workerTorPassword
+          )
+          .withNotifier(pipeline.notifier.getOrElse(new DummyNotification()))
+          .withEnableNotification(configuration.notification)
+          .build()
+      )
+    }
     case SuccessTasksConfigRequest(requestId, taskType, configuration) => {
       log.info(s"Config received: $configuration")
       resourceBalancer ! RequestResource(UUID.randomUUID(), configuration)
