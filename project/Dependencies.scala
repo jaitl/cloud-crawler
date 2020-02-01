@@ -4,6 +4,9 @@ object Dependencies {
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.8" % Test
   lazy val scalamock = "org.scalamock" %% "scalamock" % "4.1.0" % Test
 
+  lazy val scalaTestIt = "org.scalatest" %% "scalatest" % "3.0.8" % IntegrationTest
+  lazy val testContainersIt = "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.35.0" % IntegrationTest
+
   lazy val ficus = "com.iheart" %% "ficus" % "1.4.3"
   
   lazy val mongoScalaDriver = "org.mongodb.scala" %% "mongo-scala-driver" % "2.7.0"
