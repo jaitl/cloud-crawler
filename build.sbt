@@ -6,7 +6,7 @@ import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerBaseImage
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerExposedPorts
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerRepository
 
-val projectVersion = sys.env.getOrElse("TRAVIS_TAG", "SNAPSHOT")
+val projectVersion = sys.env.getOrElse("RELEASE_VERSION", "SNAPSHOT")
 
 lazy val root = (project in file("."))
   .aggregate(models, master, worker, `simple-worker`)
