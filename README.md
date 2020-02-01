@@ -1,4 +1,6 @@
 [![Build Status](https://github.com/Jaitl/cloud-crawler/workflows/Build/badge.svg?branch=master)](https://github.com/Jaitl/cloud-crawler/actions?workflow=Build)
+[![Release Status](https://github.com/Jaitl/cloud-crawler/workflows/Release/badge.svg?branch=master)](https://github.com/Jaitl/cloud-crawler/actions?workflow=Release)
+[![Version](https://img.shields.io/github/release/Jaitl/cloud-crawler.svg?label=Version)](https://github.com/Jaitl/cloud-crawler/releases)
 [![Coverage Status](https://coveralls.io/repos/github/Jaitl/cloud-crawler/badge.svg?branch=master)](https://coveralls.io/github/Jaitl/cloud-crawler?branch=master)
 # cloudCrawler
 A framework for building a distributed, highload system for crawling open data.
