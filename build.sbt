@@ -1,15 +1,11 @@
-import Dependencies._
 import BuildSettings._
-import com.typesafe.sbt.packager.docker.DockerPermissionStrategy
-import com.typesafe.sbt.packager.docker.DockerVersion
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerBaseImage
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerExposedPorts
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerRepository
+import Dependencies._
+import DockerSettings._
 
 val projectVersion = sys.env.getOrElse("RELEASE_VERSION", "SNAPSHOT")
 
 lazy val root = (project in file("."))
-  .aggregate(models, master, worker, `simple-worker`)
+  .aggregate(models, master, worker, `simple-worker`, `integration-tests`)
   .settings(commonSettings)
   .settings(
     name := "cloud-crawler",
@@ -30,16 +26,11 @@ lazy val master = (project in file("master"))
     skip in publish := true
   )
   .settings(commonSettings)
+  .settings(dockerSettings)
   .dependsOn(models)
   .settings(
     libraryDependencies ++= Seq(mongoScalaDriver, ficus) ++ Akka.list ++ Logging.list,
     libraryDependencies ++= Seq(scalaTest, scalamock)
-  )
-  .settings(
-    dockerPermissionStrategy := DockerPermissionStrategy.Run,
-    dockerVersion := Some(DockerVersion(18, 9, 0, Some("ce"))),
-    version in Docker := "latest",
-    dockerBaseImage := "java"
   )
 
 lazy val worker = (project in file("worker"))
@@ -60,14 +51,22 @@ lazy val `simple-worker` = (project in file("simple-worker"))
     skip in publish := true
   )
   .settings(commonSettings)
+  .settings(dockerSettings)
   .dependsOn(worker)
   .settings(
     libraryDependencies += jsoup,
     libraryDependencies += scalaTest
   )
+
+lazy val `integration-tests` = (project in file("integration-tests"))
+  .configs(IntegrationTest)
   .settings(
-    dockerPermissionStrategy := DockerPermissionStrategy.Run,
-    dockerVersion := Some(DockerVersion(18, 9, 0, Some("ce"))),
-    version in Docker := "latest",
-    dockerBaseImage := "java"
+    name := "integration-tests",
+    version := projectVersion,
+    skip in publish := true
+  )
+  .settings(commonSettings)
+  .settings(
+    Defaults.itSettings,
+    libraryDependencies ++= Seq(scalaTestIt, testContainersIt)
   )
