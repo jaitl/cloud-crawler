@@ -44,4 +44,11 @@ object Dependencies {
 
     lazy val list: Seq[ModuleID] = Seq(elastic4sCore, elastic4sHttp)
   }
+
+  object gRpc {
+    lazy val list = Seq(
+      "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
+      "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+    )
+  }
 }
