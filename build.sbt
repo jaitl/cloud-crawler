@@ -1,11 +1,12 @@
 import BuildSettings._
 import Dependencies._
 import DockerSettings._
+import ProtobufSettings._
 
 val projectVersion = sys.env.getOrElse("RELEASE_VERSION", "SNAPSHOT")
 
 lazy val root = (project in file("."))
-  .aggregate(models, master, worker, `simple-worker`, `integration-tests`)
+  .aggregate(models, master, `master-client`, worker, `simple-worker`, `integration-tests`)
   .settings(commonSettings)
   .settings(
     name := "cloud-crawler",
@@ -16,6 +17,12 @@ lazy val root = (project in file("."))
 lazy val models = (project in file("models"))
   .settings(name := "models", version := projectVersion)
   .settings(commonSettings)
+
+lazy val `master-client` = (project in file("master-client"))
+  .settings(name := "master-client", version := projectVersion)
+  .settings(commonSettings)
+  .settings(protoSettings)
+  .settings(libraryDependencies ++= gRpc.list)
 
 lazy val master = (project in file("master"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
