@@ -35,6 +35,7 @@ lazy val master = (project in file("master"))
   .settings(commonSettings)
   .settings(dockerSettings)
   .dependsOn(models)
+  .dependsOn(`master-client`)
   .settings(
     libraryDependencies ++= Seq(mongoScalaDriver, ficus) ++ Akka.list ++ Logging.list,
     libraryDependencies ++= Seq(scalaTest, scalamock)
@@ -44,6 +45,7 @@ lazy val worker = (project in file("worker"))
   .settings(name := "worker", version := projectVersion)
   .settings(commonSettings)
   .dependsOn(models)
+  .dependsOn(`master-client`)
   .settings(
     libraryDependencies ++= Seq(mongoScalaDriver, ficus, asyncHttpClient, awsSdk, json4s, jtorctl) ++ Akka.list ++ Logging.list ++ Elasticsearch.list,
     libraryDependencies ++= Seq(scalaTest, scalamock)
