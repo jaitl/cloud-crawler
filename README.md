@@ -17,18 +17,45 @@ A framework for building a distributed, highload system for crawling open data.
     sbt -DWORKER_PORT=2562 simple-worker/run
     ```
 
-## Simple task
-1. MongoDB
-```
-{
-    "_id" : ObjectId("5c5aea3dec37b20006c9c492"),
-    "taskType" : "HabrTasks",
-    "taskData" : "438886",
-    "taskStatus" : "taskInProgress",
-    "attempt" : 0,
-    "lastUpdate" : NumberLong(1549465631389)
-}
-```
+## MongoDB data example
+1. СonfigurationСollection
+    ```
+    {
+        "workerExecuteInterval" : "35.seconds",
+        "workerFilePath" : "/",
+        "workerBatchSize" : 2.0,
+        "workerBaseUrl" : "https://habr.com/ru",
+        "workerTaskType" : "HabrTasks",
+        "workerParallelBatches" : 1,
+        "workerResource" : "Tor",
+        "workerNotification" : false
+    }
+    ```
+2. TorCollection
+    ```
+    {
+        "workerTorHost" : "127.0.0.1",
+        "workerTorLimit" : 1,
+        "workerTorPort" : 9050,
+        "workerTorControlPort" : 0,
+        "workerTorPassword" : "",
+        "workerTorTimeoutUp" : "30.seconds",
+        "workerTorTimeoutDown" : "30.seconds",
+        "workerTaskType" : [ 
+            "HabrTasks"
+        ],
+        "usedCount" : 0
+    }
+    ```
+3. CrawlTasks
+    ```
+    {
+        "taskType" : "HabrTasks",
+        "taskData" : "438886",
+        "taskStatus" : "taskWait",
+        "attempt" : 0
+    }
+    ```
 
 ## Worker dependency
 [![GitHub release](https://img.shields.io/github/release/Jaitl/cloud-crawler.svg?label=version)](https://bintray.com/jaitl/cloud-crawler/worker)
