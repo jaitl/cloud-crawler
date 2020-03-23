@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.github.jaitl.crawler.master.client;
+
+import "google/protobuf/wrappers.proto";
+
+message Task {
+    string id = 1;
+    string taskType = 2;
+    string taskData = 3;
+    int32 attempt = 4;
+    google.protobuf.Int64Value lastUpdate = 5;
+    bool skipped = 6;
+}
+
+message TasksBatch {
+    string id = 1;
+    string taskType = 2;
+    repeated Task tasks = 3;
+}

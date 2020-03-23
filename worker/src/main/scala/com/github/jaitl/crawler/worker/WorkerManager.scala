@@ -73,6 +73,7 @@ private[worker] class WorkerManager(
       tasksBatchController ! TasksBatchController.ExecuteTask
     case FailureTasksBatchRequest(requestId, taskType, throwable) =>
     case NoTasks(requestId, taskType) =>
+      log.info(s"No tasks, id: $requestId")
     case EmptyTaskTypeList =>
   }
 

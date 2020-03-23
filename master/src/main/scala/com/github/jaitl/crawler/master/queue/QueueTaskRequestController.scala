@@ -66,6 +66,7 @@ class QueueTaskRequestController(
       unstashAll()
 
     case QueueBatchFailure(requestId, taskType, requester, throwable) =>
+      log.error(throwable, s"Failure during request tasks, taskType: $taskType, requestId: ${requestId.toString}")
       requester ! FailureTasksBatchRequest(requestId, taskType, throwable)
 
       context.unbecome()

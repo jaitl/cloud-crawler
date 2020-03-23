@@ -8,9 +8,9 @@ import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.types.ObjectId
 import org.mongodb.scala.MongoClient
+import org.mongodb.scala.MongoClient.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.MongoDatabase
-import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.model.Sorts
 
 import scala.concurrent.Future
