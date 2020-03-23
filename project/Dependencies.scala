@@ -9,7 +9,7 @@ object Dependencies {
 
   lazy val ficus = "com.iheart" %% "ficus" % "1.4.3"
   
-  lazy val mongoScalaDriver = "org.mongodb.scala" %% "mongo-scala-driver" % "2.7.0"
+  lazy val mongoScalaDriver = "org.mongodb.scala" %% "mongo-scala-driver" % "4.0.1"
   lazy val asyncHttpClient = "org.asynchttpclient" % "async-http-client" % "2.4.7"
   lazy val awsSdk = "com.amazonaws" % "aws-java-sdk" % "1.9.20.1"
   lazy val json4s = "org.json4s" %% "json4s-jackson" % "3.6.4"
@@ -48,7 +48,8 @@ object Dependencies {
   object gRpc {
     lazy val list = Seq(
       "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
-      "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+      "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
+      "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"
     )
   }
 }
