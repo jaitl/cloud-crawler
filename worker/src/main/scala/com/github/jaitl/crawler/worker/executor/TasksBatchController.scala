@@ -7,14 +7,13 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.ActorRefFactory
 import akka.actor.Props
-import com.github.jaitl.crawler.models.task.Task
-import com.github.jaitl.crawler.models.task.TasksBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
+import com.github.jaitl.crawler.master.client.task.Task
+import com.github.jaitl.crawler.master.client.task.TasksBatch
+import com.github.jaitl.crawler.worker.client.QueueClient
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
 import com.github.jaitl.crawler.worker.exception.PageNotFoundException
-import com.github.jaitl.crawler.worker.notification.NotificationExecutor.SendNotification
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
@@ -42,6 +41,7 @@ import com.github.jaitl.crawler.worker.executor.resource.ResourceController.Retu
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.ReturnSuccessResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceController.SuccessRequestResource
 import com.github.jaitl.crawler.worker.executor.resource.ResourceHelper
+import com.github.jaitl.crawler.worker.notification.NotificationExecutor.SendNotification
 import com.github.jaitl.crawler.worker.parser.ParsingException
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
@@ -49,7 +49,10 @@ import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
+import scala.util.Failure
+import scala.util.Success
 
 private[worker] class TasksBatchController(
   batch: TasksBatch,
@@ -59,11 +62,13 @@ private[worker] class TasksBatchController(
   crawlExecutorCreator: ActorCreator,
   notifierExecutorCreator: ActorCreator,
   saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
-  queueTaskBalancer: ActorRef,
+  queueClient: QueueClient,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends Actor
     with ActorLogging {
+  implicit private val executionContext: ExecutionContext = context.dispatcher
+
   var currentActiveCrawlTask: Int = 0
   var forcedStop: Boolean = false
 
@@ -181,7 +186,13 @@ private[worker] class TasksBatchController(
 
         if (taskQueue.nonEmpty) {
           val ids = taskQueue.map(_.task.id)
-          queueTaskBalancer ! ReturnTasks(UUID.randomUUID(), batch.taskType, ids)
+          val requestId = UUID.randomUUID()
+          queueClient.returnTasks(requestId, ids).onComplete {
+            case Success(_) =>
+              log.debug(s"Tasks returned to queue, controller: ${batch.id}, requestId: $requestId")
+            case Failure(ex) =>
+              log.error(ex, s"Failure during return tasks to queue, controller: ${batch.id}, requestId: $requestId")
+          }
         }
 
         context.stop(self)
@@ -200,6 +211,7 @@ private[worker] object TasksBatchController {
 
   case class QueuedTask(task: Task, attempt: Int, t: Seq[Throwable] = Seq.empty)
 
+  // scalastyle:off parameter.number
   def props(
     batch: TasksBatch,
     pipeline: Pipeline[_],
@@ -208,7 +220,7 @@ private[worker] object TasksBatchController {
     crawlExecutorCreator: ActorCreator,
     notifierExecutorCreator: ActorCreator,
     saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
-    queueTaskBalancer: ActorRef,
+    queueClient: QueueClient,
     executeScheduler: Scheduler,
     config: TasksBatchControllerConfig
   ): Props =
@@ -221,12 +233,12 @@ private[worker] object TasksBatchController {
         crawlExecutorCreator = crawlExecutorCreator,
         notifierExecutorCreator = notifierExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,
-        queueTaskBalancer = queueTaskBalancer,
+        queueClient = queueClient,
         executeScheduler = executeScheduler,
         config = config
       ))
 
-  def name(batchId: UUID): String = s"tasksBatchController-$batchId"
+  def name(batchId: String): String = s"tasksBatchController-$batchId"
 
   case class TasksBatchControllerConfig(
     maxAttempts: Int,
@@ -239,7 +251,7 @@ class TasksBatchControllerCreator(
   crawlExecutorCreator: ActorCreator,
   notifierExecutorCreator: ActorCreator,
   saveCrawlResultCreator: ThreeArgumentActorCreator[Pipeline[_], ActorRef, ConfigurablePipeline],
-  queueTaskBalancer: ActorRef,
+  queueClient: QueueClient,
   executeScheduler: Scheduler,
   config: TasksBatchControllerConfig
 ) extends ThreeArgumentActorCreator[TasksBatch, Pipeline[_], ConfigurablePipeline] {
@@ -258,7 +270,7 @@ class TasksBatchControllerCreator(
         crawlExecutorCreator = crawlExecutorCreator,
         notifierExecutorCreator = notifierExecutorCreator,
         saveCrawlResultCreator = saveCrawlResultCreator,
-        queueTaskBalancer = queueTaskBalancer,
+        queueClient = queueClient,
         executeScheduler = executeScheduler,
         config = config
       ),

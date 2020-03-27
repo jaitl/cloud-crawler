@@ -4,11 +4,11 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 
-import com.github.jaitl.crawler.models.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.typesafe.scalalogging.StrictLogging
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
+import com.github.jaitl.crawler.master.client.task.Task
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

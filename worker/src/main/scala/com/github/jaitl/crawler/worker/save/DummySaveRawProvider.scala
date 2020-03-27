@@ -1,6 +1,6 @@
 package com.github.jaitl.crawler.worker.save
 
-import com.github.jaitl.crawler.models.task.Task
+import com.github.jaitl.crawler.master.client.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.typesafe.scalalogging.StrictLogging
 

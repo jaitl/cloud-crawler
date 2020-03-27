@@ -23,8 +23,8 @@ class MongoConfigurationProvider(
   torCollectionName: String
 ) extends CrawlerConfigurationProvider {
 
-  import org.mongodb.scala.bson.codecs.Macros._
-  import org.mongodb.scala.model.Filters._
+  import org.mongodb.scala.bson.codecs.Macros._ // scalastyle:ignore
+  import org.mongodb.scala.model.Filters._ // scalastyle:ignore
   import org.mongodb.scala.model.Updates._ // scalastyle:ignore
 
   private val mongoClient: MongoClient = MongoClient(connectionString)

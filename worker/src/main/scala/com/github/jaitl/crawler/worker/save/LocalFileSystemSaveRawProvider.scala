@@ -3,7 +3,7 @@ package com.github.jaitl.crawler.worker.save
 import java.io.File
 import java.io.RandomAccessFile
 
-import com.github.jaitl.crawler.models.task.Task
+import com.github.jaitl.crawler.master.client.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.typesafe.scalalogging.StrictLogging
 

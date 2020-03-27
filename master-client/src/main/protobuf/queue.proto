@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package com.github.jaitl.crawler.master.client;
+
+import "task.proto";
+
+service TaskQueueService {
+    rpc getTasks (TaskRequest) returns (TaskReply) {
+    }
+    rpc returnToQueue (ReturnRequest) returns (ReturnReply) {
+    }
+    rpc putProcessResult (ProcessResultRequest) returns (ProcessResultReply) {
+    }
+}
+
+message TaskRequest {
+    string requestId = 1;
+    repeated TaskTypeWithBatchSize taskTypes = 2;
+}
+
+message TaskReply {
+    enum Status {
+        FAILED = 0;
+        FAILED_EMPTY_TASKS_LIST = 1;
+        NO_TASKS = 2;
+        OK = 3;
+    }
+
+    Status status = 1;
+    string requestId = 2;
+    string taskType = 3;
+    TasksBatch tasksBatch = 4;
+}
+
+message ReturnRequest {
+    string requestId = 1;
+    repeated string ids = 2;
+}
+
+message ReturnReply {
+    enum Status {
+        FAILED = 0;
+        OK = 1;
+    }
+
+    Status status = 1;
+}
+
+message ProcessResultRequest {
+    string requestId = 1;
+    repeated string successIds = 2;
+    repeated string failureIds = 3;
+    repeated string skippedIds = 4;
+    repeated string parsingFailedTaskIds = 5;
+    repeated string bannedIds = 6;
+    map<string, NewTasks> newTasks = 7;
+}
+
+message ProcessResultReply {
+    enum Status {
+        FAILED = 0;
+        OK = 1;
+    }
+
+    Status status = 1;
+}

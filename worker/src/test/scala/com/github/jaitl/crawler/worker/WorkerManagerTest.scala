@@ -4,13 +4,12 @@ import java.util.UUID
 
 import akka.testkit.TestActorRef
 import akka.testkit.TestProbe
-import com.github.jaitl.crawler.models.task.Task
-import com.github.jaitl.crawler.models.task.TasksBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.RequestBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.RequestTasksBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.SuccessTasksBatchRequest
-import com.github.jaitl.crawler.models.worker.WorkerManager.TaskTypeWithBatchSize
+import com.github.jaitl.crawler.master.client.task.Task
+import com.github.jaitl.crawler.master.client.task.TaskTypeWithBatchSize
+import com.github.jaitl.crawler.master.client.task.TasksBatch
 import com.github.jaitl.crawler.worker.WorkerManager.CheckTimeout
+import com.github.jaitl.crawler.worker.WorkerManager.RequestBatch
+import com.github.jaitl.crawler.worker.client.QueueClient
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
@@ -25,11 +24,19 @@ import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import com.github.jaitl.crawler.worker.validators.DummyTasksValidator
 import org.scalatest.concurrent.Eventually
 
+import scala.collection.immutable
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+
 class WorkerManagerTest extends ActorTestSuite with Eventually {
+  implicit val executionContextGlobal: ExecutionContext = ExecutionContext.global
   import scala.concurrent.duration._
 
   class WorkerTestSuite {
     val tasksBatchSize = 10
+    val taskRequest: immutable.Seq[TaskTypeWithBatchSize] = TaskTypeWithBatchSize("test", 10) :: Nil
+    val taskResponce: Future[Option[TasksBatch]] = Future
+      .successful(Some(TasksBatch(UUID.randomUUID().toString, "test", Seq(Task("1", "test", "1")))))
 
     val pipeline = PipelineBuilder
       .noParserPipeline()
@@ -38,7 +45,6 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
       .withCrawler(mock[BaseCrawler])
       .build()
 
-    val queueTaskBalancer = TestProbe()
     val pipelines = Map("test" -> pipeline)
     val config = WorkerConfig(1, 5.seconds, 1.minute, 1.millis)
     val tasksBatchController = TestProbe()
@@ -46,14 +52,16 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
     val batchRequestScheduler = mock[Scheduler]
     val batchExecutionTimeoutScheduler = mock[Scheduler]
     val batchTasksValidator = new DummyTasksValidator
+    val queueClient = mock[QueueClient]
 
     (batchRequestScheduler.schedule _).expects(*, *, *).returning(Unit)
     (batchExecutionTimeoutScheduler.schedule _).expects(*, *, *).returning(Unit)
+    (queueClient.getTasks _).expects(*, taskRequest).returning(taskResponce)
     (tasksBatchControllerCreator.create _).expects(*, *, *, *).returning(tasksBatchController.ref)
 
     val workerManager = TestActorRef[WorkerManager](
       WorkerManager.props(
-        queueTaskBalancer.ref,
+        queueClient,
         pipelines,
         ConfigurablePipelineBuilder()
           .withProxy(mock[ResourceType])
@@ -71,16 +79,6 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
     "RequestBatch" in new WorkerTestSuite {
       workerManager ! RequestBatch
 
-      val res = queueTaskBalancer.expectMsgType[RequestTasksBatch]
-      (res.taskTypes should contain).only(TaskTypeWithBatchSize("test", 10))
-
-      queueTaskBalancer.reply(
-        SuccessTasksBatchRequest(
-          res.requestId,
-          "test",
-          TasksBatch(UUID.randomUUID(), "test", Seq(Task("1", "test", "1")))
-        ))
-
       tasksBatchController.expectMsg(TasksBatchController.ExecuteTask)
 
       (workerManager.underlyingActor.batchControllers should have).size(1)
@@ -88,16 +86,6 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
 
     "Terminated" in new WorkerTestSuite {
       workerManager ! RequestBatch
-
-      val res = queueTaskBalancer.expectMsgType[RequestTasksBatch]
-      (res.taskTypes should contain).only(TaskTypeWithBatchSize("test", 10))
-
-      queueTaskBalancer.reply(
-        SuccessTasksBatchRequest(
-          res.requestId,
-          "test",
-          TasksBatch(UUID.randomUUID(), "test", Seq(Task("1", "test", "1")))
-        ))
 
       tasksBatchController.expectMsg(TasksBatchController.ExecuteTask)
 
@@ -115,16 +103,6 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
       watcher.watch(tasksBatchController.ref)
 
       workerManager ! RequestBatch
-
-      val res = queueTaskBalancer.expectMsgType[RequestTasksBatch]
-      (res.taskTypes should contain).only(TaskTypeWithBatchSize("test", 10))
-
-      queueTaskBalancer.reply(
-        SuccessTasksBatchRequest(
-          res.requestId,
-          "test",
-          TasksBatch(UUID.randomUUID(), "test", Seq(Task("1", "test", "1")))
-        ))
 
       tasksBatchController.expectMsg(TasksBatchController.ExecuteTask)
 
