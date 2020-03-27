@@ -6,16 +6,15 @@ import java.util.UUID
 import akka.actor.ActorRef
 import akka.testkit.TestActorRef
 import akka.testkit.TestProbe
-import com.github.jaitl.crawler.models.task.Task
-import com.github.jaitl.crawler.models.task.TasksBatch
-import com.github.jaitl.crawler.models.worker.WorkerManager.ReturnTasks
+import com.github.jaitl.crawler.master.client.task.Task
+import com.github.jaitl.crawler.master.client.task.TasksBatch
 import com.github.jaitl.crawler.worker.ActorTestSuite
+import com.github.jaitl.crawler.worker.client.QueueClient
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.worker.creator.ActorCreator
 import com.github.jaitl.crawler.worker.creator.OneArgumentActorCreator
 import com.github.jaitl.crawler.worker.creator.ThreeArgumentActorCreator
-import com.github.jaitl.crawler.worker.creator.TwoArgumentActorCreator
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.Crawl
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlFailureResult
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor.CrawlSuccessResult
@@ -43,6 +42,7 @@ import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
 import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TasksBatchControllerTest extends ActorTestSuite {
@@ -50,7 +50,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
     val tasks = (1 to taskCount).map(i => Task(i.toString, "test", i.toString))
     val tasksBatchSize = 10
     val batch = TasksBatch(
-      id = UUID.randomUUID(),
+      id = UUID.randomUUID().toString,
       taskType = "test",
       tasks = tasks
     )
@@ -72,6 +72,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
     val queueTaskBalancer = TestProbe()
     val executeScheduler = mock[Scheduler]
     val config = TasksBatchControllerConfig(maxAttempts = 2, 1.minute)
+    val queueClient = mock[QueueClient]
 
     (resourceControllerCreator.create _).expects(*, *).returning(resourceController.ref)
     (crawlExecutorCreator.create _).expects(*).returning(crawlExecutor.ref)
@@ -81,18 +82,18 @@ class TasksBatchControllerTest extends ActorTestSuite {
 
     val tasksBatchController = TestActorRef[TasksBatchController](
       TasksBatchController.props(
-        batch,
-        pipeline,
-        ConfigurablePipelineBuilder()
+        batch = batch,
+        pipeline = pipeline,
+        configPipeline = ConfigurablePipelineBuilder()
           .withProxy(mock[ResourceType])
           .withBatchSize(tasksBatchSize).build(),
-        resourceControllerCreator,
-        crawlExecutorCreator,
-        notificationExecutorCreator,
-        saveCrawlResultCreator,
-        queueTaskBalancer.ref,
-        executeScheduler,
-        config
+        resourceControllerCreator = resourceControllerCreator,
+        crawlExecutorCreator = crawlExecutorCreator,
+        notifierExecutorCreator = notificationExecutorCreator,
+        saveCrawlResultCreator = saveCrawlResultCreator,
+        queueClient = queueClient,
+        executeScheduler = executeScheduler,
+        config = config
       )
     )
 
@@ -167,12 +168,9 @@ class TasksBatchControllerTest extends ActorTestSuite {
       (tasksBatchController.underlyingActor.taskQueue should have).size(2)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
+      (queueClient.returnTasks _).expects(*, tasks.map(_.id)).returning(Future.successful(Unit))
+
       saveCrawlResultController.reply(SuccessSavedResults)
-
-      val returnedRes = queueTaskBalancer.expectMsgType[ReturnTasks]
-
-      returnedRes.taskType shouldBe batch.taskType
-      returnedRes.ids shouldBe tasks.map(_.id)
 
       watcher.expectTerminated(tasksBatchController)
     }

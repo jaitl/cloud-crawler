@@ -6,15 +6,14 @@
 A framework for building a distributed, highload system for crawling open data.
 
 ## Run
-1. Run two master node:
+1. Run master node:
     ```
-    sbt -DMASTER_PORT=2551 master/run
-    sbt -DMASTER_PORT=2552 master/run
+    sbt master/run
     ```
 2. Run worker nodes:
     ```
-    sbt -DWORKER_PORT=2561 simple-worker/run
-    sbt -DWORKER_PORT=2562 simple-worker/run
+    sbt simple-worker/run
+    sbt simple-worker/run
     ```
 
 ## MongoDB data example

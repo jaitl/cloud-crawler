@@ -2,11 +2,12 @@ package com.github.jaitl.crawler.worker
 
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
-import akka.cluster.singleton.ClusterSingletonProxy
-import akka.cluster.singleton.ClusterSingletonProxySettings
 import com.github.jaitl.crawler.master.client.configuration.ConfigurationServiceGrpc
 import com.github.jaitl.crawler.master.client.configuration.ProjectConfiguration
-import com.github.jaitl.crawler.models.worker.WorkerManager.RequestBatch
+import com.github.jaitl.crawler.master.client.queue.TaskQueueServiceGrpc
+import com.github.jaitl.crawler.worker.WorkerManager.RequestBatch
+import com.github.jaitl.crawler.worker.client.QueueClient
+import com.github.jaitl.crawler.worker.client.QueueClientImpl
 import com.github.jaitl.crawler.worker.config.WorkerConfig
 import com.github.jaitl.crawler.worker.creator.PropsActorCreator
 import com.github.jaitl.crawler.worker.executor.CrawlExecutor
@@ -44,25 +45,21 @@ object WorkerApp extends StrictLogging {
   def run(): Unit = {
     val config = ConfigFactory.load("worker.conf")
 
-    logger.info(
-      "Start worker on {}:{}",
-      config.getConfig("akka.remote.netty.tcp").getString("hostname"),
-      config.getConfig("akka.remote.netty.tcp").getString("port")
-    )
-
-    val system = ActorSystem(config.getConfig("clustering.cluster").getString("name"), config)
+    val system = ActorSystem("CCWorkerActorSystem", config)
 
     val masterGrpcHost = config.getString("master.grpc.host")
     val masterGrpcPort = config.getInt("master.grpc.port")
 
     val channel = NettyChannelBuilder.forAddress(masterGrpcHost, masterGrpcPort).usePlaintext().build
     val configurationClient = ConfigurationServiceGrpc.stub(channel)
+    val taskQueueClient = TaskQueueServiceGrpc.stub(channel)
+    val queueClient = new QueueClientImpl(taskQueueClient)
     val startUpService = new StartUpService(configurationClient, warmUpPipelines)
     logger.info(s"Connect master by GRPC on $masterGrpcHost:$masterGrpcPort")
 
     startUpService.configurePipeline(warmUpPipelines.taskType).onComplete {
       case Success((configuration, pipeline)) =>
-        val workerManager = createWorkerManager(system, config, configuration, pipeline)
+        val workerManager = createWorkerManager(queueClient, system, config, configuration, pipeline)
         logger.info("Create worker manager")
         workerManager ! RequestBatch
       case Failure(ex) =>
@@ -72,6 +69,7 @@ object WorkerApp extends StrictLogging {
   }
 
   def createWorkerManager(
+    queueClient: QueueClient,
     system: ActorSystem,
     config: Config,
     configuration: ProjectConfiguration,
@@ -86,13 +84,7 @@ object WorkerApp extends StrictLogging {
       config.as[FiniteDuration]("worker.manager.runExecutionTimeoutCheckInterval"),
       config.as[FiniteDuration]("worker.manager.batchExecutionTimeout")
     )
-    val queueTaskBalancer: ActorRef = system.actorOf(
-      ClusterSingletonProxy.props(
-        singletonManagerPath = "/user/queueTaskBalancer",
-        settings = ClusterSingletonProxySettings(system).withRole("master")
-      ),
-      name = "queueTaskBalancerProxy"
-    )
+
     val crawlExecutorCreator = new PropsActorCreator(
       actorName = CrawlExecutor.name(),
       props = CrawlExecutor.props().withDispatcher("worker.blocking-io-dispatcher")
@@ -105,7 +97,7 @@ object WorkerApp extends StrictLogging {
     val saveCrawlResultControllerConfig = config.as[SaveCrawlResultControllerConfig]("worker.save-controller")
 
     val saveCrawlResultControllerCreator = new SaveCrawlResultControllerCreator(
-      queueTaskBalancer = queueTaskBalancer,
+      queueClient = queueClient,
       saveScheduler = new AkkaScheduler(system),
       config = saveCrawlResultControllerConfig
     )
@@ -120,14 +112,14 @@ object WorkerApp extends StrictLogging {
       crawlExecutorCreator = crawlExecutorCreator,
       notifierExecutorCreator = notifierExecutorCreator,
       saveCrawlResultCreator = saveCrawlResultControllerCreator,
-      queueTaskBalancer = queueTaskBalancer,
+      queueClient = queueClient,
       executeScheduler = new AkkaScheduler(system),
       config = tasksBatchControllerConfig
     )
 
     system.actorOf(
       WorkerManager.props(
-        queueTaskBalancer = queueTaskBalancer,
+        queueClient = queueClient,
         pipelines = Map(warmUpPipelines.taskType -> warmUpPipelines),
         configurablePipeline = configurablePipeline,
         config = workerConfig,

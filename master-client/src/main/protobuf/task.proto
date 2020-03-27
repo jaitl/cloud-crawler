@@ -9,7 +9,7 @@ message Task {
     string taskType = 2;
     string taskData = 3;
     int32 attempt = 4;
-    google.protobuf.Int64Value lastUpdate = 5;
+    google.protobuf.Int64Value lastUpdateMillis = 5;
     bool skipped = 6;
 }
 
@@ -17,4 +17,13 @@ message TasksBatch {
     string id = 1;
     string taskType = 2;
     repeated Task tasks = 3;
+}
+
+message TaskTypeWithBatchSize {
+    string taskType = 1;
+    int32 batchSize = 2;
+}
+
+message NewTasks {
+    repeated string tasks = 1;
 }

@@ -2,7 +2,7 @@ package com.github.jaitl.crawler.master.queue.provider
 
 import java.time.Instant
 
-import com.github.jaitl.crawler.models.task.Task
+import com.github.jaitl.crawler.master.client.task.Task
 
 import scala.concurrent.Future
 
@@ -11,7 +11,7 @@ trait QueueTaskProvider {
 
   def pullAndUpdateStatus(taskType: String, size: Int, taskStatus: String): Future[Seq[Task]]
 
-  def pushTasks(taskType: String, taskData: Seq[String]): Future[Unit]
+  def pushTasks(taskData: Map[String, Seq[String]]): Future[Unit]
 
   def updateTasksStatus(ids: Seq[String], taskStatus: String): Future[Unit]
 

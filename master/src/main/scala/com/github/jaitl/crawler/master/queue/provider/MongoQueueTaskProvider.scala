@@ -2,7 +2,7 @@ package com.github.jaitl.crawler.master.queue.provider
 
 import java.time.Instant
 
-import com.github.jaitl.crawler.models.task.Task
+import com.github.jaitl.crawler.master.client.task.Task
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.mongodb.scala.MongoClient.DEFAULT_CODEC_REGISTRY
@@ -19,9 +19,9 @@ class MongoQueueTaskProvider(
   collectionName: String
 ) extends QueueTaskProvider {
 
-  import org.mongodb.scala._
-  import org.mongodb.scala.bson.codecs.Macros._
-  import org.mongodb.scala.model.Filters._
+  import org.mongodb.scala._ // scalastyle:ignore
+  import org.mongodb.scala.bson.codecs.Macros._ // scalastyle:ignore
+  import org.mongodb.scala.model.Filters._ // scalastyle:ignore
   import org.mongodb.scala.model.Updates._ // scalastyle:ignore
 
   private val codecRegistry = fromRegistries(fromProviders(classOf[MongoQueueTaskEntity]), DEFAULT_CODEC_REGISTRY)
@@ -37,12 +37,12 @@ class MongoQueueTaskProvider(
       .map(
         entity =>
           Task(
-            entity._id.toString,
-            entity.taskType,
-            entity.taskData,
-            entity.attempt,
-            entity.lastUpdate.map(Instant.ofEpochMilli),
-            false
+            id = entity._id.toString,
+            taskType = entity.taskType,
+            taskData = entity.taskData,
+            attempt = entity.attempt,
+            lastUpdateMillis = entity.lastUpdate,
+            skipped = false
         ))
       .toFuture()
 
@@ -78,15 +78,17 @@ class MongoQueueTaskProvider(
             taskType = entity.taskType,
             taskData = entity.taskData,
             attempt = entity.attempt,
-            lastUpdate = entity.lastUpdate.map(Instant.ofEpochMilli)
+            lastUpdateMillis = entity.lastUpdate
         )))
       .toFuture()
       .map(_.flatten)
   }
 
-  override def pushTasks(taskType: String, taskData: Seq[String]): Future[Unit] = {
-    val newTasks = taskData
-      .map(data => MongoQueueTaskEntity(new ObjectId(), taskType, data, TaskStatus.taskWait, 0, None))
+  override def pushTasks(taskData: Map[String, Seq[String]]): Future[Unit] = {
+    val newTasks = taskData.flatMap {
+      case (taskType, dataSeq) =>
+        dataSeq.map(data => MongoQueueTaskEntity(new ObjectId(), taskType, data, TaskStatus.taskWait, 0, None))
+    }.toSeq
 
     collection.insertMany(newTasks).toFuture().map(_ => Unit)
   }
@@ -138,12 +140,12 @@ class MongoQueueTaskProvider(
       .map(
         entity =>
           Task(
-            entity._id.toString,
-            entity.taskType,
-            entity.taskData,
-            entity.attempt,
-            entity.lastUpdate.map(Instant.ofEpochMilli),
-            false
+            id = entity._id.toString,
+            taskType = entity.taskType,
+            taskData = entity.taskData,
+            attempt = entity.attempt,
+            lastUpdateMillis = entity.lastUpdate,
+            skipped = false
         ))
       .toFuture()
   }

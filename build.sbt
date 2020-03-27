@@ -6,17 +6,13 @@ import ProtobufSettings._
 val projectVersion = sys.env.getOrElse("RELEASE_VERSION", "SNAPSHOT")
 
 lazy val root = (project in file("."))
-  .aggregate(models, master, `master-client`, worker, `simple-worker`, `integration-tests`)
+  .aggregate(master, `master-client`, worker, `simple-worker`, `integration-tests`)
   .settings(commonSettings)
   .settings(
     name := "cloud-crawler",
     version := projectVersion,
     skip in publish := true
   )
-
-lazy val models = (project in file("models"))
-  .settings(name := "models", version := projectVersion)
-  .settings(commonSettings)
 
 lazy val `master-client` = (project in file("master-client"))
   .settings(name := "master-client", version := projectVersion)
@@ -34,7 +30,6 @@ lazy val master = (project in file("master"))
   )
   .settings(commonSettings)
   .settings(dockerSettings)
-  .dependsOn(models)
   .dependsOn(`master-client`)
   .settings(
     libraryDependencies ++= Seq(mongoScalaDriver, ficus) ++ Akka.list ++ Logging.list,
@@ -44,7 +39,6 @@ lazy val master = (project in file("master"))
 lazy val worker = (project in file("worker"))
   .settings(name := "worker", version := projectVersion)
   .settings(commonSettings)
-  .dependsOn(models)
   .dependsOn(`master-client`)
   .settings(
     libraryDependencies ++= Seq(mongoScalaDriver, ficus, asyncHttpClient, awsSdk, json4s, jtorctl) ++ Akka.list ++ Logging.list ++ Elasticsearch.list,

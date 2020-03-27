@@ -29,7 +29,7 @@ object BuildSettings {
       ".*MongoQueueTaskProvider.*",
       ".*QueueTaskProviderFactory.*",
       ".*\\.simple\\.worker\\..*",
-      ".*\\.crawler\\.models\\..*"
+      ".*\\.crawler\\.master\\..*"
     ).mkString(";")
   )
 }

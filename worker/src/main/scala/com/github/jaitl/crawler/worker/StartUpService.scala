@@ -19,15 +19,15 @@ import scala.concurrent.duration.Duration
 
 private[worker] class StartUpService(
   configurationClient: ConfigurationServiceGrpc.ConfigurationServiceStub,
-  pipeline: Pipeline[_],
+  pipeline: Pipeline[_]
 )(implicit executionContext: ExecutionContext)
     extends StrictLogging {
   def configurePipeline(taskType: String): Future[(ProjectConfiguration, ConfigurablePipeline)] =
     for {
       config <- configurationClient.getConfig(ConfigRequest(UUID.randomUUID().toString, taskType))
       pipeline <- config.config match {
-        case Some(cfg@ProjectConfiguration(_, _, _, _, _, _, _, "Tor", _, _)) => configureTor(taskType, cfg)
-        case Some(cfg@ProjectConfiguration(_, _, _, _, _, _, _, "Proxy", _, _)) => configureProxy(taskType, cfg)
+        case Some(cfg @ ProjectConfiguration(_, _, _, _, _, _, _, "Tor", _, _)) => configureTor(taskType, cfg)
+        case Some(cfg @ ProjectConfiguration(_, _, _, _, _, _, _, "Proxy", _, _)) => configureProxy(taskType, cfg)
         case Some(pc) => Future.failed(new Exception(s"Configuration failed, unknown resource: ${pc.workerResource}"))
         case None => Future.failed(new Exception(s"Configuration failed: ${config.status}"))
       }

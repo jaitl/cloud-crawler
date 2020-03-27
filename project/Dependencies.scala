@@ -26,14 +26,11 @@ object Dependencies {
   object Akka {
     val version = "2.5.9"
 
-    lazy val cluster = "com.typesafe.akka" %% "akka-cluster" % version
     lazy val slf4j = "com.typesafe.akka" %% "akka-slf4j" % version
-    lazy val clusterTools = "com.typesafe.akka" %% "akka-cluster-tools" % version
-    lazy val clusterSharding = "com.typesafe.akka" %% "akka-cluster-sharding" % version
-
+    lazy val actor = "com.typesafe.akka" %% "akka-actor" % version
     lazy val testkit = "com.typesafe.akka" %% "akka-testkit" % version % Test
 
-    lazy val list: Seq[ModuleID] = Seq(cluster, slf4j, clusterTools, clusterSharding, testkit)
+    lazy val list: Seq[ModuleID] = Seq(actor, slf4j, testkit)
   }
 
   object Elasticsearch {
