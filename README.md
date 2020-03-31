@@ -35,7 +35,7 @@ A framework for building a distributed, highload system for crawling open data.
     {
         "workerTorHost" : "127.0.0.1",
         "workerTorLimit" : 1,
-        "workerTorPort" : 9050,
+        "workerTorPort" : 9150,
         "workerTorControlPort" : 0,
         "workerTorPassword" : "",
         "workerTorTimeoutUp" : "30.seconds",

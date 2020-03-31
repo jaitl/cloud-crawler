@@ -38,7 +38,7 @@ class QueueClientImpl(
       .returnToQueue(ReturnRequest(requestId.toString, ids))
       .map { reply =>
         reply.status match {
-          case ReturnReply.Status.OK => Unit
+          case ReturnReply.Status.OK => ()
           case ReturnReply.Status.FAILED => throw new Exception(s"Master failure, examine master logs, id: $requestId")
           case status: ReturnReply.Status => throw new Exception(s"Unknown status: $status, id: $requestId")
         }
@@ -65,7 +65,7 @@ class QueueClientImpl(
         ))
       .map { reply =>
         reply.status match {
-          case ProcessResultReply.Status.OK => Unit
+          case ProcessResultReply.Status.OK => ()
           case ProcessResultReply.Status.FAILED =>
             throw new Exception(s"Master failure, examine master logs, id: $requestId")
           case status: ProcessResultReply.Status =>

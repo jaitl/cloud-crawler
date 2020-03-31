@@ -19,6 +19,6 @@ class MongoSaveParsedProvider[T](
 
   override def saveResults(parsedData: Seq[T])(implicit executionContext: ExecutionContext): Future[Unit] = {
     val docs = parsedData.map(d => converter.convert(d))
-    collection.insertMany(docs).toFuture().map(_ => Unit)
+    collection.insertMany(docs).toFuture().map(_ => ())
   }
 }

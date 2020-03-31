@@ -19,7 +19,7 @@ class LocalFileSystemSaveRawProvider() extends SaveRawProvider with StrictLoggin
   }
 
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
-    raw.toList.par.foreach(r => {
+    raw.toList.foreach(r => {
       val folder = path
         .concat("/")
         .concat(r._1.id)

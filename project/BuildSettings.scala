@@ -5,7 +5,7 @@ import bintray.BintrayKeys._
 
 object BuildSettings {
   lazy val commonSettings: Seq[Setting[_]] = Seq(
-    scalaVersion := "2.12.8",
+    scalaVersion := "2.13.1",
     organization := "com.github.jaitl",
     organizationName := "JaitlApp",
     resolvers += "jitpack" at "https://jitpack.io",
@@ -20,7 +20,6 @@ object BuildSettings {
       "-language:higherKinds", // allow higher kinded types without `import scala.language.higherKinds`
       "-Xlint", // enable handy linter warnings
       // "-Xfatal-warnings", // turn compiler warnings into errors
-      "-Ypartial-unification" // allow the compiler to unify type constructors of different arities
     ),
     coverageExcludedPackages := Seq(
       "<empty>",

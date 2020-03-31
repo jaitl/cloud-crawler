@@ -188,8 +188,9 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
 
-      (queueClient.putProcessResult _).expects(where {
-        case (
+      (queueClient.putProcessResult _)
+        .expects(where {
+          (
             requestId: UUID,
             successIds: Seq[String],
             failureIds: Seq[String],
@@ -197,8 +198,9 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
             parsingFailedTaskIds: Seq[String],
             bannedIds: Seq[String],
             newTasks: Map[String, Seq[String]]) =>
-          successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty
-      }).returning(Future.successful(Unit))
+            successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty
+        })
+        .returning(Future.successful(()))
 
       saveCrawlResultController ! SaveResults
 
@@ -229,8 +231,9 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
 
-      (queueClient.putProcessResult _).expects(where {
-        case (
+      (queueClient.putProcessResult _)
+        .expects(where {
+          (
             requestId: UUID,
             successIds: Seq[String],
             failureIds: Seq[String],
@@ -238,10 +241,11 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
             parsingFailedTaskIds: Seq[String],
             bannedIds: Seq[String],
             newTasks: Map[String, Seq[String]]) =>
-          successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty &&
+            successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty &&
             newTasks.keySet == Set("test1", "test2") && newTasks("test1") == Seq("1", "2", "3") &&
             newTasks("test2") == Seq("21", "22", "23")
-      }).returning(Future.successful(Unit))
+        })
+        .returning(Future.successful(()))
 
       saveCrawlResultController ! SaveResults
 
@@ -277,19 +281,21 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
       (saveCrawlResultController.underlyingActor.failedTasks should have).size(1)
 
-      (queueClient.putProcessResult _).expects(where {
-        case (
-          requestId: UUID,
-          successIds: Seq[String],
-          failureIds: Seq[String],
-          skippedIds: Seq[String],
-          parsingFailedTaskIds: Seq[String],
-          bannedIds: Seq[String],
-          newTasks: Map[String, Seq[String]]) =>
-          successIds.size == 3 && successIds.containsSlice(Seq("1", "2", "3")) && failureIds == Seq("4") &&
+      (queueClient.putProcessResult _)
+        .expects(where {
+          (
+            requestId: UUID,
+            successIds: Seq[String],
+            failureIds: Seq[String],
+            skippedIds: Seq[String],
+            parsingFailedTaskIds: Seq[String],
+            bannedIds: Seq[String],
+            newTasks: Map[String, Seq[String]]) =>
+            successIds.size == 3 && successIds.containsSlice(Seq("1", "2", "3")) && failureIds == Seq("4") &&
             newTasks.keySet == Set("test1", "test2") && newTasks("test1") == Seq("1", "2", "3") &&
             newTasks("test2") == Seq("21", "22", "23")
-      }).returning(Future.successful(Unit))
+        })
+        .returning(Future.successful(()))
 
       saveCrawlResultController ! SaveResults
 

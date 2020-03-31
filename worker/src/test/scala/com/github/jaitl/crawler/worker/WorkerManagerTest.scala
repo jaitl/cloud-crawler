@@ -54,8 +54,8 @@ class WorkerManagerTest extends ActorTestSuite with Eventually {
     val batchTasksValidator = new DummyTasksValidator
     val queueClient = mock[QueueClient]
 
-    (batchRequestScheduler.schedule _).expects(*, *, *).returning(Unit)
-    (batchExecutionTimeoutScheduler.schedule _).expects(*, *, *).returning(Unit)
+    (batchRequestScheduler.schedule _).expects(*, *, *).returning(())
+    (batchExecutionTimeoutScheduler.schedule _).expects(*, *, *).returning(())
     (queueClient.getTasks _).expects(*, taskRequest).returning(taskResponce)
     (tasksBatchControllerCreator.create _).expects(*, *, *, *).returning(tasksBatchController.ref)
 

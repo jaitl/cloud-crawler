@@ -78,7 +78,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
     (crawlExecutorCreator.create _).expects(*).returning(crawlExecutor.ref)
     (notificationExecutorCreator.create _).expects(*).returning(notificationExecutor.ref)
     (saveCrawlResultCreator.create _).expects(*, *, *, *).returning(saveCrawlResultController.ref)
-    (executeScheduler.schedule _).expects(*, *, *).returning(Unit)
+    (executeScheduler.schedule _).expects(*, *, *).returning(())
 
     val tasksBatchController = TestActorRef[TasksBatchController](
       TasksBatchController.props(
@@ -168,7 +168,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
       (tasksBatchController.underlyingActor.taskQueue should have).size(2)
       tasksBatchController.underlyingActor.currentActiveCrawlTask shouldBe 0
 
-      (queueClient.returnTasks _).expects(*, tasks.map(_.id)).returning(Future.successful(Unit))
+      (queueClient.returnTasks _).expects(*, tasks.map(_.id)).returning(Future.successful(()))
 
       saveCrawlResultController.reply(SuccessSavedResults)
 

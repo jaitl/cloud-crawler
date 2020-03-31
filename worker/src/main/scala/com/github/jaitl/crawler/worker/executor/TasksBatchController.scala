@@ -185,7 +185,7 @@ private[worker] class TasksBatchController(
         log.info(s"Stop task batch controller: ${batch.id}, forcedStop: $forcedStop")
 
         if (taskQueue.nonEmpty) {
-          val ids = taskQueue.map(_.task.id)
+          val ids = taskQueue.map(_.task.id).toSeq
           val requestId = UUID.randomUUID()
           queueClient.returnTasks(requestId, ids).onComplete {
             case Success(_) =>
