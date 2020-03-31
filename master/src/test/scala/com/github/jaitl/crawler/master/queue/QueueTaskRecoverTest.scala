@@ -19,7 +19,7 @@ class QueueTaskRecoverTest extends ActorTestSuite {
     val recoverScheduler = mock[Scheduler]
     val config = RecoveryConfig(1.minute, 1.minute)
 
-    (recoverScheduler.schedule _).expects(*, *, *).returning(Unit)
+    (recoverScheduler.schedule _).expects(*, *, *).returning(())
   }
 
   "QueueTaskRecover" should {

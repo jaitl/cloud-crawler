@@ -1,3 +1,8 @@
 package com.github.jaitl.crawler.master.queue
 
-case class QueueTaskConfig(maxAttemptsCount: Int)
+import scala.concurrent.duration.Duration
+
+case class QueueTaskConfig(
+  maxAttemptsCount: Int,
+  dbRequestTimeout: Duration
+)

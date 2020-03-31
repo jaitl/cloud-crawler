@@ -26,7 +26,7 @@ jobs:
       - name: Login to GitHub Docker Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.GITHUB_DOCKER_USERNAME }} --password-stdin
       - name: SBT image build
-        run: sbt docker:publishLocal
+        run: sbt master/docker:publishLocal
       - name: Docker tag
         run: docker tag master:latest docker.pkg.github.com/jaitl/cloud-crawler/master:${RELEASE_VERSION}
         env:
