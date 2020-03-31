@@ -75,5 +75,5 @@ repositories {
 ```
 dependency:
 ```
-compile 'com.github.jaitl.crawler:worker_2.12:version'
+compile 'com.github.jaitl.crawler:worker_2.13:version'
 ```
