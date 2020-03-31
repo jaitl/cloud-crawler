@@ -3,7 +3,7 @@ package com.github.jaitl.crawler.worker.save
 import java.io.File
 import java.io.RandomAccessFile
 
-import com.github.jaitl.crawler.models.task.Task
+import com.github.jaitl.crawler.master.client.task.Task
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.typesafe.scalalogging.StrictLogging
 
@@ -19,7 +19,7 @@ class LocalFileSystemSaveRawProvider() extends SaveRawProvider with StrictLoggin
   }
 
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
-    raw.toList.par.foreach(r => {
+    raw.toList.foreach(r => {
       val folder = path
         .concat("/")
         .concat(r._1.id)

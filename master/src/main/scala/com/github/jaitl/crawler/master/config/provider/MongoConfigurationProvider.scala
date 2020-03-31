@@ -1,16 +1,16 @@
 package com.github.jaitl.crawler.master.config.provider
 
-import com.github.jaitl.crawler.models.worker.ProjectConfiguration
-import com.github.jaitl.crawler.models.worker.CrawlerProxy
-import com.github.jaitl.crawler.models.worker.CrawlerTor
+import com.github.jaitl.crawler.master.client.configuration.ProjectConfiguration
+import com.github.jaitl.crawler.master.client.configuration.ProxyResource
+import com.github.jaitl.crawler.master.client.configuration.TorResource
 import com.mongodb.client.model.FindOneAndUpdateOptions
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.types.ObjectId
 import org.mongodb.scala.MongoClient
+import org.mongodb.scala.MongoClient.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.MongoDatabase
-import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.model.Sorts
 
 import scala.concurrent.Future
@@ -56,7 +56,7 @@ class MongoConfigurationProvider(
       ))
       .toFuture()
 
-  override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[CrawlerProxy]] =
+  override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[ProxyResource]] =
     crawlerProxies
       .findOneAndUpdate(
         equal("workerTaskType", taskType),
@@ -64,7 +64,7 @@ class MongoConfigurationProvider(
         new FindOneAndUpdateOptions().sort(Sorts.ascending("usedCount"))
       )
       .map(entity =>
-        CrawlerProxy(
+        ProxyResource(
           entity._id.toString,
           entity.workerProxyHost,
           entity.workerProxyPort,
@@ -77,7 +77,7 @@ class MongoConfigurationProvider(
       ))
       .toFuture()
 
-  override def getCrawlerTorConfiguration(taskType: String): Future[Seq[CrawlerTor]] =
+  override def getCrawlerTorConfiguration(taskType: String): Future[Seq[TorResource]] =
     crawlerTors
       .findOneAndUpdate(
         equal("workerTaskType", taskType),
@@ -85,7 +85,7 @@ class MongoConfigurationProvider(
         new FindOneAndUpdateOptions().sort(Sorts.ascending("usedCount"))
       )
       .map(entity =>
-        CrawlerTor(
+        TorResource(
           entity._id.toString,
           entity.workerTorHost,
           entity.workerTorLimit,
@@ -95,7 +95,7 @@ class MongoConfigurationProvider(
           entity.workerTorTimeoutUp,
           entity.workerTorTimeoutDown,
           entity.workerTaskType
-        ))
+      ))
       .toFuture()
 }
 case class MongoProjectConfiguration(

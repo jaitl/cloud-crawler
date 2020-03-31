@@ -35,16 +35,19 @@ private class TorResourceController(
   implicit private val executionContext: ExecutionContext = context.dispatcher
 
   val executors: mutable.Map[UUID, ExecutorContext] = mutable.Map.empty
-  var torController: TorControlConnection = _
+  var torController: Option[TorControlConnection] = None
 
   var failCount: Int = 0
 
   override def preStart(): Unit = {
-    val s = new Socket(config.host, config.controlPort)
-    torController = new TorControlConnection(s)
-    torController.launchThread(true)
-    val password: String = "\"" + config.password + "\""
-    torController.authenticate(password.getBytes)
+    if (config.password.nonEmpty) {
+      val s = new Socket(config.host, config.controlPort)
+      val torCtrl = new TorControlConnection(s)
+      torCtrl.launchThread(true)
+      val password: String = "\"" + config.password + "\""
+      torCtrl.authenticate(password.getBytes)
+      torController = Some(torCtrl)
+    }
   }
 
   override def postStop(): Unit = {
@@ -114,7 +117,7 @@ private class TorResourceController(
       val context = executors(requestExecutor.getExecutorId())
         .copy(isUsed = false, awaitTo = Some(awaitTo))
       executors += context.id -> context
-      torController.signal("NEWNYM")
+      torController.foreach(_.signal("NEWNYM"))
       log.info(s"Waiting in ReturnBannedResource $requestId for $awaitTo")
   }
 

@@ -1,28 +1,20 @@
-version: '2'
+version: '3.7'
 services:
-  node:
+  worker:
     container_name: cc_worker
-    image: simple-worker
+    image: simple-worker:latest
     environment:
-      CLUSTER_PORT: 1606
-      CLUSTER_IP: node
-      SEED_PORT_1600_TCP_ADDR: master
-      SEED_PORT_1600_TCP_PORT: 1600
-      WORKER_MONGODB_URL: mongodb://root:example@host.docker.internal:27017
+      MASTER_GRPC_HOST: master
+      WORKER_MONGODB_URL: mongodb://mongodb:27017
       WORKER_EXECUTE_INTERVAL: 30.seconds
   master:
     container_name: cc_master
     image: master:latest
     environment:
-      CLUSTER_PORT: 1600
-      CLUSTER_IP: master
-      SEED_PORT_1600_TCP_ADDR: master
-      MONGO_PROVIDER_CONNECTION_STRING: mongodb://root:example@host.docker.internal:27017
-  tor:
-    image: arulrajnet/torprivoxy
+      MONGO_PROVIDER_CONNECTION_STRING: mongodb://mongodb:27017
+  mongodb:
+    image: mongo:4.2
     ports:
-      - 9050:9050
-      - 9051:9051
-      - 8118:8118
-    volumes:
-      - ./torrc:/opt/tor/torrc
+      - 27017:27017
+  tor:
+    image: peterdavehello/tor-socks-proxy:latest

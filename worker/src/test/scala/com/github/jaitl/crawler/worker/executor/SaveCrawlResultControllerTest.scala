@@ -1,10 +1,12 @@
 package com.github.jaitl.crawler.worker.executor
 
+import java.util.UUID
+
 import akka.testkit.TestActorRef
 import akka.testkit.TestProbe
-import com.github.jaitl.crawler.models.task.Task
-import com.github.jaitl.crawler.models.worker.WorkerManager.TasksBatchProcessResult
+import com.github.jaitl.crawler.master.client.task.Task
 import com.github.jaitl.crawler.worker.ActorTestSuite
+import com.github.jaitl.crawler.worker.client.QueueClient
 import com.github.jaitl.crawler.worker.crawler.BaseCrawler
 import com.github.jaitl.crawler.worker.crawler.CrawlResult
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.AddResults
@@ -24,7 +26,6 @@ import com.github.jaitl.crawler.worker.pipeline.ResourceType
 import com.github.jaitl.crawler.worker.save.SaveParsedProvider
 import com.github.jaitl.crawler.worker.save.SaveRawProvider
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
-import com.github.jaitl.crawler.worker.timeout.RandomTimeout
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -47,6 +48,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val queueTaskBalancer = TestProbe()
     val tasksBatchController = TestProbe()
+    val queueClient = mock[QueueClient]
 
     val saveScheduler = mock[Scheduler]
     (saveScheduler.schedule _).expects(*, *, *)
@@ -55,15 +57,15 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
-        pipeline,
-        ConfigurablePipelineBuilder()
+        pipeline = pipeline,
+        configPipeline = ConfigurablePipelineBuilder()
           .withProxy(mock[ResourceType])
           .withBatchSize(tasksBatchSize)
           .build(),
-        queueTaskBalancer.ref,
-        tasksBatchController.ref,
-        saveScheduler,
-        config
+        queueClient = queueClient,
+        tasksBatchController = tasksBatchController.ref,
+        saveScheduler = saveScheduler,
+        config = config
       ))
   }
 
@@ -83,6 +85,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val queueTaskBalancer = TestProbe()
     val tasksBatchController = TestProbe()
+    val queueClient = mock[QueueClient]
 
     val saveScheduler = mock[Scheduler]
     (saveScheduler.schedule _).expects(*, *, *)
@@ -91,15 +94,15 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
-        pipeline,
-        ConfigurablePipelineBuilder()
+        pipeline = pipeline,
+        configPipeline = ConfigurablePipelineBuilder()
           .withProxy(mock[ResourceType])
           .withBatchSize(tasksBatchSize)
           .build(),
-        queueTaskBalancer.ref,
-        tasksBatchController.ref,
-        saveScheduler,
-        config
+        queueClient = queueClient,
+        tasksBatchController = tasksBatchController.ref,
+        saveScheduler = saveScheduler,
+        config = config
       ))
   }
 
@@ -120,6 +123,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val queueTaskBalancer = TestProbe()
     val tasksBatchController = TestProbe()
+    val queueClient = mock[QueueClient]
 
     val saveScheduler = mock[Scheduler]
     (saveScheduler.schedule _).expects(*, *, *)
@@ -128,15 +132,15 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
     val saveCrawlResultController = TestActorRef[SaveCrawlResultController[TestDataRes]](
       SaveCrawlResultController.props(
-        pipeline,
-        ConfigurablePipelineBuilder()
+        pipeline = pipeline,
+        configPipeline = ConfigurablePipelineBuilder()
           .withProxy(mock[ResourceType])
           .withBatchSize(tasksBatchSize)
           .build(),
-        queueTaskBalancer.ref,
-        tasksBatchController.ref,
-        saveScheduler,
-        config
+        queueClient = queueClient,
+        tasksBatchController = tasksBatchController.ref,
+        saveScheduler = saveScheduler,
+        config = config
       ))
   }
 
@@ -184,11 +188,21 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
 
-      saveCrawlResultController ! SaveResults
+      (queueClient.putProcessResult _)
+        .expects(where {
+          (
+            requestId: UUID,
+            successIds: Seq[String],
+            failureIds: Seq[String],
+            skippedIds: Seq[String],
+            parsingFailedTaskIds: Seq[String],
+            bannedIds: Seq[String],
+            newTasks: Map[String, Seq[String]]) =>
+            successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty
+        })
+        .returning(Future.successful(()))
 
-      val result = queueTaskBalancer.expectMsgType[TasksBatchProcessResult]
-      (result.successIds should contain).only("1", "2", "3")
-      (result.failureIds should have).size(0)
+      saveCrawlResultController ! SaveResults
 
       tasksBatchController.expectMsg(SuccessSavedResults)
     }
@@ -217,14 +231,23 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
 
-      saveCrawlResultController ! SaveResults
+      (queueClient.putProcessResult _)
+        .expects(where {
+          (
+            requestId: UUID,
+            successIds: Seq[String],
+            failureIds: Seq[String],
+            skippedIds: Seq[String],
+            parsingFailedTaskIds: Seq[String],
+            bannedIds: Seq[String],
+            newTasks: Map[String, Seq[String]]) =>
+            successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty &&
+            newTasks.keySet == Set("test1", "test2") && newTasks("test1") == Seq("1", "2", "3") &&
+            newTasks("test2") == Seq("21", "22", "23")
+        })
+        .returning(Future.successful(()))
 
-      val result = queueTaskBalancer.expectMsgType[TasksBatchProcessResult]
-      (result.successIds should contain).only("1", "2", "3")
-      (result.failureIds should have).size(0)
-      (result.newTasks.keySet should contain).only("test1", "test2")
-      (result.newTasks("test1") should contain).only("1", "2", "3")
-      (result.newTasks("test2") should contain).only("21", "22", "23")
+      saveCrawlResultController ! SaveResults
 
       tasksBatchController.expectMsg(SuccessSavedResults)
     }
@@ -258,14 +281,23 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       (saveCrawlResultController.underlyingActor.successTasks should have).size(3)
       (saveCrawlResultController.underlyingActor.failedTasks should have).size(1)
 
-      saveCrawlResultController ! SaveResults
+      (queueClient.putProcessResult _)
+        .expects(where {
+          (
+            requestId: UUID,
+            successIds: Seq[String],
+            failureIds: Seq[String],
+            skippedIds: Seq[String],
+            parsingFailedTaskIds: Seq[String],
+            bannedIds: Seq[String],
+            newTasks: Map[String, Seq[String]]) =>
+            successIds.size == 3 && successIds.containsSlice(Seq("1", "2", "3")) && failureIds == Seq("4") &&
+            newTasks.keySet == Set("test1", "test2") && newTasks("test1") == Seq("1", "2", "3") &&
+            newTasks("test2") == Seq("21", "22", "23")
+        })
+        .returning(Future.successful(()))
 
-      val result = queueTaskBalancer.expectMsgType[TasksBatchProcessResult]
-      (result.successIds should contain).only("1", "2", "3")
-      (result.failureIds should contain).only("4")
-      (result.newTasks.keySet should contain).only("test1", "test2")
-      (result.newTasks("test1") should contain).only("1", "2", "3")
-      (result.newTasks("test2") should contain).only("21", "22", "23")
+      saveCrawlResultController ! SaveResults
 
       tasksBatchController.expectMsg(SuccessSavedResults)
     }

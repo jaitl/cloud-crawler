@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package com.github.jaitl.crawler.master.client;
+
+service ConfigurationService {
+    rpc getConfig (ConfigRequest) returns (ConfigReply) {
+    }
+    rpc getProxy (ResourceRequest) returns (ProxyResourceReply) {
+    }
+    rpc getTor (ResourceRequest) returns (TorResourceReply) {
+    }
+}
+
+message ProjectConfiguration {
+    string id = 1;
+    string workerExecuteInterval = 2;
+    string workerFilePath = 3;
+    int32 workerBatchSize = 4;
+    string workerBaseUrl = 5;
+    string workerTaskType = 6;
+    int32 workerParallelBatches = 7;
+    string workerResource = 8;
+    bool notification = 9;
+}
+
+message TorResource {
+    string id = 1;
+    string workerTorHost = 2;
+    int32 workerTorLimit = 3;
+    int32 workerTorPort = 4;
+    int32 workerTorControlPort = 5;
+    string workerTorPassword = 6;
+    string workerTorTimeoutUp = 7;
+    string workerTorTimeoutDown = 8;
+    repeated string workerTaskType = 9;
+}
+
+message ProxyResource {
+    string id = 1;
+    string workerProxyHost = 2;
+    int32 workerProxyPort = 3;
+    string workerProxyTimeoutUp = 4;
+    string workerProxyTimeoutDown = 5;
+    int32 workerParallel = 6;
+    string workerProxyLogin = 7;
+    string workerProxyPassword = 8;
+    repeated string workerTaskType = 9;
+}
+
+message ConfigRequest {
+    string requestId = 1;
+    string taskType = 2;
+}
+
+message ResourceRequest {
+    string requestId = 1;
+    string taskType = 2;
+}
+
+message ConfigReply {
+    enum Status {
+        FAILED = 0;
+        NOT_FOUND = 1;
+        OK = 2;
+    }
+
+    Status status = 1;
+    ProjectConfiguration config = 2;
+}
+
+message ProxyResourceReply {
+    enum Status {
+        FAILED = 0;
+        NOT_FOUND = 1;
+        OK = 2;
+    }
+
+    Status status = 1;
+    ProxyResource proxy = 2;
+}
+
+message TorResourceReply {
+    enum Status {
+        FAILED = 0;
+        NOT_FOUND = 1;
+        OK = 2;
+    }
+
+    Status status = 1;
+    TorResource tor = 2;
+}
