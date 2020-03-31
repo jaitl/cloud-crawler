@@ -104,12 +104,12 @@ class SaveCrawlResultController[T](
 
       val saveFuture: Future[SaveResults] = for {
         _ <- (parserResults.nonEmpty, pipeline.saveParsedProvider) match {
-          case (true, Some(provider)) => provider.saveResults(parserResults)
-          case _ => Future.successful(Unit)
+          case (true, Some(provider)) => provider.saveResults(parserResults.toSeq)
+          case _ => Future.successful(())
         }
         _ <- pipeline.saveRawProvider match {
-          case Some(provider) => provider.save(rawResult)
-          case None => Future.successful(Unit)
+          case Some(provider) => provider.save(rawResult.toSeq)
+          case None => Future.successful(())
         }
       } yield SuccessSavedResults
 
@@ -126,11 +126,11 @@ class SaveCrawlResultController[T](
       context.unbecome()
       unstashAll()
 
-      val successIds = successTasks.map(_.task.id)
-      val failureIds = failedTasks.map(_.task.id)
-      val skippedIds = skippedTasks.map(_.task.id)
-      val bannedIds = bannedTasks.map(_.task.id)
-      val parsingFailedTaskIds = parsingFailedTask.map(_.task.id)
+      val successIds = successTasks.map(_.task.id).toSeq
+      val failureIds = failedTasks.map(_.task.id).toSeq
+      val skippedIds = skippedTasks.map(_.task.id).toSeq
+      val bannedIds = bannedTasks.map(_.task.id).toSeq
+      val parsingFailedTaskIds = parsingFailedTask.map(_.task.id).toSeq
       val newCrawlTasks = successTasks.flatMap(
         _.parseResult.map(_.newCrawlTasks).getOrElse(Seq.empty)
       )
@@ -138,7 +138,7 @@ class SaveCrawlResultController[T](
         .groupBy(_.taskType)
         .map {
           case (taskType, vals) =>
-            val newTasks = vals.flatMap(_.tasks).distinct
+            val newTasks = vals.flatMap(_.tasks).distinct.toSeq
             (taskType, newTasks)
         }
 

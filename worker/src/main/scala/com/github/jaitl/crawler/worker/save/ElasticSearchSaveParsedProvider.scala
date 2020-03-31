@@ -18,7 +18,7 @@ class ElasticSearchSaveParsedProvider[T](
   val client = ElasticClient(ElasticProperties(s"http://$server:$port?cluster.name=$clusername"))
 
   override def saveResults(parsedData: Seq[T])(implicit executionContext: ExecutionContext): Future[Unit] = Future {
-    parsedData.par.map(d => {
+    parsedData.map(d => {
       val doc = converter.convert(d)
       client.execute {
         indexInto(index / index).source(doc)

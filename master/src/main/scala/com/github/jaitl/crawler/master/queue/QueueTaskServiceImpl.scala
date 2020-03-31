@@ -100,12 +100,12 @@ class QueueTaskServiceImpl(
       _ <- if (failedTasks.nonEmpty) {
         queueProvider.updateTasksStatusAndIncAttempt(failedTasks, TaskStatus.taskFailed)
       } else {
-        Future.successful(Unit)
+        Future.successful(())
       }
       _ <- if (recoveredTasks.nonEmpty) {
         queueProvider.updateTasksStatusAndIncAttempt(recoveredTasks, TaskStatus.taskWait)
       } else {
-        Future.successful(Unit)
+        Future.successful(())
       }
     } yield ()
 
@@ -121,7 +121,7 @@ class QueueTaskServiceImpl(
       _ <- if (tasks.nonEmpty) {
         queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskSkipped)
       } else {
-        Future.successful(Unit)
+        Future.successful(())
       }
     } yield ()
 
@@ -136,7 +136,7 @@ class QueueTaskServiceImpl(
       _ <- if (tasks.nonEmpty) {
         queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskParsingFailed)
       } else {
-        Future.successful(Unit)
+        Future.successful(())
       }
     } yield ()
 

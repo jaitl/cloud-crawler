@@ -9,6 +9,6 @@ import scala.concurrent.Future
 
 class DummySaveRawProvider(val path: String) extends SaveRawProvider with StrictLogging {
   override def save(raw: Seq[(Task, CrawlResult)]): Future[Unit] = Future {
-    raw.toList.par.foreach(r => {})
+    raw.toList.foreach(r => {})
   }
 }

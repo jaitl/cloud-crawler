@@ -18,7 +18,7 @@ abstract class ActorTestSuite
     with BeforeAndAfterAll
     with MockFactory {
 
-  protected val futureSuccess: Future[Unit] = Future.successful(Unit)
+  protected val futureSuccess: Future[Unit] = Future.successful(())
 
   override def afterAll {
     TestKit.shutdownActorSystem(system)

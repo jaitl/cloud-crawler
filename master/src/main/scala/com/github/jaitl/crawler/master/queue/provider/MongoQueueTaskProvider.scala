@@ -90,7 +90,7 @@ class MongoQueueTaskProvider(
         dataSeq.map(data => MongoQueueTaskEntity(new ObjectId(), taskType, data, TaskStatus.taskWait, 0, None))
     }.toSeq
 
-    collection.insertMany(newTasks).toFuture().map(_ => Unit)
+    collection.insertMany(newTasks).toFuture().map(_ => ())
   }
 
   override def updateTasksStatus(ids: Seq[String], taskStatus: String): Future[Unit] = {
@@ -100,7 +100,7 @@ class MongoQueueTaskProvider(
         combine(set("taskStatus", taskStatus), set("lastUpdate", System.currentTimeMillis()))
       )
     }
-    collection.bulkWrite(updates).toFuture().map(_ => Unit)
+    collection.bulkWrite(updates).toFuture().map(_ => ())
   }
 
   override def updateTasksStatusFromTo(time: Instant, fromStatus: String, toStatus: String): Future[Long] =
@@ -123,14 +123,14 @@ class MongoQueueTaskProvider(
         )
       )
     }
-    collection.bulkWrite(updates).toFuture().map(_ => Unit)
+    collection.bulkWrite(updates).toFuture().map(_ => ())
   }
 
   override def dropTasks(ids: Seq[String]): Future[Unit] = {
     val deletes = ids.map { id =>
       DeleteOneModel(equal("_id", new ObjectId(id)))
     }
-    collection.bulkWrite(deletes).toFuture().map(_ => Unit)
+    collection.bulkWrite(deletes).toFuture().map(_ => ())
   }
 
   override def getByIds(ids: Seq[String]): Future[Seq[Task]] = {

@@ -12,6 +12,6 @@ object DockerSettings {
     dockerPermissionStrategy := DockerPermissionStrategy.Run,
     dockerVersion := Some(DockerVersion(18, 9, 0, Some("ce"))),
     version in Docker := "latest",
-    dockerBaseImage := "java"
+    dockerBaseImage := "openjdk:11-jre-slim"
   )
 }
