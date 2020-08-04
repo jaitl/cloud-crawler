@@ -28,6 +28,7 @@ import com.github.jaitl.crawler.worker.parser.ParseResult
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipeline
 import com.github.jaitl.crawler.worker.pipeline.Pipeline
 import com.github.jaitl.crawler.worker.scheduler.Scheduler
+import com.typesafe.scalalogging.StrictLogging
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
@@ -44,7 +45,7 @@ class SaveCrawlResultController[T](
   saveScheduler: Scheduler,
   config: SaveCrawlResultControllerConfig)
     extends Actor
-    with ActorLogging
+    with StrictLogging
     with Stash {
   implicit private val executionContext: ExecutionContext = context.dispatcher
 
@@ -155,8 +156,8 @@ class SaveCrawlResultController[T](
           newTasks = newTasks
         )
         .onComplete {
-          case Success(_) => log.debug(s"Crawl result sent to master, requestId: $requestId")
-          case Failure(ex) => log.error(ex, s"Failure during sent crawl result to master, requestId: $requestId")
+          case Success(_) => logger.debug(s"Crawl result sent to master, requestId: $requestId")
+          case Failure(ex) => logger.error(s"Failure during sent crawl result to master, requestId: $requestId", ex)
         }
 
       successTasks = mutable.ArraySeq.empty[SuccessCrawledTask]
@@ -168,7 +169,7 @@ class SaveCrawlResultController[T](
       tasksBatchController ! success
 
     case failure @ FailureSaveResults(t) =>
-      log.error(t, "Error during save results")
+      logger.error("Error during save results", t)
       context.unbecome()
       unstashAll()
 
