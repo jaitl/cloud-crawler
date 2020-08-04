@@ -87,68 +87,85 @@ class QueueTaskServiceImpl(
     } yield ProcessResultReply(ProcessResultReply.Status.OK)
 
   private def markAsProcessed(requestId: String, ids: Seq[String]): Future[Unit] =
-    queueProvider.dropTasks(ids).recover {
-      case ex: Throwable =>
-        logger.error(s"Fail to mark as processed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
+    if (ids.isEmpty) {
+      Future.successful(())
+    } else {
+      queueProvider.dropTasks(ids).recover {
+        case ex: Throwable =>
+          logger.error(s"Fail to mark as processed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
+      }
     }
 
-  private def markAsFailed(requestId: String, ids: Seq[String]): Future[Unit] = {
-    val updateFuture = for {
-      tasks <- queueProvider.getByIds(ids)
-      failedTasks = tasks.filter(t => t.attempt + 1 >= config.maxAttemptsCount).map(_.id)
-      recoveredTasks = tasks.filter(t => t.attempt + 1 < config.maxAttemptsCount).map(_.id)
-      _ <- if (failedTasks.nonEmpty) {
-        queueProvider.updateTasksStatusAndIncAttempt(failedTasks, TaskStatus.taskFailed)
-      } else {
-        Future.successful(())
-      }
-      _ <- if (recoveredTasks.nonEmpty) {
-        queueProvider.updateTasksStatusAndIncAttempt(recoveredTasks, TaskStatus.taskWait)
-      } else {
-        Future.successful(())
-      }
-    } yield ()
+  private def markAsFailed(requestId: String, ids: Seq[String]): Future[Unit] =
+    if (ids.isEmpty) {
+      Future.successful(())
+    } else {
+      val updateFuture = for {
+        tasks <- queueProvider.getByIds(ids)
+        failedTasks = tasks.filter(t => t.attempt + 1 >= config.maxAttemptsCount).map(_.id)
+        recoveredTasks = tasks.filter(t => t.attempt + 1 < config.maxAttemptsCount).map(_.id)
+        _ <- if (failedTasks.nonEmpty) {
+          queueProvider.updateTasksStatusAndIncAttempt(failedTasks, TaskStatus.taskFailed)
+        } else {
+          Future.successful(())
+        }
+        _ <- if (recoveredTasks.nonEmpty) {
+          queueProvider.updateTasksStatusAndIncAttempt(recoveredTasks, TaskStatus.taskWait)
+        } else {
+          Future.successful(())
+        }
+      } yield ()
 
-    updateFuture.recover {
-      case ex: Throwable =>
-        logger.error(s"Fail to mark as failed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
+      updateFuture.recover {
+        case ex: Throwable =>
+          logger.error(s"Fail to mark as failed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
+      }
     }
-  }
 
-  private def markAsSkipped(requestId: String, ids: Seq[String]): Future[Unit] = {
-    val updateFuture = for {
-      tasks <- queueProvider.getByIds(ids)
-      _ <- if (tasks.nonEmpty) {
-        queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskSkipped)
-      } else {
-        Future.successful(())
+  private def markAsSkipped(requestId: String, ids: Seq[String]): Future[Unit] =
+    if (ids.isEmpty) {
+      Future.successful(())
+    } else {
+      val updateFuture = for {
+        tasks <- queueProvider.getByIds(ids)
+        _ <- if (tasks.nonEmpty) {
+          queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskSkipped)
+        } else {
+          Future.successful(())
+        }
+      } yield ()
+
+      updateFuture.recover {
+        case ex: Throwable =>
+          logger.error(s"Fail to mark as skipped, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
       }
-    } yield ()
-
-    updateFuture.recover {
-      case ex: Throwable =>
-        logger.error(s"Fail to mark as skipped, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
     }
-  }
-  private def markAsParsingFailed(requestId: String, ids: Seq[String]): Future[Unit] = {
-    val updateFuture = for {
-      tasks <- queueProvider.getByIds(ids)
-      _ <- if (tasks.nonEmpty) {
-        queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskParsingFailed)
-      } else {
-        Future.successful(())
+  private def markAsParsingFailed(requestId: String, ids: Seq[String]): Future[Unit] =
+    if (ids.isEmpty) {
+      Future.successful(())
+    } else {
+      val updateFuture = for {
+        tasks <- queueProvider.getByIds(ids)
+        _ <- if (tasks.nonEmpty) {
+          queueProvider.updateTasksStatus(tasks.map(_.id), TaskStatus.taskParsingFailed)
+        } else {
+          Future.successful(())
+        }
+      } yield ()
+
+      updateFuture.recover {
+        case ex: Throwable =>
+          logger.error(s"Fail to mark as parsingFailed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
       }
-    } yield ()
-
-    updateFuture.recover {
-      case ex: Throwable =>
-        logger.error(s"Fail to mark as parsingFailed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
     }
-  }
   private def addNewTasks(requestId: String, taskData: Map[String, Seq[String]]): Future[Unit] =
-    queueProvider.pushTasks(taskData).recover {
-      case ex: Throwable =>
-        logger.error(s"Fail to add new tasks, taskData: $taskData], requestId: $requestId", ex)
+    if (taskData.isEmpty) {
+      Future.successful(())
+    } else {
+      queueProvider.pushTasks(taskData).recover {
+        case ex: Throwable =>
+          logger.error(s"Fail to add new tasks, taskData: $taskData], requestId: $requestId", ex)
+      }
     }
 
   override def bindService(): ServerServiceDefinition =
