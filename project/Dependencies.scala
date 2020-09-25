@@ -8,13 +8,20 @@ object Dependencies {
   lazy val testContainersIt = "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.36.1" % IntegrationTest
 
   lazy val ficus = "com.iheart" %% "ficus" % "1.4.7"
-  
+
   lazy val mongoScalaDriver = "org.mongodb.scala" %% "mongo-scala-driver" % "4.0.1"
   lazy val asyncHttpClient = "org.asynchttpclient" % "async-http-client" % "2.11.0"
   lazy val awsSdk = "com.amazonaws" % "aws-java-sdk" % "1.11.754"
   lazy val json4s = "org.json4s" %% "json4s-jackson" % "3.6.7"
   lazy val jtorctl = "com.github.avchu" % "jtorctl" % "v0.3.3"
   lazy val jsoup = "org.jsoup" % "jsoup" % "1.13.1"
+  lazy val mysql = "mysql" % "mysql-connector-java" % "8.0.21"
+
+  object Scalikejdbc {
+    lazy val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % "3.5.0";
+    lazy val scalikejdbcConfig = "org.scalikejdbc" %% "scalikejdbc-config" % "3.5.0";
+    lazy val list: Seq[ModuleID] = Seq(scalikejdbc, scalikejdbcConfig)
+  }
 
   object Logging {
     lazy val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"

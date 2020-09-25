@@ -16,7 +16,7 @@ class HabrParser extends BaseParser[HabrParsedData] {
       val title = doc.select("h1.post__title").text()
       val content = doc.select("div.post__body").text()
 
-      ParseResult(HabrParsedData(author, title, content))
+      ParseResult(HabrParsedData(crawlTask.taskId, crawlResult.data, author, title, content))
     } catch {
       case exception: Exception => throw ParsingException(exception.getMessage, crawlResult.data)
     }
