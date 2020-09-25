@@ -43,7 +43,7 @@ class CrawlExecutorTest extends ActorTestSuite {
       (baseCrawler
         .crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
         .expects(*, *, *)
-        .returning(Future.successful(CrawlResult("1")))
+        .returning(Future.successful(CrawlResult("1", "1")))
 
       (parser.parse _).expects(*, *).returning(ParseResult(TestDataRes("1")))
 
@@ -53,7 +53,7 @@ class CrawlExecutorTest extends ActorTestSuite {
 
       val res = expectMsgType[CrawlSuccessResult]
 
-      res.crawlResult shouldBe CrawlResult("1")
+      res.crawlResult shouldBe CrawlResult("1", "1")
       res.parseResult shouldBe Some(ParseResult(TestDataRes("1")))
     }
 
@@ -91,7 +91,7 @@ class CrawlExecutorTest extends ActorTestSuite {
       (baseCrawler
         .crawl(_: CrawlTask, _: HttpRequestExecutor)(_: ExecutionContext))
         .expects(*, *, *)
-        .returning(Future.successful(CrawlResult("1")))
+        .returning(Future.successful(CrawlResult("1","1")))
 
       (parser.parse _).expects(*, *).throwing(new Exception(""))
 

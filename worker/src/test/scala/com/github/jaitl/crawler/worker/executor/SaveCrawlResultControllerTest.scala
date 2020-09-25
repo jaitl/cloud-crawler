@@ -148,7 +148,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     "SuccessCrawledTask" in new OnlyRawResultSaverSuite {
       val successCrawledTask = SuccessCrawledTask(
         Task("1", "1", "1"),
-        CrawlResult("1"),
+        CrawlResult("1", "1"),
         Some(ParseResult[TestDataRes](TestDataRes("1")))
       )
 
@@ -174,15 +174,15 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
     "save raw result" in new OnlyRawResultSaverSuite {
       (saveRawProvider.save _).expects(*).returning(futureSuccess)
 
-      val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"), None)
+      val successCrawledTask1 = SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1", "1"), None)
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask2 = SuccessCrawledTask(Task("2", "test", "2"), CrawlResult("2"), None)
+      val successCrawledTask2 = SuccessCrawledTask(Task("2", "test", "2"), CrawlResult("2","2"), None)
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask3 = SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"), None)
+      val successCrawledTask3 = SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3","3"), None)
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
@@ -212,20 +212,20 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       val successCrawledTask1 = SuccessCrawledTask(
         Task("1", "test", "1"),
-        CrawlResult("1"),
+        CrawlResult("1", "1"),
         Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
       val successCrawledTask2 = SuccessCrawledTask(
         Task("2", "test", "2"),
-        CrawlResult("2"),
+        CrawlResult("2", "2"),
         Some(ParseResult(TestDataRes("2"), Seq(NewCrawlTasks("test2", Seq("21", "22", "23"))))))
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
       val successCrawledTask3 =
-        SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"), Some(ParseResult(TestDataRes("3"))))
+        SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3", "3"), Some(ParseResult(TestDataRes("3"))))
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
@@ -258,20 +258,20 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
 
       val successCrawledTask1 = SuccessCrawledTask(
         Task("1", "test", "1"),
-        CrawlResult("1"),
+        CrawlResult("1", "1"),
         Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
       val successCrawledTask2 = SuccessCrawledTask(
         Task("2", "test", "2"),
-        CrawlResult("2"),
+        CrawlResult("2", "2"),
         Some(ParseResult(TestDataRes("2"), Seq(NewCrawlTasks("test2", Seq("21", "22", "23"))))))
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
       val successCrawledTask3 =
-        SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3"), Some(ParseResult(TestDataRes("3"))))
+        SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3", "3"), Some(ParseResult(TestDataRes("3"))))
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
@@ -309,7 +309,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
         .returning(Future.failed(new Exception("")))
 
       val successCrawledTask1 =
-        SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1"), Some(ParseResult(TestDataRes("1"))))
+        SuccessCrawledTask(Task("1", "test", "1"), CrawlResult("1", "1"), Some(ParseResult(TestDataRes("1"))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 

@@ -73,7 +73,7 @@ class ConfigurationServiceImpl(
           logger.info(s"Not found tor for: ${request.taskType}, ${request.requestId}")
           TorResourceReply(TorResourceReply.Status.NOT_FOUND)
         case tors: Seq[TorResource] =>
-          logger.info(s"Found tor for: ${request.taskType}, ${request.requestId}")
+          logger.info(s"Found tor for: ${request.taskType}, ${request.requestId}, ${tors.head}")
           TorResourceReply(TorResourceReply.Status.OK, Some(tors.head))
       }
       .recover {
