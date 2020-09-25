@@ -68,7 +68,7 @@ class SqlQueueTaskProvider(
   override def dropTasks(ids: Seq[String]): Future[Unit] =
     Future.successful(DB.localTx { implicit session =>
       val tasksIds = ids.map(Integer.parseInt)
-      sql"update projects_url set status = ${TaskStatus.} where id in (${tasksIds})"
+      sql"update projects_url set status = ${TaskStatus.taskFinished} where id in (${tasksIds})"
         .executeUpdate()
         .apply()
     })
