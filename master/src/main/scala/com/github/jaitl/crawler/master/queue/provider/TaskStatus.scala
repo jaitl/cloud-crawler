@@ -5,6 +5,6 @@ object TaskStatus {
   val taskParsingFailed: String = "taskParsingFailed"
   val taskInProgress: String = "taskInProgress"
   val taskFailed: String = "taskFailed"
-  val taskSkipped: String = "taskSkipped",
+  val taskSkipped: String = "taskSkipped"
   val taskFinished: String = "taskFinished"
 }
