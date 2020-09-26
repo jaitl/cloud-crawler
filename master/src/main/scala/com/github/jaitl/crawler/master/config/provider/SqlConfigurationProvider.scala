@@ -7,6 +7,7 @@ import scalikejdbc.ConnectionPool
 import scalikejdbc._
 
 import scala.concurrent.Future
+import scala.util.Random
 
 class SqlConfigurationProvider(
   driverName: String,
@@ -37,39 +38,43 @@ class SqlConfigurationProvider(
 
   override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[ProxyResource]] =
     Future.successful(DB.localTx { implicit session =>
-      sql"select * from projects_endpoints p where p.type = 'Proxy'"
-        .map(rs =>
-          ProxyResource(
-            id = rs.get("id"),
-            workerProxyHost = rs.get("host"),
-            workerProxyPort = rs.get("port"),
-            workerProxyTimeoutUp = rs.get("timeout_up"),
-            workerProxyTimeoutDown = rs.get("timeout_down"),
-            workerParallel = rs.get("concurrency"),
-            workerProxyLogin = rs.get("login"),
-            workerProxyPassword = rs.get("password"),
-            workerTaskType = Seq("HTML")
-          ))
-        .list()
-        .apply()
+      Random.shuffle(
+        sql"select * from projects_endpoints p where p.type = 'Proxy'"
+          .map(rs =>
+            ProxyResource(
+              id = rs.get("id"),
+              workerProxyHost = rs.get("host"),
+              workerProxyPort = rs.get("port"),
+              workerProxyTimeoutUp = rs.get("timeout_up"),
+              workerProxyTimeoutDown = rs.get("timeout_down"),
+              workerParallel = rs.get("concurrency"),
+              workerProxyLogin = rs.get("login"),
+              workerProxyPassword = rs.get("password"),
+              workerTaskType = Seq("HTML")
+            ))
+          .list()
+          .apply()
+      )
     })
 
   override def getCrawlerTorConfiguration(taskType: String): Future[Seq[TorResource]] =
     Future.successful(DB.localTx { implicit session =>
-      sql"select * from projects_endpoints p where p.type = 'Tor'"
-        .map(rs =>
-          TorResource(
-            id = rs.get("id"),
-            workerTorHost = rs.get("host"),
-            workerTorPort = rs.get("port"),
-            workerTorTimeoutUp = rs.get("timeout_up"),
-            workerTorTimeoutDown = rs.get("timeout_down"),
-            workerTorLimit = rs.get("concurrency"),
-            workerTorPassword = rs.get("control_password"),
-            workerTorControlPort = rs.get("control_port"),
-            workerTaskType = Seq("HTML")
-        ))
-        .list()
-        .apply()
+      Random.shuffle(
+        sql"select * from projects_endpoints p where p.type = 'Tor'"
+          .map(rs =>
+            TorResource(
+              id = rs.get("id"),
+              workerTorHost = rs.get("host"),
+              workerTorPort = rs.get("port"),
+              workerTorTimeoutUp = rs.get("timeout_up"),
+              workerTorTimeoutDown = rs.get("timeout_down"),
+              workerTorLimit = rs.get("concurrency"),
+              workerTorPassword = rs.get("control_password"),
+              workerTorControlPort = rs.get("control_port"),
+              workerTaskType = Seq("HTML")
+          ))
+          .list()
+          .apply()
+      )
     })
 }
