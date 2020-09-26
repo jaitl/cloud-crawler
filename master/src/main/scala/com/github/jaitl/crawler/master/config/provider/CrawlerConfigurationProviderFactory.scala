@@ -14,5 +14,13 @@ object CrawlerConfigurationProviderFactory {
           proxyCollectionName = mongoConfig.getString("proxyCollectionName"),
           torCollectionName = mongoConfig.getString("torCollectionName")
         )
+      case "sql" =>
+        val sqlConfig = config.getConfig("sql")
+        new SqlConfigurationProvider(
+          connectionUrl = sqlConfig.getString("connectionUrl"),
+          driverName = sqlConfig.getString("driverName"),
+          user = sqlConfig.getString("user"),
+          password = sqlConfig.getString("password")
+        )
     }
 }

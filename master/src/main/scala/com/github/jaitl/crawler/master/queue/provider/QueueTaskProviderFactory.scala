@@ -12,6 +12,14 @@ object QueueTaskProviderFactory {
           dbName = mongoConfig.getString("dbName"),
           collectionName = mongoConfig.getString("collectionName")
         )
+      case "sql" =>
+        val sqlConfig = config.getConfig("sql")
+        new SqlQueueTaskProvider(
+          connectionUrl = sqlConfig.getString("connectionUrl"),
+          driverName = sqlConfig.getString("driverName"),
+          user = sqlConfig.getString("user"),
+          password = sqlConfig.getString("password")
+        )
     }
   }
 }
