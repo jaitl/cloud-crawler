@@ -37,7 +37,7 @@ class SqlConfigurationProvider(
 
   override def getCrawlerProxyConfiguration(taskType: String): Future[Seq[ProxyResource]] =
     Future.successful(DB.localTx { implicit session =>
-      sql"select * from project_endpoints p where p.type = 'Proxy'"
+      sql"select * from projects_endpoints p where p.type = 'Proxy'"
         .map(rs =>
           ProxyResource(
             id = rs.get("id"),
