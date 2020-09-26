@@ -123,7 +123,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
           crawlRequest.requestId,
           crawlRequest.task,
           crawlRequest.requestExecutor,
-          CrawlResult("1"),
+          CrawlResult("1", "1"),
           Some(ParseResult(TestDataRes("1")))
         ))
 
@@ -132,7 +132,7 @@ class TasksBatchControllerTest extends ActorTestSuite {
         AddResults(
           SuccessCrawledTask(
             crawlRequest.task.task,
-            CrawlResult("1"),
+            CrawlResult("1", "1"),
             Some(ParseResult(TestDataRes("1")))
           )))
 

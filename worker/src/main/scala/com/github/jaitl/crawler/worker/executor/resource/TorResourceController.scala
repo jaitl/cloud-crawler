@@ -39,7 +39,7 @@ private class TorResourceController(
 
   var failCount: Int = 0
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     if (config.password.nonEmpty) {
       val s = new Socket(config.host, config.controlPort)
       val torCtrl = new TorControlConnection(s)
@@ -48,7 +48,6 @@ private class TorResourceController(
       torCtrl.authenticate(password.getBytes)
       torController = Some(torCtrl)
     }
-  }
 
   override def postStop(): Unit = {
     super.postStop()

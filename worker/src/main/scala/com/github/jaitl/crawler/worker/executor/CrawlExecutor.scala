@@ -26,7 +26,7 @@ private class CrawlExecutor extends Actor {
 
   override def receive: Receive = {
     case Crawl(requestId, task, requestExecutor, pipeline) =>
-      val crawlTask = CrawlTask(task.task.taskData, task.task.taskType)
+      val crawlTask = CrawlTask(task.task.id, task.task.taskData, task.task.taskType)
       val crawlResult = for {
         crawlResult <- Try(pipeline.crawler.crawl(crawlTask, requestExecutor)) match {
           case Success(res) => res
