@@ -47,8 +47,9 @@ class SqlConfigurationProvider(
             workerProxyTimeoutDown = rs.get("timeout_down"),
             workerParallel = rs.get("concurrency"),
             workerProxyLogin = rs.get("login"),
-            workerProxyPassword = rs.get("password")
-        ))
+            workerProxyPassword = rs.get("password"),
+            workerTaskType = Seq("HTML")
+          ))
         .list()
         .apply()
     })
