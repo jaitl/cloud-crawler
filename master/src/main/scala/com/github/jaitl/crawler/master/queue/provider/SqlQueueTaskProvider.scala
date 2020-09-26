@@ -19,12 +19,11 @@ class SqlQueueTaskProvider(
 
   override def pullBatch(taskType: String, size: Int): Future[Seq[Task]] =
     Future.successful(DB.localTx { implicit session =>
-      sql"select * from projects_url pu, projects p where p.type = ${taskType} and p.id = pu.project_id and pu.status = ${TaskStatus.taskWait} limit ${size}"
+      sql"select pu.id, pu.url from projects_url pu, projects p where p.type = ${taskType} and p.id = pu.project_id and pu.status = ${TaskStatus.taskWait} limit ${size}"
         .map(
           rs =>
             Task(
               id = rs.get("id"),
-              taskType = rs.get("type"),
               taskData = rs.get("url")
           ))
         .list()
@@ -34,12 +33,11 @@ class SqlQueueTaskProvider(
   override def pullAndUpdateStatus(taskType: String, size: Int, taskStatus: String): Future[Seq[Task]] =
     Future.successful(DB.localTx { implicit session =>
       val tasks =
-        sql"select * from projects_url pu, projects p where p.type = ${taskType} and pu.status = ${TaskStatus.taskWait} and p.id = pu.project_id limit ${size}"
+        sql"select pu.id, pu.url from projects_url pu, projects p where p.type = ${taskType} and pu.status = ${TaskStatus.taskWait} and p.id = pu.project_id limit ${size}"
           .map(
             rs =>
               Task(
                 id = rs.get("id"),
-                taskType = rs.get("type"),
                 taskData = rs.get("url")
             ))
           .list()
@@ -76,12 +74,11 @@ class SqlQueueTaskProvider(
   override def getByIds(ids: Seq[String]): Future[Seq[Task]] =
     Future.successful(DB.localTx { implicit session =>
       val tasksIds = ids.map(Integer.parseInt)
-      sql"select * from projects_url where id in (${tasksIds})"
+      sql"select id, url from projects_url where id in (${tasksIds})"
         .map(
           rs =>
             Task(
               id = rs.get("id"),
-              taskType = rs.get("type"),
               taskData = rs.get("url")
           ))
         .list()
