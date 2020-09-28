@@ -18,7 +18,6 @@ import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.Succes
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessCrawledTask
 import com.github.jaitl.crawler.worker.executor.SaveCrawlResultController.SuccessSavedResults
 import com.github.jaitl.crawler.worker.parser.BaseParser
-import com.github.jaitl.crawler.worker.parser.NewCrawlTasks
 import com.github.jaitl.crawler.worker.parser.ParseResult
 import com.github.jaitl.crawler.worker.pipeline.ConfigurablePipelineBuilder
 import com.github.jaitl.crawler.worker.pipeline.PipelineBuilder
@@ -178,11 +177,11 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask2 = SuccessCrawledTask(Task("2", "test", "2"), CrawlResult("2","2"), None)
+      val successCrawledTask2 = SuccessCrawledTask(Task("2", "test", "2"), CrawlResult("2", "2"), None)
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
-      val successCrawledTask3 = SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3","3"), None)
+      val successCrawledTask3 = SuccessCrawledTask(Task("3", "test", "3"), CrawlResult("3", "3"), None)
       saveCrawlResultController ! AddResults(successCrawledTask3)
       expectMsg(SuccessAddedResults)
 
@@ -197,7 +196,7 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
             skippedIds: Seq[String],
             parsingFailedTaskIds: Seq[String],
             bannedIds: Seq[String],
-            newTasks: Map[String, Seq[String]]) =>
+            newTasks: Seq[Task]) =>
             successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty
         })
         .returning(Future.successful(()))
@@ -213,14 +212,14 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       val successCrawledTask1 = SuccessCrawledTask(
         Task("1", "test", "1"),
         CrawlResult("1", "1"),
-        Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
+        Some(ParseResult(TestDataRes("1"), Seq(Task("test1"), Task("test2")))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
       val successCrawledTask2 = SuccessCrawledTask(
         Task("2", "test", "2"),
         CrawlResult("2", "2"),
-        Some(ParseResult(TestDataRes("2"), Seq(NewCrawlTasks("test2", Seq("21", "22", "23"))))))
+        Some(ParseResult(TestDataRes("2"), Seq(Task("21"), Task("22"), Task("23")))))
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
@@ -240,10 +239,9 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
             skippedIds: Seq[String],
             parsingFailedTaskIds: Seq[String],
             bannedIds: Seq[String],
-            newTasks: Map[String, Seq[String]]) =>
+            newTasks: Seq[Task]) =>
             successIds.size == 3 && successIds == Seq("1", "2", "3") && failureIds.isEmpty &&
-            newTasks.keySet == Set("test1", "test2") && newTasks("test1") == Seq("1", "2", "3") &&
-            newTasks("test2") == Seq("21", "22", "23")
+            newTasks == Seq(Task("test1"), Task("test2"), Task("21"), Task("22"), Task("23"))
         })
         .returning(Future.successful(()))
 
@@ -259,14 +257,14 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
       val successCrawledTask1 = SuccessCrawledTask(
         Task("1", "test", "1"),
         CrawlResult("1", "1"),
-        Some(ParseResult(TestDataRes("1"), Seq(NewCrawlTasks("test1", Seq("1", "2", "3"))))))
+        Some(ParseResult(TestDataRes("1"), Seq(Task("test1"), Task("test2")))))
       saveCrawlResultController ! AddResults(successCrawledTask1)
       expectMsg(SuccessAddedResults)
 
       val successCrawledTask2 = SuccessCrawledTask(
         Task("2", "test", "2"),
         CrawlResult("2", "2"),
-        Some(ParseResult(TestDataRes("2"), Seq(NewCrawlTasks("test2", Seq("21", "22", "23"))))))
+        Some(ParseResult(TestDataRes("2"), Seq(Task("21"), Task("22"), Task("23")))))
       saveCrawlResultController ! AddResults(successCrawledTask2)
       expectMsg(SuccessAddedResults)
 
@@ -290,10 +288,9 @@ class SaveCrawlResultControllerTest extends ActorTestSuite {
             skippedIds: Seq[String],
             parsingFailedTaskIds: Seq[String],
             bannedIds: Seq[String],
-            newTasks: Map[String, Seq[String]]) =>
+            newTasks: Seq[Task]) =>
             successIds.size == 3 && successIds.containsSlice(Seq("1", "2", "3")) && failureIds == Seq("4") &&
-            newTasks.keySet == Set("test1", "test2") && newTasks("test1") == Seq("1", "2", "3") &&
-            newTasks("test2") == Seq("21", "22", "23")
+            newTasks.toSet == Set(Task("test1"), Task("test2"), Task("21"), Task("22"), Task("23"))
         })
         .returning(Future.successful(()))
 

@@ -2,6 +2,7 @@ package com.github.jaitl.crawler.worker.client
 
 import java.util.UUID
 
+import com.github.jaitl.crawler.master.client.task.Task
 import com.github.jaitl.crawler.master.client.task.TaskTypeWithBatchSize
 import com.github.jaitl.crawler.master.client.task.TasksBatch
 
@@ -17,6 +18,6 @@ trait QueueClient {
     skippedIds: Seq[String],
     parsingFailedTaskIds: Seq[String],
     bannedIds: Seq[String],
-    newTasks: Map[String, Seq[String]]
+    newTasks: Seq[Task]
   ): Future[Unit]
 }

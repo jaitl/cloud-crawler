@@ -12,7 +12,7 @@ class HabrParserTest extends FunSuite with Matchers {
     val content = Source.fromResource("html/1k_post.html").mkString
     val parser = new HabrParser
 
-    val res = parser.parse(CrawlTask("1", "1000", "HabrTasks"), CrawlResult("1", content)).parsedData
+    val res = parser.parse(CrawlTask("1", "1000", "HabrTasks", "1", null, null), CrawlResult("1", content)).parsedData
 
     res.author shouldBe "Maxime"
     res.title shouldBe "Wikiasaria — комедия ошибок"
