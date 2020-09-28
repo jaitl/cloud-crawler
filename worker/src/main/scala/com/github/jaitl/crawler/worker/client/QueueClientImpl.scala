@@ -9,7 +9,7 @@ import com.github.jaitl.crawler.master.client.queue.ReturnRequest
 import com.github.jaitl.crawler.master.client.queue.TaskQueueServiceGrpc
 import com.github.jaitl.crawler.master.client.queue.TaskReply
 import com.github.jaitl.crawler.master.client.queue.TaskRequest
-import com.github.jaitl.crawler.master.client.task.NewTasks
+import com.github.jaitl.crawler.master.client.task.Task
 import com.github.jaitl.crawler.master.client.task.TaskTypeWithBatchSize
 import com.github.jaitl.crawler.master.client.task.TasksBatch
 
@@ -51,7 +51,7 @@ class QueueClientImpl(
     skippedIds: Seq[String],
     parsingFailedTaskIds: Seq[String],
     bannedIds: Seq[String],
-    newTasks: Map[String, Seq[String]]): Future[Unit] =
+    newTasks: Seq[Task]): Future[Unit] =
     taskQueueClient
       .putProcessResult(
         ProcessResultRequest(
@@ -61,7 +61,7 @@ class QueueClientImpl(
           skippedIds = skippedIds,
           parsingFailedTaskIds = parsingFailedTaskIds,
           bannedIds = bannedIds,
-          newTasks = newTasks.map { case (t, s) => t -> NewTasks(s) }
+          newTasks = newTasks
         ))
       .map { reply =>
         reply.status match {

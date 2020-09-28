@@ -40,7 +40,7 @@ private class TorResourceController(
   var failCount: Int = 0
 
   override def preStart(): Unit =
-    if (config.password.nonEmpty) {
+    if (false) {
       val s = new Socket(config.host, config.controlPort)
       val torCtrl = new TorControlConnection(s)
       torCtrl.launchThread(true)

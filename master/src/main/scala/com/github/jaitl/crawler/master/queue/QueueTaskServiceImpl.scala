@@ -7,9 +7,7 @@ import com.github.jaitl.crawler.master.client.queue.ReturnRequest
 import com.github.jaitl.crawler.master.client.queue.TaskQueueServiceGrpc
 import com.github.jaitl.crawler.master.client.queue.TaskReply
 import com.github.jaitl.crawler.master.client.queue.TaskRequest
-import com.github.jaitl.crawler.master.client.task.Task
-import com.github.jaitl.crawler.master.client.task.TaskTypeWithBatchSize
-import com.github.jaitl.crawler.master.client.task.TasksBatch
+import com.github.jaitl.crawler.master.client.task.{NewTasks, Task, TaskTypeWithBatchSize, TasksBatch}
 import com.github.jaitl.crawler.master.queue.provider.QueueTaskProvider
 import com.github.jaitl.crawler.master.queue.provider.TaskStatus
 import com.typesafe.scalalogging.StrictLogging
@@ -83,7 +81,7 @@ class QueueTaskServiceImpl(
       _ <- markAsFailed(request.requestId, request.failureIds)
       _ <- markAsSkipped(request.requestId, request.skippedIds)
       _ <- markAsParsingFailed(request.requestId, request.failureIds)
-      _ <- addNewTasks(request.requestId, request.newTasks.map { case (t, s) => t -> s.tasks })
+      _ <- addNewTasks(request.requestId, request.newTasks)
     } yield ProcessResultReply(ProcessResultReply.Status.OK)
 
   private def markAsProcessed(requestId: String, ids: Seq[String]): Future[Unit] =
@@ -158,7 +156,7 @@ class QueueTaskServiceImpl(
           logger.error(s"Fail to mark as parsingFailed, ids: [${ids.mkString(",")}], requestId: $requestId", ex)
       }
     }
-  private def addNewTasks(requestId: String, taskData: Map[String, Seq[String]]): Future[Unit] =
+  private def addNewTasks(requestId: String, taskData: Seq[Task]): Future[Unit] =
     if (taskData.isEmpty) {
       Future.successful(())
     } else {
