@@ -134,14 +134,7 @@ class SaveCrawlResultController[T](
       val parsingFailedTaskIds = parsingFailedTask.map(_.task.id).toSeq
       val newCrawlTasks = successTasks.flatMap(
         _.parseResult.map(_.newCrawlTasks).getOrElse(Seq.empty)
-      )
-      val newTasks = newCrawlTasks
-        .groupBy(_.taskType)
-        .map {
-          case (taskType, vals) =>
-            val newTasks = vals.flatMap(_.tasks).distinct.toSeq
-            (taskType, newTasks)
-        }
+      ).toList
 
       val requestId = UUID.randomUUID()
 
@@ -153,7 +146,7 @@ class SaveCrawlResultController[T](
           skippedIds = skippedIds,
           parsingFailedTaskIds = parsingFailedTaskIds,
           bannedIds = bannedIds,
-          newTasks = newTasks
+          newTasks = newCrawlTasks
         )
         .onComplete {
           case Success(_) => logger.debug(s"Crawl result sent to master, requestId: $requestId")

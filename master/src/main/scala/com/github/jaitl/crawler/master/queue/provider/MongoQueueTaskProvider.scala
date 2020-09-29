@@ -42,7 +42,8 @@ class MongoQueueTaskProvider(
             taskData = entity.taskData,
             attempt = entity.attempt,
             lastUpdateMillis = entity.lastUpdate,
-            skipped = false
+            skipped = false,
+            projectId = entity.projectId
         ))
       .toFuture()
 
@@ -72,26 +73,22 @@ class MongoQueueTaskProvider(
 
     res
       .map(
-        _.map(entity =>
-          Task(
-            id = entity._id.toString,
-            taskType = entity.taskType,
-            taskData = entity.taskData,
-            attempt = entity.attempt,
-            lastUpdateMillis = entity.lastUpdate
-        )))
+        _.map(
+          entity =>
+            Task(
+              id = entity._id.toString,
+              taskType = entity.taskType,
+              taskData = entity.taskData,
+              attempt = entity.attempt,
+              lastUpdateMillis = entity.lastUpdate,
+              projectId = entity.projectId
+          )))
       .toFuture()
       .map(_.flatten)
   }
 
-  override def pushTasks(taskData: Map[String, Seq[String]]): Future[Unit] = {
-    val newTasks = taskData.flatMap {
-      case (taskType, dataSeq) =>
-        dataSeq.map(data => MongoQueueTaskEntity(new ObjectId(), taskType, data, TaskStatus.taskWait, 0, None))
-    }.toSeq
-
-    collection.insertMany(newTasks).toFuture().map(_ => ())
-  }
+  override def pushTasks(taskData: Seq[Task]): Future[Unit] =
+    Future.successful()
 
   override def updateTasksStatus(ids: Seq[String], taskStatus: String): Future[Unit] = {
     val updates = ids.map { id =>
@@ -145,7 +142,8 @@ class MongoQueueTaskProvider(
             taskData = entity.taskData,
             attempt = entity.attempt,
             lastUpdateMillis = entity.lastUpdate,
-            skipped = false
+            skipped = false,
+            projectId = entity.projectId
         ))
       .toFuture()
   }
@@ -156,6 +154,7 @@ class MongoQueueTaskProvider(
     taskData: String,
     taskStatus: String,
     attempt: Int,
-    lastUpdate: Option[Long]
+    lastUpdate: Option[Long],
+    projectId: String
   )
 }

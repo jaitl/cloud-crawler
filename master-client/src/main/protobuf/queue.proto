@@ -53,7 +53,7 @@ message ProcessResultRequest {
     repeated string skippedIds = 4;
     repeated string parsingFailedTaskIds = 5;
     repeated string bannedIds = 6;
-    map<string, NewTasks> newTasks = 7;
+    repeated Task newTasks = 7;
 }
 
 message ProcessResultReply {
