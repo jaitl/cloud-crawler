@@ -61,15 +61,11 @@ class SqlQueueTaskProvider(
           .map(
             rs =>
               Task(
-                id = rs.get("id"),
-                taskData = rs.get("url"),
-                projectId = rs.get("project_id"),
-                nextProjectId = rs.get("next_project_id"),
-                baseDomain = rs.get("base_domain")
+                taskData = rs.get("url")
               ))
           .list()
           .apply().map(_.taskData)
-      taskData.filter(t => !tasks.contains(t.taskData)).foreach(t =>
+      taskData.filter(t => !tasks.contains(t.taskData)).distinct.foreach(t =>
         sql"insert into projects_url(`url`, `status`, `project_id`) values (${t.taskData}, ${TaskStatus.taskWait}, ${t.nextProjectId})"
           .update()
           .apply())
@@ -83,7 +79,7 @@ class SqlQueueTaskProvider(
 
   override def updateTasksStatusFromTo(time: Instant, fromStatus: String, toStatus: String): Future[Long] =
     Future.successful(DB.localTx { implicit session =>
-      sql"update projects_url set status = ${toStatus} where status = ${fromStatus}".update().apply()
+      sql"update projects_url set status = ${toStatus} where status = ${fromStatus} and updated_at <= ${time}".update().apply()
     })
 
   override def updateTasksStatusAndIncAttempt(ids: Seq[String], taskStatus: String): Future[Unit] =
