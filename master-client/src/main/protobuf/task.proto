@@ -11,6 +11,9 @@ message Task {
     int32 attempt = 4;
     google.protobuf.Int64Value lastUpdateMillis = 5;
     bool skipped = 6;
+    string projectId = 7;
+    string nextProjectId = 8;
+    string baseDomain = 9;
 }
 
 message TasksBatch {
@@ -25,5 +28,5 @@ message TaskTypeWithBatchSize {
 }
 
 message NewTasks {
-    repeated string tasks = 1;
+    repeated Task tasks = 1;
 }

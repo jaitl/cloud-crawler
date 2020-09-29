@@ -11,7 +11,7 @@ trait QueueTaskProvider {
 
   def pullAndUpdateStatus(taskType: String, size: Int, taskStatus: String): Future[Seq[Task]]
 
-  def pushTasks(taskData: Map[String, Seq[String]]): Future[Unit]
+  def pushTasks(taskData: Seq[Task]): Future[Unit]
 
   def updateTasksStatus(ids: Seq[String], taskStatus: String): Future[Unit]
 
