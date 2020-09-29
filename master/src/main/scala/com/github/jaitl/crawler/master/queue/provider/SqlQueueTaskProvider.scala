@@ -55,7 +55,21 @@ class SqlQueueTaskProvider(
 
   override def pushTasks(taskData: Seq[Task]): Future[Unit] =
     Future.successful(DB.localTx { implicit session =>
-      taskData.foreach(t =>
+      val urls = taskData.map(_.taskData)
+      val tasks =
+        sql"select pu.url from projects_url pu where pu.url in (${urls})"
+          .map(
+            rs =>
+              Task(
+                id = rs.get("id"),
+                taskData = rs.get("url"),
+                projectId = rs.get("project_id"),
+                nextProjectId = rs.get("next_project_id"),
+                baseDomain = rs.get("base_domain")
+              ))
+          .list()
+          .apply().map(_.taskData)
+      taskData.filter(t => !tasks.contains(t.taskData)).foreach(t =>
         sql"insert into projects_url(`url`, `status`, `project_id`) values (${t.taskData}, ${TaskStatus.taskWait}, ${t.nextProjectId})"
           .update()
           .apply())
