@@ -71,7 +71,7 @@ class SqlQueueTaskProvider(
           .apply())
     })
     Future.successful(DB.localTx { implicit session =>
-      sql"DELETE pu1 FROM projects_url pu1 INNER JOIN projects_url pu2 WHERE pu1.id < pu2.id AND pu1.url = pu2.url AND pu1.state = ${TaskStatus.taskWait}"
+      sql"DELETE pu1 FROM projects_url pu1 INNER JOIN projects_url pu2 WHERE pu1.id < pu2.id AND pu1.url = pu2.url AND pu1.status = ${TaskStatus.taskWait}"
         .update()
         .apply()
     })
