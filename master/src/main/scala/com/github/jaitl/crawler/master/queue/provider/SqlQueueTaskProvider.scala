@@ -102,7 +102,7 @@ class SqlQueueTaskProvider(
   override def getByIds(ids: Seq[String]): Future[Seq[Task]] =
     Future.successful(DB.localTx { implicit session =>
       val tasksIds = ids.map(Integer.parseInt)
-      sql"select pu.id, pu.url, pu.project_id, p.next_project_id, p.base_domain from projects_url pu, projects p where id in (${tasksIds}) and pu.project_id = p.id"
+      sql"select pu.id, pu.url, pu.project_id, p.next_project_id, p.base_domain from projects_url pu, projects p where pu.id in (${tasksIds}) and pu.project_id = p.id"
         .map(
           rs =>
             Task(
