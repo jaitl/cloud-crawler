@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/github/release/Jaitl/cloud-crawler.svg?label=Version)](https://github.com/Jaitl/cloud-crawler/releases)
 [![Coverage Status](https://coveralls.io/repos/github/Jaitl/cloud-crawler/badge.svg?branch=master)](https://coveralls.io/github/Jaitl/cloud-crawler?branch=master)
 # cloudCrawler
-A framework for building a distributed, highload system for crawling open data.
+Framework for creating a fast distributed crawler system to gather open data.
 
 ## Run
 1. Run master node:
